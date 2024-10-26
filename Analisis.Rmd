@@ -1,0 +1,126 @@
+---
+title: "Población Activa"
+author: "Pablo Catret"
+date: "2024-10-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(scales)
+```
+
+## Cargado de datos:
+
+```{r}
+url <- "https://www.ine.es/jaxiT3/files/t/es/csv_bdsc/65123.csv?nocab=1"
+
+datos <- read.csv(url, sep=";", dec=",")
+
+
+datos$Total <- as.numeric(gsub(",", ".", gsub("\\.", "", datos$Total)))
+
+sacarFechas <- function(x) {
+  año <- as.numeric(substr(x, 1, 4))
+  trimestre <- substr(x, 6, 6)
+  mes <- switch(trimestre, "1" = "03", "2" = "06", "3" = "09", "4" = "12")
+  paste(año, mes, "01", sep = "-")
+}
+
+datos$Fecha <- as.Date(sapply(datos$Periodo, sacarFechas), format = "%Y-%m-%d")
+
+datos_porc <- datos[datos$Unidad=="Porcentaje",]
+datos_porc <- datos_porc[, !names(datos_porc) %in% "Unidad"]
+
+datos_abs <- datos[datos$Unidad=="Valor absoluto",]
+datos_abs <- datos_abs[, !names(datos_abs) %in% "Unidad"]
+datos_abs$Total <- datos_abs$Total *1000
+datos_abs <- datos_abs[order(datos_abs$Fecha), ]
+
+datos_abs$Diferencia_Total <- NA
+
+for (sexo in unique(datos_abs$Sexo)) {
+  for (rama in unique(datos_abs$Rama.de.actividad.CNAE.2009)) {
+    subset <- datos_abs[datos_abs$Sexo == sexo & 
+                        datos_abs$Rama.de.actividad.CNAE.2009 == rama, ]
+    
+    datos_abs$Diferencia_Total[datos_abs$Sexo == sexo & 
+                                datos_abs$Rama.de.actividad.CNAE.2009 == rama] <- 
+      c(NA, diff(subset$Total))
+  }
+}
+
+```
+
+
+## Representación de datos
+
+```{r}
+
+library(ggplot2)
+library(scales)
+
+fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
+inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
+
+ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.2009 == "Total", ], 
+       aes(x = Fecha, y = Total, color = Sexo, group = Sexo)) +
+  
+  geom_line() + 
+  geom_point() +
+  
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_text(aes(x = fin_crisis, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  
+  scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
+  
+  expand_limits(y = 0) +
+  
+  theme_minimal() +
+  
+  labs(title = "Evolución del empleo en España",
+       x = "Fecha",
+       y = "Total")
+
+```
+
+```{r}
+ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.2009 == "Total", ], 
+       aes(x = Fecha, y = Diferencia_Total, color = Sexo, group = Sexo)) +
+  
+  geom_line() + 
+  geom_point() +
+  
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", size = 0.5) +
+  
+  geom_text(aes(x = fin_crisis, y = -750000,
+                label = "Fin de la crisis\n (2013)"), 
+            color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = -750000,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  
+  scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
+  
+  theme_minimal() +
+  
+  labs(title = "Evolución del empleo en España (Diferencia respecto al periodo anterior)",
+       x = "Fecha",
+       y = "Diferencia en Total")
+```
+
