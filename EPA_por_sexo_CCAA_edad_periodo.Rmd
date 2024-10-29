@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library("readr")
 library("dplyr")
 library("tidyr")
+library("ggplot2")
 ```
 
 ```{r}
@@ -125,5 +126,45 @@ datos <- datos %>%
   mutate(`Tasa de Ocupación` = (datos$Ocupados/datos$`Población en edad de trabajar`)*100) %>%
   mutate(`Tasa de Empleo` = (datos$Ocupados/datos$Activos)*100) %>%
   mutate(`Tasa de Desempleo` = (datos$Parados/datos$Activos)*100)
+```
+
+```{r}
+# Filtrar los datos para Andalucía y edad de 16 a 19 años
+data_filtered <- datos %>%
+  filter(Sexo == "Hombres" &
+         `Comunidades y Ciudades Autónomas` %in% c("Andalucía", "País Vasco") &
+         Edad == "De 25 a 34 años")
+
+# Crear el gráfico
+ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = `Comunidades y Ciudades Autónomas`)) +
+  geom_line() +
+  labs(title = "Evolución de la Tasa de Ocupación en Andalucía (25-34 años)",
+       x = "Periodo",
+       y = "Tasa de Actividad") +
+  theme_minimal()
+```
+
+```{r}
+# Filtrar los datos para Andalucía y edad de 16 a 19 años
+data_filtered <- datos %>%
+  filter(Sexo %in% c("Hombres", "Mujeres"),
+         `Comunidades y Ciudades Autónomas` == "Andalucía" &
+         Edad == "De 16 a 19 años")
+
+# Calcular la diferencia de Tasa de Actividad entre Hombres y Mujeres
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Actividad`[Sexo == "Hombres"] - `Tasa de Actividad`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+# Crear el gráfico
+ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Actividad`)) +
+  geom_line(aes(colour = Sexo)) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia))
+  labs(title = "Evolución de la Tasa de Actividad en Andalucía (16-19 años)",
+       x = "Periodo",
+       y = "Tasa de Actividad") +
+  theme_minimal()
+
 ```
 
