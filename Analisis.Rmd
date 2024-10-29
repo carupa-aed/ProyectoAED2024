@@ -10,11 +10,22 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library(ggplot2)
-library(scales)
-library(readr)
+library("ggplot2")
+library("scales")
+library("gganimate")
+library("transformr")
+
+if(!require(dplyr)) install.packages("dplyr")
+if(!require(tidyr)) install.packages("tidyr")
+if(!require(stats)) install.packages("stats")
+if(!require(ggplot2)) install.packages("ggplot2")
+
 library(dplyr)
 library(tidyr)
+library(stats)
+library(ggplot2)
+library(plotly)
+library(treemapify)
 ```
 
 ## Cargado de datos:
@@ -63,10 +74,25 @@ for (sexo in unique(datos_abs$Sexo)) {
 ## Representación de datos
 
 ```{r}
+datos_filtrados <- na.omit(datos_porc[datos_porc$Sexo == "Ambos sexos" &
+                                       datos_porc$Periodo == "2024T3" &
+                                       datos_porc$Rama.de.actividad.CNAE.2009 != "Total" &
+                                       grepl("^[0-9]", datos_porc$Rama.de.actividad.CNAE.2009), ])
 
-library(ggplot2)
-library(scales)
+datos_filtrados$Rama.abreviada <- substring(datos_filtrados$Rama.de.actividad.CNAE.2009, 1, 30) # esto es para que quepan los texxtos, que son muy largos
+grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label = paste(datos_filtrados$Rama.abreviada, Total, sep = "\n"))) +
+  geom_treemap() +
+  geom_treemap_text(aes(label = ifelse(Total > 1, paste(datos_filtrados$Rama.abreviada, Total, sep = "\n"), "")), 
+                    colour = "white", 
+                    place = "centre", 
+                    size = 8) + 
+  labs(title = "Distribución de Total por Rama de Actividad") +
+  theme_minimal()
+print(grafico_treemap)
+```
 
+
+```{r}
 fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
 inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
 
@@ -127,102 +153,132 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
        y = "Diferencia en Total")
 ```
 
+## Datos normalizados
+```{r}
+library(dplyr)
 
+data_normalized <- datos_abs[datos_abs$Sexo=="Ambos sexos",] %>%
+  group_by(Rama.de.actividad.CNAE.2009) %>%
+  arrange(Fecha) %>%  # Ordena por fecha dentro de cada grupo
+  mutate(Primer_Total = first(Total),  # Obtiene el primer valor de Total
+         Total_Normalizado = Total / Primer_Total) %>%  # Normaliza dividiendo por el primer valor
+  ungroup()  # Desagrupa al final
+
+```
+
+## 
 
 ```{r}
-rm(list = ls())
+data_wide <- data_normalized %>%
+  select(Rama.de.actividad.CNAE.2009, Fecha, Total_Normalizado) %>%  # Seleccionar las columnas necesarias
+  pivot_wider(names_from = Fecha, values_from = Total_Normalizado, values_fill = 0)
+data_wide <- na.omit(data_wide)
 
-# Población total
-Poblacion <- read_delim("data/Poblacion Total.csv", 
-    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
-    locale = locale(decimal_mark = ",", grouping_mark = "."), 
-    trim_ws = TRUE)
+diferencias <- data_wide %>%
+  select(-Rama.de.actividad.CNAE.2009) %>%  # Excluir la columna de Rama
+  as.matrix() 
 
-# Activos
-Activos <- read_delim("data/Activos.csv", 
-    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
-    locale = locale(decimal_mark = ",", grouping_mark = "."), 
-    trim_ws = TRUE)
+distancias_matriz <- dist(diferencias, method = "euclidean")
 
-# Inactivos
-Inactivos <- read_delim("data/Inactivos.csv", 
-    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
-    locale = locale(decimal_mark = ",", grouping_mark = "."), 
-    trim_ws = TRUE)
+distancias_matriz <- as.matrix(distancias_matriz)
 
-# Ocupados
-Ocupados <- read_delim("data/Ocupados.csv", 
-    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
-    locale = locale(decimal_mark = ",", grouping_mark = "."), 
-    trim_ws = TRUE)
+rownames(distancias_matriz) <- data_wide$Rama.de.actividad.CNAE.2009
+colnames(distancias_matriz) <- data_wide$Rama.de.actividad.CNAE.2009
 
-# Parados
-Parados <- read_delim("data/Parados.csv", 
-    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
-    locale = locale(decimal_mark = ",", grouping_mark = "."), 
-    trim_ws = TRUE)
+mds_result <- cmdscale(distancias_matriz, k = 2)
+
+mds_data <- as.data.frame(mds_result)
+
+nombres_actividades <- colnames(distancias_matriz)
+
+mds_data$Rama <- nombres_actividades
+
+grafica_mds <- ggplot(mds_data, aes(x = V1, y = V2, label = Rama)) +
+  geom_point(color = "blue") +
+  labs(title = "Proyección MDS de actividades por medias de diferencias entre datos normalizados",
+       x = "Dimensión 1", y = "Dimensión 2") +
+  theme_minimal()
+grafica_interactiva <- ggplotly(grafica_mds)
+
+grafica_interactiva
+```
+
+Observamos los outliers:
+```{r}
+ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="99 Actividades de organizaciones y organismos extraterritoriales",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
+ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="07 Extracción de minerales metálicos",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
+ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="Total",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
+```
+## Clusterización y proyección
+
+```{r}
+set.seed(123)
+num_clusters <- 5
+clusters <- kmeans(diferencias, centers = num_clusters)
+
+mds_data$Cluster <- as.factor(clusters$cluster)
+grafica_mds <- ggplot(mds_data, aes(x = V1, y = V2, color = Cluster, label = Rama)) +
+  geom_point(size = 2, alpha=0.8) +
+  labs(title = "Proyección MDS de actividades por medias de diferencias entre datos normalizados",
+       x = "Dimensión 1", y = "Dimensión 2") +
+  theme_minimal()
+
+grafica_interactiva <- ggplotly(grafica_mds)
+
+grafica_interactiva
 ```
 
 ```{r}
-Poblacion <- Poblacion %>%
-  rename(`Población Total` = `Total`) %>%
-  filter(Edad != "Menores de 16") %>%
-  select(-contains("Total Nacional")) %>%
-  mutate(`Comunidades y Ciudades Autónomas` = replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
+medias_por_cluster <- data_wide %>%
+  group_by(Cluster = mds_data$Cluster) %>%
+  summarise(across(everything(), mean, na.rm = TRUE)) %>% 
+  pivot_longer(-c(Cluster,Rama.de.actividad.CNAE.2009), names_to = "Fecha", values_to = "Media")
 
-Activos <- Activos %>%
-  rename(`Activos` = `Total`)
+grafico_lineas <- ggplot(medias_por_cluster, aes(x = Fecha, y = 100*Media, color = Cluster, group = Cluster)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(title = "Media de Total Normalizado por Cluster a lo Largo del Tiempo",
+       x = "Fecha", y = "Media de Total Normalizado") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-Inactivos <- Inactivos %>%
-  rename(`Inactivos` = `Total`)
-
-Ocupados <- Ocupados %>%
-  rename(`Ocupados` = `Total`)
-  
-Parados <- Parados %>%
-  rename(`Parados` = `Total`)
+print(grafico_lineas)
 ```
 
 ```{r}
-Poblacion <- Poblacion %>%
-  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
-  group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
-  summarise(`Población Total` = sum(`Población Total`, na.rm = TRUE), .groups = 'drop')
+data_wide$Cluster <- as.factor(mds_data$Cluster)
 
-Inactivos <- Inactivos %>%
-  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
-  group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
-  summarise(`Inactivos` = sum(`Inactivos`, na.rm = TRUE), .groups = 'drop')
+data_long <- data_wide %>%
+  pivot_longer(-c(Rama.de.actividad.CNAE.2009, Cluster), names_to = "Fecha", values_to = "Total_Normalizado")
+
+cuantiles_por_cluster <- data_long %>%
+  group_by(Cluster, Fecha) %>%
+  summarise(
+    Cuantil_25 = quantile(Total_Normalizado, 0.25, na.rm = TRUE),
+    Cuantil_50 = quantile(Total_Normalizado, 0.50, na.rm = TRUE),
+    Cuantil_75 = quantile(Total_Normalizado, 0.75, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  pivot_longer(-c(Cluster, Fecha), names_to = "Cuantil", values_to = "Valor")
+
+grafico_cuantiles <- ggplot(cuantiles_por_cluster, aes(x = Fecha, y = Valor, color = Cluster, group = interaction(Cluster, Cuantil))) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  facet_wrap(~ Cuantil, nrow = 3, scales = "free_y") + 
+  labs(title = "Cuantiles de Total Normalizado por Cluster a lo Largo del Tiempo",
+       x = "Fecha", y = "Valor") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+print(grafico_cuantiles)
 ```
 
 ```{r}
-Poblacion <- Poblacion %>%
-  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
-  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+lista_ramas_por_cluster <- data_wide %>%
+  group_by(Cluster) %>%
+  summarise(Ramas = list(unique(Rama.de.actividad.CNAE.2009)), .groups = 'drop')
 
-Activos <- Activos %>%
-  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
-  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_cluster$Cluster))
+print(lista_ramas)
 
-Inactivos <- Inactivos %>%
-  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
-  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
-
-Ocupados <- Ocupados %>%
-  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
-  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
-
-Parados <- Parados %>%
-  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
-  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
-```
-
-```{r}
-datos <- Poblacion %>%
-  mutate(Activos = Activos$Activos) %>%
-  mutate(Inactivos = Inactivos$Inactivos) %>%
-  mutate(Ocupados = Ocupados$Ocupados) %>%
-  mutate(Parados = Parados$Parados) %>%
-  mutate(Periodo = as.Date(paste0(gsub("T(\\d)", "-\\1", Periodo), "-01"), "%Y-%m-%d")) %>%
-  mutate(`Comunidades y Ciudades Autónomas` = gsub("^\\d{2} ", "", `Comunidades y Ciudades Autónomas`))
 ```
