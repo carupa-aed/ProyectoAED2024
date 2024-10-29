@@ -50,8 +50,8 @@ Parados <- read_delim("data/Parados.csv",
 ```
 
 ```{r}
-Poblacion <- Poblacion %>%
-  rename(`Población Total` = `Total`) %>%
+Poblacion_edad_trabajar <- Poblacion %>%
+  rename(`Población en edad de trabajar` = `Total`) %>%
   filter(Edad != "Menores de 16") %>%
   select(-contains("Total Nacional")) %>%
   mutate(`Comunidades y Ciudades Autónomas` = replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
@@ -70,10 +70,10 @@ Parados <- Parados %>%
 ```
 
 ```{r}
-Poblacion <- Poblacion %>%
+Poblacion_edad_trabajar <- Poblacion_edad_trabajar %>%
   mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
   group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
-  summarise(`Población Total` = sum(`Población Total`, na.rm = TRUE), .groups = 'drop')
+  summarise(`Población en edad de trabajar` = sum(`Población en edad de trabajar`, na.rm = TRUE), .groups = 'drop')
 
 Inactivos <- Inactivos %>%
   mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
@@ -82,7 +82,7 @@ Inactivos <- Inactivos %>%
 ```
 
 ```{r}
-Poblacion <- Poblacion %>%
+Poblacion_edad_trabajar <- Poblacion_edad_trabajar %>%
   mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
   arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
 
@@ -104,11 +104,26 @@ Parados <- Parados %>%
 ```
 
 ```{r}
-datos <- Poblacion %>%
+# Almacenamos todos los datasets en uno
+datos <- Poblacion_edad_trabajar %>%
   mutate(Activos = Activos$Activos) %>%
   mutate(Inactivos = Inactivos$Inactivos) %>%
   mutate(Ocupados = Ocupados$Ocupados) %>%
   mutate(Parados = Parados$Parados) %>%
   mutate(Periodo = as.Date(paste0(gsub("T(\\d)", "-\\1", Periodo), "-01"), "%Y-%m-%d")) %>%
   mutate(`Comunidades y Ciudades Autónomas` = gsub("^\\d{2} ", "", `Comunidades y Ciudades Autónomas`))
+
+# Borramos los datasets innecesarios
+rm(list = setdiff(ls(), "datos"))
 ```
+
+# Creación de tasas
+```{r}
+datos <- datos %>%
+  mutate(`Tasa de Actividad` = (datos$Activos/datos$`Población en edad de trabajar`)*100) %>%
+  mutate(`Tasa de Inactividad` = (datos$Inactivos/datos$`Población en edad de trabajar`)*100) %>%
+  mutate(`Tasa de Ocupación` = (datos$Ocupados/datos$`Población en edad de trabajar`)*100) %>%
+  mutate(`Tasa de Empleo` = (datos$Ocupados/datos$Activos)*100) %>%
+  mutate(`Tasa de Desempleo` = (datos$Parados/datos$Activos)*100)
+```
+
