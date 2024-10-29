@@ -25,6 +25,8 @@ library(tidyr)
 library(stats)
 library(ggplot2)
 library(plotly)
+library(treemapify)
+
 ```
 
 ## Cargado de datos:
@@ -71,6 +73,25 @@ for (sexo in unique(datos_abs$Sexo)) {
 
 
 ## Representación de datos
+
+```{r}
+datos_filtrados <- na.omit(datos_porc[datos_porc$Sexo == "Ambos sexos" &
+                                       datos_porc$Periodo == "2024T3" &
+                                       datos_porc$Rama.de.actividad.CNAE.2009 != "Total" &
+                                       grepl("^[0-9]", datos_porc$Rama.de.actividad.CNAE.2009), ])
+
+datos_filtrados$Rama.abreviada <- substring(datos_filtrados$Rama.de.actividad.CNAE.2009, 1, 30) # esto es para que quepan los texxtos, que son muy largos
+grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label = paste(datos_filtrados$Rama.abreviada, Total, sep = "\n"))) +
+  geom_treemap() +
+  geom_treemap_text(aes(label = ifelse(Total > 1, paste(datos_filtrados$Rama.abreviada, Total, sep = "\n"), "")), 
+                    colour = "white", 
+                    place = "centre", 
+                    size = 8) + 
+  labs(title = "Distribución de Total por Rama de Actividad") +
+  theme_minimal()
+print(grafico_treemap)
+```
+
 
 ```{r}
 fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
@@ -251,5 +272,15 @@ grafico_cuantiles <- ggplot(cuantiles_por_cluster, aes(x = Fecha, y = Valor, col
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 print(grafico_cuantiles)
+```
+
+```{r}
+lista_ramas_por_cluster <- data_wide %>%
+  group_by(Cluster) %>%
+  summarise(Ramas = list(unique(Rama.de.actividad.CNAE.2009)), .groups = 'drop')
+
+lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_cluster$Cluster))
+print(lista_ramas)
+
 ```
 
