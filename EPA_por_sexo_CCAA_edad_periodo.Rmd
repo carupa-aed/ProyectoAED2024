@@ -1,0 +1,114 @@
+---
+title: "EPA por sexo CCAA edad periodo"
+author: "Marcos"
+date: "2024-10-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("readr")
+library("dplyr")
+library("tidyr")
+```
+
+```{r}
+rm(list = ls())
+
+# Población total
+Poblacion <- read_delim("data/Poblacion Total.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+
+# Activos
+Activos <- read_delim("data/Activos.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+
+# Inactivos
+Inactivos <- read_delim("data/Inactivos.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+
+# Ocupados
+Ocupados <- read_delim("data/Ocupados.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+
+# Parados
+Parados <- read_delim("data/Parados.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+```
+
+```{r}
+Poblacion <- Poblacion %>%
+  rename(`Población Total` = `Total`) %>%
+  filter(Edad != "Menores de 16") %>%
+  select(-contains("Total Nacional")) %>%
+  mutate(`Comunidades y Ciudades Autónomas` = replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
+
+Activos <- Activos %>%
+  rename(`Activos` = `Total`)
+
+Inactivos <- Inactivos %>%
+  rename(`Inactivos` = `Total`)
+
+Ocupados <- Ocupados %>%
+  rename(`Ocupados` = `Total`)
+  
+Parados <- Parados %>%
+  rename(`Parados` = `Total`)
+```
+
+```{r}
+Poblacion <- Poblacion %>%
+  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
+  group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
+  summarise(`Población Total` = sum(`Población Total`, na.rm = TRUE), .groups = 'drop')
+
+Inactivos <- Inactivos %>%
+  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
+  group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
+  summarise(`Inactivos` = sum(`Inactivos`, na.rm = TRUE), .groups = 'drop')
+```
+
+```{r}
+Poblacion <- Poblacion %>%
+  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
+  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+
+Activos <- Activos %>%
+  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
+  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+
+Inactivos <- Inactivos %>%
+  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
+  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+
+Ocupados <- Ocupados %>%
+  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
+  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+
+Parados <- Parados %>%
+  mutate(Edad = ifelse(Edad == "55 y más años", "De 55 y más años", Edad)) %>%
+  arrange(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo)
+```
+
+```{r}
+datos <- Poblacion %>%
+  mutate(Activos = Activos$Activos) %>%
+  mutate(Inactivos = Inactivos$Inactivos) %>%
+  mutate(Ocupados = Ocupados$Ocupados) %>%
+  mutate(Parados = Parados$Parados) %>%
+  mutate(Periodo = as.Date(paste0(gsub("T(\\d)", "-\\1", Periodo), "-01"), "%Y-%m-%d")) %>%
+  mutate(`Comunidades y Ciudades Autónomas` = gsub("^\\d{2} ", "", `Comunidades y Ciudades Autónomas`))
+```
