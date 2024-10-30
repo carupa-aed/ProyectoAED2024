@@ -19,6 +19,7 @@ library("ggplot2")
 ```{r}
 rm(list = ls())
 
+# https://www.ine.es/jaxiT3/files/t/es/csv_bdsc/65285.csv?nocab=1
 # Población total
 Poblacion <- read_delim("data/Poblacion Total.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
@@ -111,8 +112,17 @@ datos <- Poblacion_edad_trabajar %>%
   mutate(Inactivos = Inactivos$Inactivos) %>%
   mutate(Ocupados = Ocupados$Ocupados) %>%
   mutate(Parados = Parados$Parados) %>%
-  mutate(Periodo = as.Date(paste0(gsub("T(\\d)", "-\\1", Periodo), "-01"), "%Y-%m-%d")) %>%
   mutate(`Comunidades y Ciudades Autónomas` = gsub("^\\d{2} ", "", `Comunidades y Ciudades Autónomas`))
+
+sacarFechas <- function(x) {
+  año <- as.numeric(substr(x, 1, 4))
+  trimestre <- substr(x, 6, 6)
+  mes <- switch(trimestre, "1" = "03", "2" = "06", "3" = "09", "4" = "12")
+  paste(año, mes, "01", sep = "-")
+}
+
+datos$Periodo <- as.Date(sapply(datos$Periodo, sacarFechas), format = "%Y-%m-%d")
+
 
 # Borramos los datasets innecesarios
 rm(list = setdiff(ls(), "datos"))
@@ -132,7 +142,7 @@ datos <- datos %>%
 # Filtrar los datos para Andalucía y edad de 16 a 19 años
 data_filtered <- datos %>%
   filter(Sexo == "Hombres" &
-         `Comunidades y Ciudades Autónomas` %in% c("Andalucía", "País Vasco") &
+         `Comunidades y Ciudades Autónomas` %in% c("Andalucía", "Navarra, Comunidad Foral de", "Comunitat Valenciana", "Melilla") &
          Edad == "De 25 a 34 años")
 
 # Crear el gráfico
@@ -140,7 +150,7 @@ ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = `Comun
   geom_line() +
   labs(title = "Evolución de la Tasa de Ocupación en Andalucía (25-34 años)",
        x = "Periodo",
-       y = "Tasa de Actividad") +
+       y = "Tasa de Ocupación") +
   theme_minimal()
 ```
 
