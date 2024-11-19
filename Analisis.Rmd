@@ -26,6 +26,7 @@ library(stats)
 library(ggplot2)
 library(plotly)
 library(treemapify)
+library(reshape2)
 ```
 
 ## Cargado de datos:
@@ -167,6 +168,39 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
   labs(title = "Evolución del empleo en España (Diferencia respecto al periodo anterior)",
        x = "Fecha",
        y = "Diferencia en Total")
+```
+
+## Estudio Correlaciones
+```{r}
+datos_ancho <- datos_abs %>%
+  
+  filter(Sexo== "Ambos sexos") %>%
+  mutate(Total = as.numeric(Total)) %>%
+  select( Fecha, Rama.de.actividad.CNAE.2009, Total) %>%
+  pivot_wider(names_from = Rama.de.actividad.CNAE.2009, values_from = Total, values_fill = list(Total = 0))
+
+
+matriz_valores <- datos_ancho %>%
+  select(-Fecha)
+
+matriz_correlacion <- cor(matriz_valores, use = "pairwise.complete.obs", method = "pearson")
+cor_melted <- melt(matriz_correlacion)
+
+ggplotly(ggplot(cor_melted, aes(Var1, Var2, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+  theme_minimal() +
+  labs(title = "Matriz de correlación entre ramas de actividad",
+       x = "Rama de actividad",
+       y = "Rama de actividad") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank()
+  ))
+
+
 ```
 
 ## Datos normalizados
