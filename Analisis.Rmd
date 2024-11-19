@@ -176,6 +176,7 @@ datos_ancho <- datos_abs %>%
   
   filter(Sexo== "Ambos sexos") %>%
   mutate(Total = as.numeric(Total)) %>%
+  filter(grepl("^[0-9]", Rama.de.actividad.CNAE.2009)) %>%  # Filtra solo aquellas que empiezan con una letra
   select( Fecha, Rama.de.actividad.CNAE.2009, Total) %>%
   pivot_wider(names_from = Rama.de.actividad.CNAE.2009, values_from = Total, values_fill = list(Total = 0))
 
@@ -202,6 +203,40 @@ ggplotly(ggplot(cor_melted, aes(Var1, Var2, fill = value)) +
 
 
 ```
+
+```{r}
+datos_ancho <- datos_abs %>%
+  filter(Sexo == "Ambos sexos") %>%
+  filter(grepl("^[A-Za-z]", Rama.de.actividad.CNAE.2009)) %>%  # Filtra solo aquellas que empiezan con una letra
+  mutate(Total = as.numeric(Total)) %>%
+  select(Fecha, Rama.de.actividad.CNAE.2009, Total) %>%
+  pivot_wider(names_from = Rama.de.actividad.CNAE.2009, values_from = Total, values_fill = list(Total = 0))
+
+# Preparamos la matriz de correlación
+matriz_valores <- datos_ancho %>%
+  select(-Fecha)
+
+matriz_correlacion <- cor(matriz_valores, use = "pairwise.complete.obs", method = "pearson")
+cor_melted <- melt(matriz_correlacion)
+
+# Graficamos la matriz de correlación
+ggplotly(
+  ggplot(cor_melted, aes(Var1, Var2, fill = value)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+    theme_minimal() +
+    labs(title = "Matriz de correlación entre ramas de actividad",
+         x = "Rama de actividad",
+         y = "Rama de actividad") +
+    theme(
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.ticks.y = element_blank()
+    )
+)
+```
+
 
 ## Datos normalizados
 ```{r}
@@ -260,6 +295,33 @@ ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="07 Extracción de miner
 ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="Total",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
 ```
 ## Clusterización y proyección
+
+```{r}
+# Establecer semilla
+set.seed(123)
+
+# Crear un rango de posibles valores para el número de clusters
+k_range <- 1:10
+
+# Calcular el WCSS (Within-Cluster Sum of Squares) para cada valor de k
+wcss <- sapply(k_range, function(k) {
+  kmeans(diferencias, centers = k, nstart = 25)$tot.withinss
+})
+
+# Crear el gráfico de codo
+library(ggplot2)
+elbow_plot <- ggplotly(ggplot(data.frame(K = k_range, WCSS = wcss), aes(x = K, y = WCSS)) +
+  geom_line() + 
+  geom_point() +
+  labs(title = "Gráfico de codo para determinar el número óptimo de clusters",
+       x = "Número de clusters (k)", y = "WCSS (Suma de cuadrados dentro de los clusters)") +
+  theme_minimal())
+
+# Mostrar el gráfico de codo
+print(elbow_plot)
+
+```
+A pesar que la gráfica del codo parece indicar ser mejor k=4, como se observa que el añadir el 5o lo que hace es crear un cluster propio a los outliers, optamos por coger k=5.
 
 ```{r}
 set.seed(123)
