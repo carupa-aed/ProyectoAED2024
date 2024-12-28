@@ -1,0 +1,37 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-12-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+total <- read.csv2('data/Poblacion Total.csv')
+```
+
+```{r}
+total_nacional <- total['Total.Nacional']
+```
+
+```{r}
+unique(total$Comunidades.y.Ciudades.Autónomas)
+```
+
+```{r}
+total$Comunidades.y.Ciudades.Autónomas[total$Comunidades.y.Ciudades.Autónomas == ""] <- "Total Nacional"
+total_limpio <- total[,!names(total) %in% c("Total.Nacional")]
+```
+
+```{r}
+head(total_limpio)
+```
+
+```{r}
+write.csv2(total_limpio, 'data/Poblacion Total.csv')
+```
+
