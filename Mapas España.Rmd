@@ -1,0 +1,147 @@
+---
+title: "Mapas España"
+author: "Miguel Palazón"
+date: "2024-12-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cargado de datos
+
+```{r}
+require(mapSpain)
+require(tidyverse)
+require(tidyr)
+```
+
+```{r}
+activos <- read.csv2('data/Activos.csv')
+inactivos <- read.csv2('data/Inactivos.csv')
+ocupados <- read.csv2('data/Ocupados.csv')
+parados <- read.csv2('data/Parados.csv')
+total <- read.csv2('data/Poblacion Total.csv')
+```
+
+## Ejemplos de mapas con Tidyverse
+
+```{r}
+galicia <- esp_get_munic_siane(region = "Galicia") %>%
+  # Homogeinizo labels
+  mutate(Provincia = esp_dict_translate(ine.prov.name, "es"))
+
+
+ggplot(galicia) +
+  geom_sf(aes(fill = Provincia), color = "grey70") +
+  labs(title = "Provincias de Galicia") +
+  scale_fill_discrete(type = hcl.colors(4, "Blues")) +
+  theme_bw()
+```
+
+```{r}
+esp_can <- esp_get_country()
+can_prov <- esp_get_can_provinces()
+can_box <- esp_get_can_box()
+
+ggplot(esp_can) +
+  geom_sf()
+```
+
+```{r}
+Provs <- esp_get_prov()
+Box <- esp_get_can_box()
+Line <- esp_get_can_provinces()
+
+ggplot(Provs) +
+  geom_sf() +
+  geom_sf(data = Box) +
+  geom_sf(data = Line) +
+  theme_linedraw()
+```
+
+```{r}
+CCAA <- esp_get_ccaa()
+Box <- esp_get_can_box()
+
+ggplot(CCAA) +
+  geom_sf() +
+  geom_sf(data = Box)
+```
+
+```{r}
+census <- mapSpain::pobmun19
+
+# Extract CCAA from base dataset
+
+codelist <- mapSpain::esp_codelist
+
+census <-
+  unique(merge(census, codelist[, c("cpro", "codauto")], all.x = TRUE))
+
+# Summarize by CCAA
+census_ccaa <-
+  aggregate(cbind(pob19, men, women) ~ codauto, data = census, sum)
+
+census_ccaa$porc_women <- census_ccaa$women / census_ccaa$pob19
+census_ccaa$porc_women_lab <-
+  paste0(round(100 * census_ccaa$porc_women, 2), "%")
+
+# Merge into spatial data
+
+CCAA_sf <- esp_get_ccaa()
+CCAA_sf <- merge(CCAA_sf, census_ccaa)
+Can <- esp_get_can_box()
+
+
+# Plot with ggplot
+library(ggplot2)
+
+
+ggplot(CCAA_sf) +
+  geom_sf(aes(fill = porc_women),
+    color = "grey70",
+    lwd = .3
+  ) +
+  geom_sf(data = Can, color = "grey70") +
+  geom_sf_label(aes(label = porc_women_lab),
+    fill = "white", alpha = 0.5,
+    size = 3,
+    label.size = 0
+  ) +
+  scale_fill_gradientn(
+    colors = hcl.colors(10, "Blues", rev = TRUE),
+    n.breaks = 10,
+    labels = function(x) {
+      sprintf("%1.1f%%", 100 * x)
+    },
+    guide = guide_legend(title = "Porc. women")
+  ) +
+  theme_void() +
+  theme(legend.position = c(0.1, 0.6))
+```
+
+## Número de parados actuales por CCAA
+
+```{r}
+# limpieza de datos
+parados_ccaa_actual <- parados[parados$Sexo == "Ambos sexos" & parados$Periodo == "2024T3" & parados$Edad == "Total" & parados$Comunidades.y.Ciudades.Autónomas != "Total Nacional", c("Comunidades.y.Ciudades.Autónomas", "Total")]
+
+parados_ccaa_actual <- parados_ccaa_actual %>%
+  separate(Comunidades.y.Ciudades.Autónomas, into = c("codauto", "ine.ccaa.name"), sep = " ", extra = "merge")
+```
+
+```{r}
+CCAA <- esp_get_ccaa()
+```
+
+```{r}
+CCAA <- esp_get_ccaa()
+Box <- esp_get_can_box() # Caja alrededor de Canarias
+
+ggplot(CCAA) +
+  geom_sf() +
+  geom_sf(data = Box)
+```
+
