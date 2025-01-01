@@ -2,7 +2,9 @@
 title: "Población Activa"
 author: "Pablo Catret"
 date: "2024-10-26"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -29,7 +31,26 @@ library(treemapify)
 library(reshape2)
 ```
 
-## Cargado de datos:
+
+## Introducción
+
+El estudio de los datos de ocupación por sexo y rama de actividad, estructurados según la Clasificación Nacional de Actividades Económicas (CNAE-2009), ofrece una visión fundamental de las dinámicas del mercado laboral. Este conjunto de datos, recopilado desde 2008 hasta la actualidad y disponible a través de la base de datos del Instituto Nacional de Estadística (INE), proporciona valores absolutos y porcentajes relativos al total de personas ocupadas dentro de cada sexo, segmentados por diversas ramas de actividad económica.
+
+El dataset recoge información clave sobre la distribución de la fuerza laboral según el género y la industria. Cada categoría dentro de la CNAE-2009 clasifica las actividades económicas de manera estandarizada, permitiendo identificar tendencias, patrones y desigualdades en el empleo. Además de las cifras absolutas de personas empleadas, los porcentajes relativos permiten analizar la representatividad de cada grupo dentro del total de hombres y mujeres ocupados, revelando tanto los sectores donde predomina cada género como los niveles de segregación o integración en el mercado laboral.
+
+Significado y utilidad de los datos
+La importancia de estos datos radica en su capacidad para ofrecer una radiografía detallada del mercado laboral, sirviendo como base para análisis económicos, sociológicos y de políticas públicas. Desde el punto de vista económico, estos datos facilitan la identificación de sectores estratégicos en términos de empleo y productividad, así como el impacto de las fluctuaciones económicas y políticas en la estructura del empleo.
+
+En el ámbito de los estudios de género, esta información resulta crucial para abordar las brechas de género en el empleo, la segmentación laboral y las diferencias en la participación laboral entre hombres y mujeres. Por ejemplo, los datos pueden usarse para analizar si ciertos sectores tradicionalmente dominados por un género están experimentando cambios hacia una mayor igualdad, o si persisten barreras estructurales que perpetúan estas desigualdades.
+
+Desde una perspectiva social y política, este análisis es un recurso esencial para diseñar políticas públicas orientadas a fomentar la equidad en el empleo y promover la diversificación sectorial. Además, estos datos son útiles para evaluar el cumplimiento de los Objetivos de Desarrollo Sostenible (ODS), especialmente aquellos relacionados con el trabajo decente, el crecimiento económico y la igualdad de género.
+
+Importancia en el contexto histórico y actual
+El análisis longitudinal de estos datos, abarcando desde 2008 hasta hoy, permite evaluar cómo ha evolucionado el mercado laboral en respuesta a acontecimientos clave, como la crisis financiera global de 2008, la pandemia de COVID-19 y los recientes esfuerzos por la transición hacia una economía verde y digital. Asimismo, al incluir información sobre la distribución por sexo, se pueden estudiar las implicaciones de estos eventos en términos de igualdad de género, ofreciendo una comprensión más amplia de cómo los cambios estructurales y coyunturales afectan de manera diferencial a hombres y mujeres.
+
+## Cargado de datos
+
+En primer lugar, se procede a cargar los datos directamente desde la base de datos abierta INE Base, mediante el uso de la funcion `read.csv`. Estos datos se presentan en un formato de csv, separado por el carácter `;`, y con el uso de marca de decimales española `,`.
 
 ```{r}
 url <- "https://www.ine.es/jaxiT3/files/t/es/csv_bdsc/65123.csv?nocab=1"
@@ -71,8 +92,25 @@ for (sexo in unique(datos_abs$Sexo)) {
 
 ```
 
+Como primer paso en cualquier trabajo de análisis de datos, es garantizar la calidad y consistencia del conjunto de datos. Es por eso que se estudia en profundidad el formato de los datos y se preparan para asegurar su utilidad en el análisis posterior. 
+
+Se detecta que los datos originales contenían un formato de fechas no estandarizado correspondiente al año y trimestre del año. Para resolver esto, se implementa una función personalizada `sacarfechas` que transforma las fechas en un formato estándar y continuo, como "2024-09-01". Concretamente, se opta por escoger el primer día del trimestre como representante. Esto permite un análisis temporal coherente, además de facilitar la integración de eventos históricos clave como el fin de la crisis de 2013 y el inicio de la pandemia de COVID-19 en 2020.
+
+Por otra parte, los datos se han segmentado en dos subconjuntos principales:
+
+Porcentajes (`datos_abs`): Representan la proporción de ocupación de cada rama de actividad con respecto al total del sexo correspondiente.
+Valores absolutos (`datos_porc`): Proporcionan el número total de empleados en cada rama.
+
+Esta separación permite un análisis dual: las tendencias globales (valores absolutos) y la estructura relativa de los sectores (porcentajes).
+
+En el conjunto de datos absolutos, se pasan las cifras a números de personas, pues de forma original, los datos se presentaban en miles de personas. Además, se añadió una columna que calcula la variación entre un periodo y el siguiente. Esto permite identificar momentos de cambio significativo en el mercado laboral, detectando tendencias positivas o negativas a lo largo del tiempo. Esto también permite ver de manera rápida la estacionalidad de la ocupación, sobreetodo en ciertas ramas de actividad.
+
 
 ## Representación de datos
+
+Una vez preparados, los datos se visualizan a través de gráficos que permiten interpretar patrones, tendencias y distribuciones de manera más clara y directa.
+
+En primer lugar se analiza la distribución de peso de las ramas de actividad en el total de la población empleada. Además, se busca comparar la evolución y el cambio sufrido por la estructura laboral española desde el primer trimestre de 2008 y el tercer trimestre de 2024. Para ello se generan treemaps para los periodos inicial (2008T1) y final (2024T3) del análisis. Estos gráficos muestran cómo se distribuye el empleo entre las diferentes ramas económicas según su peso relativo.
 
 ```{r}
 datos_filtrados <- na.omit(datos_porc[datos_porc$Sexo == "Ambos sexos" &
@@ -107,7 +145,9 @@ grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label
   theme_minimal()
 print(grafico_treemap)
 ```
+Se observa cómo algunas ramas han ganado o perdido relevancia en términos de empleo total a lo largo del tiempo. Por ejemplo, sectores relacionados con la eduación y la administración pública han aumentado su proporción, mientras que ramas relacionadas con la construcción y la industria han experimentado una marcada disminución.
 
+Además de realizar un análisi comparativo de como se distribuye por ramas de actividad la población trabajadora, se realiza un análisis visual de la evolución del empleo en españa de manera absoluta agrupando por sexo, en conjunto con un análisis de la evolución de la diferencia trimestral en el empleo. Para ello se han empleado gráficos de lineas. Estos gráficos incluyen referencias visuales a eventos históricos relevantes, como el fin de la crisis económica de 2013 y el inicio de la pandemia en 2020.
 
 ```{r}
 fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
@@ -119,15 +159,15 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
   geom_line() + 
   geom_point() +
   
-  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", size = 0.5) +
-  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
   geom_text(aes(x = fin_crisis, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
                 label = "Fin de la crisis\n (2013)"), 
-                color = "grey30", size = 3, fontface = "italic",
+                color = "grey30", linewidth = 3, fontface = "italic",
             hjust = -0.04, vjust = 0) +
   geom_text(aes(x = inicio_covid, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
                 label = "Inicio COVID\n (2020)" 
-                ), color = "grey30", size = 3,fontface = "italic",
+                ), color = "grey30", linewidth = 3,fontface = "italic",
             hjust = -0.04, vjust = 0) +
   
   scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
@@ -169,8 +209,12 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
        x = "Fecha",
        y = "Diferencia en Total")
 ```
+Se destaca cómo el empleo masculino y femenino responden de manera diferente a los shocks económicos. Por ejemplo, los hombres experimentaron caídas más pronunciadas durante la crisis de 2008, mientras que las mujeres mostraron una recuperación más gradual. Además, se puede apreciar que la diferencia entre sexos, se redujo en grán medida durante la crisis de 2008, desde la cual la población masculina ha sido incapaz de recuperar las cifras precrisis, mientras que las mujeres han superado marcadamente las cifras.
 
 ## Estudio Correlaciones
+
+A continuación, se realiza un estudio de las correlaciones lineales de pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Es por ello que se realizan dos gráficas separadas que muestran la matriz de correlaciones entre ramas.
+
 ```{r}
 datos_ancho <- datos_abs %>%
   
@@ -237,8 +281,12 @@ ggplotly(
 )
 ```
 
+Se observa que la mayoría de las ramas parecen estar correlacionadas positivamente, salvo aquellos puestos relacionados con el personal doméstico e industrias extractivas con una correlación negativa con la mayoría de las ramas, así como aquellas relacionadas con la agricultura, ganadería, construcción, actividades financieras entre otras que no presentan una marcada correlación con el resto.
 
 ## Datos normalizados
+
+En este punto, se busca estudiar las tendencias relativas, eliminando la influencia de las diferencias inciales entre ramas. Para ello se normalizan los datos dividiendo por el número inicial de trabajadores en cada rama.
+
 ```{r}
 library(dplyr)
 
@@ -251,7 +299,7 @@ data_normalized <- datos_abs[datos_abs$Sexo=="Ambos sexos",] %>%
 
 ```
 
-## 
+A continuación se obtiene una métrica de distancia entre dichos datos normalizados, obteniéndose como la media de las diferencis absolutas de las cantidades normalizadas. A partir de estas distancias, se se proyectan en dos dimensiones utilizando MDS, lo que permite visualizar las relaciones entre ramas en función de sus patrones de empleo a lo largo del tiempo. 
 
 ```{r}
 data_wide <- data_normalized %>%
@@ -288,13 +336,19 @@ grafica_interactiva <- ggplotly(grafica_mds)
 grafica_interactiva
 ```
 
-Observamos los outliers:
+Se forman agrupaciones naturales de ramas con patrones similares. Además, se observan claramente algunos outliers, que puede ser de gran interés analizarlos individualmente.
+
 ```{r}
 ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="99 Actividades de organizaciones y organismos extraterritoriales",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
 ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="07 Extracción de minerales metálicos",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
 ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="Total",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
 ```
+
+Ramas como "Extracción de minerales metálicos" y "Actividades de organismos extraterritoriales" se destacan por su comportamiento atípico. Estas ramas tienen una dinámica de empleo inusual debido a su naturaleza específica, tamaño reducido o dependencia de factores externos como la demanda global. Observamos claramente que son datos con mucho ruido y un gran incremento en los últimos años, y por lo tanto es normal que nos apreceisen como outliers.
+
 ## Clusterización y proyección
+
+Tras observar la 
 
 ```{r}
 # Establecer semilla
