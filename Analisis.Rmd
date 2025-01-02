@@ -348,7 +348,7 @@ Ramas como "Extracción de minerales metálicos" y "Actividades de organismos ex
 
 ## Clusterización y proyección
 
-Tras observar la 
+Tras observar la proyección tratamos de semntar los datos en agrupaciones naturales, es por ello que tratamos de hacer un clustering que nos permita agruapar cuantitativamente aquellas ramas de actividad que han tenido un comportamiento similar entre ellas (con los datos normalizados). Para ello se opta en primer lugar por el algoitm más típico en clustering, y se analizaa sus resultados para ver si son satisfactorios. Además, como método para la selección del hiperparámetro `k`, se opta por le método del codo. Sin embargo, este resultado se analizar´para saber si es satisfactorio o si deberiamos coger otro método, o alterar ligeramente el número de clusters obtenidos.
 
 ```{r}
 # Establecer semilla
@@ -375,7 +375,8 @@ elbow_plot <- ggplotly(ggplot(data.frame(K = k_range, WCSS = wcss), aes(x = K, y
 print(elbow_plot)
 
 ```
-A pesar que la gráfica del codo parece indicar ser mejor k=4, como se observa que el añadir el 5o lo que hace es crear un cluster propio a los outliers, optamos por coger k=5.
+
+A pesar que la gráfica del codo parece indicar ser mejor `k=4`, como se observa que el añadir el quinto lo que hace es crear un cluster propio a los outliers, optamos por coger `k=5`, pues esto puede ser beneficioso para eliminar el ruido de estos, sin la necesidad de eliminarlos de por sí.
 
 ```{r}
 set.seed(123)
@@ -393,6 +394,8 @@ grafica_interactiva <- ggplotly(grafica_mds)
 
 grafica_interactiva
 ```
+
+Los resultados con k-means parecen positivos, por lo que por simplicidad del modelo, nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y se trata de averiguar si cada cluster tiene una interpretación clara natural.
 
 ```{r}
 medias_por_cluster <- data_wide %>%
@@ -448,3 +451,5 @@ lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_c
 print(lista_ramas)
 
 ```
+
+Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento durante los últimos 16 años, cosa a esperar proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clusteres con la evolución negativa, en los cuales ha habdo un decrecimiento o estancamiento de los trabajadores. Por otra parte hay un cluster de ramas con resultados positivos, de menor número. 
