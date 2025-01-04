@@ -11,7 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include=FALSE}
 library("ggplot2")
 library("scales")
 library("gganimate")
@@ -38,14 +38,12 @@ El estudio de los datos de ocupación por sexo y rama de actividad, estructurado
 
 El dataset recoge información clave sobre la distribución de la fuerza laboral según el género y la industria. Cada categoría dentro de la CNAE-2009 clasifica las actividades económicas de manera estandarizada, permitiendo identificar tendencias, patrones y desigualdades en el empleo. Además de las cifras absolutas de personas empleadas, los porcentajes relativos permiten analizar la representatividad de cada grupo dentro del total de hombres y mujeres ocupados, revelando tanto los sectores donde predomina cada género como los niveles de segregación o integración en el mercado laboral.
 
-Significado y utilidad de los datos
 La importancia de estos datos radica en su capacidad para ofrecer una radiografía detallada del mercado laboral, sirviendo como base para análisis económicos, sociológicos y de políticas públicas. Desde el punto de vista económico, estos datos facilitan la identificación de sectores estratégicos en términos de empleo y productividad, así como el impacto de las fluctuaciones económicas y políticas en la estructura del empleo.
 
 En el ámbito de los estudios de género, esta información resulta crucial para abordar las brechas de género en el empleo, la segmentación laboral y las diferencias en la participación laboral entre hombres y mujeres. Por ejemplo, los datos pueden usarse para analizar si ciertos sectores tradicionalmente dominados por un género están experimentando cambios hacia una mayor igualdad, o si persisten barreras estructurales que perpetúan estas desigualdades.
 
 Desde una perspectiva social y política, este análisis es un recurso esencial para diseñar políticas públicas orientadas a fomentar la equidad en el empleo y promover la diversificación sectorial. Además, estos datos son útiles para evaluar el cumplimiento de los Objetivos de Desarrollo Sostenible (ODS), especialmente aquellos relacionados con el trabajo decente, el crecimiento económico y la igualdad de género.
 
-Importancia en el contexto histórico y actual
 El análisis longitudinal de estos datos, abarcando desde 2008 hasta hoy, permite evaluar cómo ha evolucionado el mercado laboral en respuesta a acontecimientos clave, como la crisis financiera global de 2008, la pandemia de COVID-19 y los recientes esfuerzos por la transición hacia una economía verde y digital. Asimismo, al incluir información sobre la distribución por sexo, se pueden estudiar las implicaciones de estos eventos en términos de igualdad de género, ofreciendo una comprensión más amplia de cómo los cambios estructurales y coyunturales afectan de manera diferencial a hombres y mujeres.
 
 ## Cargado de datos
@@ -125,8 +123,7 @@ grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label
                     colour = "white", 
                     place = "centre", 
                     size = 8) + 
-  labs(title = "Distribución de Total por Rama de Actividad") +
-  theme_minimal()
+  labs(title = "Distribución de Total por Rama de Actividad") 
 print(grafico_treemap)
 
 datos_filtrados <- na.omit(datos_porc[datos_porc$Sexo == "Ambos sexos" &
@@ -141,8 +138,7 @@ grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label
                     colour = "white", 
                     place = "centre", 
                     size = 8) + 
-  labs(title = "Distribución de Total por Rama de Actividad") +
-  theme_minimal()
+  labs(title = "Distribución de Total por Rama de Actividad") 
 print(grafico_treemap)
 ```
 Se observa cómo algunas ramas han ganado o perdido relevancia en términos de empleo total a lo largo del tiempo. Por ejemplo, sectores relacionados con la eduación y la administración pública han aumentado su proporción, mientras que ramas relacionadas con la construcción y la industria han experimentado una marcada disminución.
@@ -159,23 +155,22 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
   geom_line() + 
   geom_point() +
   
-  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
-  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", size = 0.5) +
   geom_text(aes(x = fin_crisis, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
                 label = "Fin de la crisis\n (2013)"), 
-                color = "grey30", linewidth = 3, fontface = "italic",
+                color = "grey30", size = 3, fontface = "italic",
             hjust = -0.04, vjust = 0) +
   geom_text(aes(x = inicio_covid, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
                 label = "Inicio COVID\n (2020)" 
-                ), color = "grey30", linewidth = 3,fontface = "italic",
+                ), color = "grey30", size = 3,fontface = "italic",
             hjust = -0.04, vjust = 0) +
   
   scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
   
   expand_limits(y = 0) +
   
-  theme_minimal() +
-  
+
   labs(title = "Evolución del empleo en España",
        x = "Fecha",
        y = "Total")
@@ -203,8 +198,7 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
   
   scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
   
-  theme_minimal() +
-  
+
   labs(title = "Evolución del empleo en España (Diferencia respecto al periodo anterior)",
        x = "Fecha",
        y = "Diferencia en Total")
@@ -329,8 +323,7 @@ mds_data$Rama <- nombres_actividades
 grafica_mds <- ggplot(mds_data, aes(x = V1, y = V2, label = Rama)) +
   geom_point(color = "blue") +
   labs(title = "Proyección MDS de actividades por medias de diferencias entre datos normalizados",
-       x = "Dimensión 1", y = "Dimensión 2") +
-  theme_minimal()
+       x = "Dimensión 1", y = "Dimensión 2")
 grafica_interactiva <- ggplotly(grafica_mds)
 
 grafica_interactiva
@@ -368,8 +361,7 @@ elbow_plot <- ggplotly(ggplot(data.frame(K = k_range, WCSS = wcss), aes(x = K, y
   geom_line() + 
   geom_point() +
   labs(title = "Gráfico de codo para determinar el número óptimo de clusters",
-       x = "Número de clusters (k)", y = "WCSS (Suma de cuadrados dentro de los clusters)") +
-  theme_minimal())
+       x = "Número de clusters (k)", y = "WCSS (Suma de cuadrados dentro de los clusters)"))
 
 # Mostrar el gráfico de codo
 print(elbow_plot)
@@ -387,8 +379,7 @@ mds_data$Cluster <- as.factor(clusters$cluster)
 grafica_mds <- ggplot(mds_data, aes(x = V1, y = V2, color = Cluster, label = Rama)) +
   geom_point(size = 2, alpha=0.8) +
   labs(title = "Proyección MDS de actividades por medias de diferencias entre datos normalizados",
-       x = "Dimensión 1", y = "Dimensión 2") +
-  theme_minimal()
+       x = "Dimensión 1", y = "Dimensión 2")
 
 grafica_interactiva <- ggplotly(grafica_mds)
 
@@ -408,7 +399,6 @@ grafico_lineas <- ggplot(medias_por_cluster, aes(x = Fecha, y = 100*Media, color
   geom_point(size = 2) +
   labs(title = "Media de Total Normalizado por Cluster a lo Largo del Tiempo",
        x = "Fecha", y = "Media de Total Normalizado") +
-  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 print(grafico_lineas)
@@ -436,7 +426,6 @@ grafico_cuantiles <- ggplot(cuantiles_por_cluster, aes(x = Fecha, y = Valor, col
   facet_wrap(~ Cuantil, nrow = 3, scales = "free_y") + 
   labs(title = "Cuantiles de Total Normalizado por Cluster a lo Largo del Tiempo",
        x = "Fecha", y = "Valor") +
-  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
 
 print(grafico_cuantiles)
@@ -452,4 +441,4 @@ print(lista_ramas)
 
 ```
 
-Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento durante los últimos 16 años, cosa a esperar proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clusteres con la evolución negativa, en los cuales ha habdo un decrecimiento o estancamiento de los trabajadores. Por otra parte hay un cluster de ramas con resultados positivos, de menor número. 
+Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento durante los últimos 16 años, cosa a esperar proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clusteres con la evolución negativa, en los cuales ha habido un decrecimiento (cluster 5) o estancamiento (cluster 4) de los trabajadores. Por otra parte el cluster 3 parece presentar ramas con ligeros resultados positivos, y el cluster 1 con marcados resuldos postivios, aunque con menor número de ramas que los anteriores. Por último, el cluster 2 se trata del cluster de outliers. 
