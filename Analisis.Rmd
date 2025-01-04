@@ -27,8 +27,8 @@ library(tidyr)
 library(stats)
 library(ggplot2)
 library(plotly)
-library(treemapify)
-library(reshape2)
+if(!require(treemapify)) install.packages("treemapify")
+if(!require(reshape2)) install.packages("reshape2")
 ```
 
 
@@ -123,7 +123,7 @@ grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label
                     colour = "white", 
                     place = "centre", 
                     size = 8) + 
-  labs(title = "Distribución de Total por Rama de Actividad") 
+  labs(title = "Distribución de Total por Rama de Actividad (2024T3)") 
 print(grafico_treemap)
 
 datos_filtrados <- na.omit(datos_porc[datos_porc$Sexo == "Ambos sexos" &
@@ -138,7 +138,7 @@ grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label
                     colour = "white", 
                     place = "centre", 
                     size = 8) + 
-  labs(title = "Distribución de Total por Rama de Actividad") 
+  labs(title = "Distribución de Total por Rama de Actividad (2008T1)") 
 print(grafico_treemap)
 ```
 Se observa cómo algunas ramas han ganado o perdido relevancia en términos de empleo total a lo largo del tiempo. Por ejemplo, sectores relacionados con la eduación y la administración pública han aumentado su proporción, mientras que ramas relacionadas con la construcción y la industria han experimentado una marcada disminución.
