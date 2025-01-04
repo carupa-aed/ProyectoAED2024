@@ -275,7 +275,8 @@ Se observa que la mayoría de las ramas parecen estar correlacionadas positivame
 En este punto, se busca estudiar las tendencias relativas, eliminando la influencia de las diferencias inciales entre ramas. Para ello se normalizan los datos dividiendo por el número inicial de trabajadores en cada rama.
 
 ```{r}
-data_normalized <- datos_abs[datos_abs$Sexo=="Ambos sexos",] %>%
+ramas_individuales <- datos_abs[!grepl("^[A-Za-z]", datos_abs$Rama.de.actividad.CNAE.2009), ]
+data_normalized <- ramas_individuales[ramas_individuales$Sexo=="Ambos sexos",] %>%
   group_by(Rama.de.actividad.CNAE.2009) %>%
   arrange(Fecha) %>%  # Ordena por fecha dentro de cada grupo
   mutate(Primer_Total = first(Total),  # Obtiene el primer valor de Total
@@ -323,9 +324,8 @@ grafica_interactiva
 Se forman agrupaciones naturales de ramas con patrones similares. Además, se observan claramente algunos outliers, que puede ser de gran interés analizarlos individualmente.
 
 ```{r}
-ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="99 Actividades de organizaciones y organismos extraterritoriales",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
-ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="07 Extracción de minerales metálicos",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
-ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="Total",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
+ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="99 Actividades de organizaciones y organismos extraterritoriales",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()+labs(title="Evolución del empleo en 'Actividades de orgs. y organismos extraterrit.'")
+ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="07 Extracción de minerales metálicos",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()+labs(title="Evolución del empleo en 'Extracción de minerales metálicos'")
 ```
 
 Ramas como "Extracción de minerales metálicos" y "Actividades de organismos extraterritoriales" se destacan por su comportamiento atípico. Estas ramas tienen una dinámica de empleo inusual debido a su naturaleza específica, tamaño reducido o dependencia de factores externos como la demanda global. Observamos claramente que son datos con mucho ruido y un gran incremento en los últimos años, y por lo tanto es normal que nos apareciesen como outliers.
