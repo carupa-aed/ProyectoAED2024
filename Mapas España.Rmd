@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 require(mapSpain)
 require(tidyverse)
 require(tidyr)
+require(ggplot2)
 ```
 
 ```{r}
@@ -95,10 +96,6 @@ CCAA_sf <- merge(CCAA_sf, census_ccaa)
 Can <- esp_get_can_box()
 
 
-# Plot with ggplot
-library(ggplot2)
-
-
 ggplot(CCAA_sf) +
   geom_sf(aes(fill = porc_women),
     color = "grey70",
@@ -130,18 +127,32 @@ parados_ccaa_actual <- parados[parados$Sexo == "Ambos sexos" & parados$Periodo =
 
 parados_ccaa_actual <- parados_ccaa_actual %>%
   separate(Comunidades.y.Ciudades.Autónomas, into = c("codauto", "ine.ccaa.name"), sep = " ", extra = "merge")
+
+coma_to_num <- function(x) as.numeric(sub(",", ".", x))
+parados_ccaa_actual <- parados_ccaa_actual %>% mutate_at("Total", coma_to_num)
 ```
 
 ```{r}
 CCAA <- esp_get_ccaa()
-```
-
-```{r}
-CCAA <- esp_get_ccaa()
+CCAA <- merge(CCAA, parados_ccaa_actual)
 Box <- esp_get_can_box() # Caja alrededor de Canarias
 
 ggplot(CCAA) +
-  geom_sf() +
-  geom_sf(data = Box)
+  geom_sf(aes(fill = Total),
+    color = "grey70",
+    lwd = .3
+  ) +
+  geom_sf(data = Can, color = "grey70") +
+  geom_sf_label(aes(label = Total),
+    fill = "white", alpha = 0.5,
+    size = 3,
+    label.size = 0
+  ) +
+  scale_fill_gradientn(
+    colors = hcl.colors(10, "Blues", rev = TRUE),
+    n.breaks = 10,
+    guide = guide_legend(title = "Total")
+  ) +
+  theme_void() +
+  theme(legend.position = c(0.1, 0.6))
 ```
-
