@@ -12,23 +12,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, include=FALSE}
-library("ggplot2")
-library("scales")
-library("gganimate")
-library("transformr")
-
 if(!require(dplyr)) install.packages("dplyr")
 if(!require(tidyr)) install.packages("tidyr")
 if(!require(stats)) install.packages("stats")
 if(!require(ggplot2)) install.packages("ggplot2")
-
-library(dplyr)
-library(tidyr)
-library(stats)
-library(ggplot2)
-library(plotly)
+if(!require(plotly)) install.packages("plotly")
 if(!require(treemapify)) install.packages("treemapify")
 if(!require(reshape2)) install.packages("reshape2")
+if(!require(scales)) install.packages("scales")
+if(!require(transformr)) install.packages("transformr")
+if(!require(gganimate)) install.packages("gganimate")
 ```
 
 
@@ -141,9 +134,9 @@ grafico_treemap <- ggplot(datos_filtrados, aes(area = Total, fill = Total, label
   labs(title = "Distribución de Total por Rama de Actividad (2008T1)") 
 print(grafico_treemap)
 ```
-Se observa cómo algunas ramas han ganado o perdido relevancia en términos de empleo total a lo largo del tiempo. Por ejemplo, sectores relacionados con la eduación y la administración pública han aumentado su proporción, mientras que ramas relacionadas con la construcción y la industria han experimentado una marcada disminución.
+Se observa cómo algunas ramas han ganado o perdido relevancia en términos de empleo total a lo largo del tiempo. Por ejemplo, sectores relacionados con la educación y la administración pública han aumentado su proporción, mientras que ramas relacionadas con la construcción y la industria han experimentado una marcada disminución.
 
-Además de realizar un análisi comparativo de como se distribuye por ramas de actividad la población trabajadora, se realiza un análisis visual de la evolución del empleo en españa de manera absoluta agrupando por sexo, en conjunto con un análisis de la evolución de la diferencia trimestral en el empleo. Para ello se han empleado gráficos de lineas. Estos gráficos incluyen referencias visuales a eventos históricos relevantes, como el fin de la crisis económica de 2013 y el inicio de la pandemia en 2020.
+Además de realizar un análisis comparativo de cómo se distribuye por ramas de actividad la población trabajadora, se realiza un análisis visual de la evolución del empleo en España de manera absoluta agrupando por sexo, en conjunto con un análisis de la evolución de la diferencia trimestral en el empleo. Para ello se han empleado gráficos de lineas. Estos gráficos incluyen referencias visuales a eventos históricos relevantes, como el fin de la crisis económica de 2013 y el inicio de la pandemia en 2020.
 
 ```{r}
 fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
@@ -155,8 +148,8 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
   geom_line() + 
   geom_point() +
   
-  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", size = 0.5) +
-  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
   geom_text(aes(x = fin_crisis, y = max(datos_abs$Total, na.rm = TRUE) * 0.6,
                 label = "Fin de la crisis\n (2013)"), 
                 color = "grey30", size = 3, fontface = "italic",
@@ -184,8 +177,8 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
   geom_line() + 
   geom_point() +
   
-  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", size = 0.5) +
-  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", size = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
   
   geom_text(aes(x = fin_crisis, y = -750000,
                 label = "Fin de la crisis\n (2013)"), 
@@ -203,11 +196,11 @@ ggplot(datos_abs[datos_abs$Sexo != "Total" & datos_abs$Rama.de.actividad.CNAE.20
        x = "Fecha",
        y = "Diferencia en Total")
 ```
-Se destaca cómo el empleo masculino y femenino responden de manera diferente a los shocks económicos. Por ejemplo, los hombres experimentaron caídas más pronunciadas durante la crisis de 2008, mientras que las mujeres mostraron una recuperación más gradual. Además, se puede apreciar que la diferencia entre sexos, se redujo en grán medida durante la crisis de 2008, desde la cual la población masculina ha sido incapaz de recuperar las cifras precrisis, mientras que las mujeres han superado marcadamente las cifras.
+Se destaca cómo el empleo masculino y femenino responden de manera diferente a los shocks económicos. Por ejemplo, los hombres experimentaron caídas más pronunciadas durante la crisis de 2008, mientras que las mujeres mostraron una recuperación más gradual. Además, se puede apreciar que la diferencia entre sexos se redujo en grán medida durante la crisis de 2008, desde la cual la población masculina ha sido incapaz de recuperar las cifras precrisis, mientras que las mujeres han superado marcadamente dichos valores.
 
 ## Estudio Correlaciones
 
-A continuación, se realiza un estudio de las correlaciones lineales de pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Es por ello que se realizan dos gráficas separadas que muestran la matriz de correlaciones entre ramas.
+A continuación, se realiza un estudio de las correlaciones lineales de Pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Es por ello que se realizan dos gráficas separadas que muestran la matriz de correlaciones entre ramas.
 
 ```{r}
 datos_ancho <- datos_abs %>%
@@ -282,8 +275,6 @@ Se observa que la mayoría de las ramas parecen estar correlacionadas positivame
 En este punto, se busca estudiar las tendencias relativas, eliminando la influencia de las diferencias inciales entre ramas. Para ello se normalizan los datos dividiendo por el número inicial de trabajadores en cada rama.
 
 ```{r}
-library(dplyr)
-
 data_normalized <- datos_abs[datos_abs$Sexo=="Ambos sexos",] %>%
   group_by(Rama.de.actividad.CNAE.2009) %>%
   arrange(Fecha) %>%  # Ordena por fecha dentro de cada grupo
@@ -293,7 +284,7 @@ data_normalized <- datos_abs[datos_abs$Sexo=="Ambos sexos",] %>%
 
 ```
 
-A continuación se obtiene una métrica de distancia entre dichos datos normalizados, obteniéndose como la media de las diferencis absolutas de las cantidades normalizadas. A partir de estas distancias, se se proyectan en dos dimensiones utilizando MDS, lo que permite visualizar las relaciones entre ramas en función de sus patrones de empleo a lo largo del tiempo. 
+A continuación se obtiene una métrica de distancia entre dichos datos normalizados, obteniéndose como la media de las diferencias absolutas de las cantidades normalizadas. A partir de estas distancias, se proyectan en dos dimensiones utilizando MDS, lo que permite visualizar las relaciones entre ramas en función de sus patrones de empleo a lo largo del tiempo. 
 
 ```{r}
 data_wide <- data_normalized %>%
@@ -337,11 +328,11 @@ ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="07 Extracción de miner
 ggplot(datos_abs[datos_abs$Rama.de.actividad.CNAE.2009=="Total",], aes(x=Fecha,y=Total, color=Sexo))+geom_line()
 ```
 
-Ramas como "Extracción de minerales metálicos" y "Actividades de organismos extraterritoriales" se destacan por su comportamiento atípico. Estas ramas tienen una dinámica de empleo inusual debido a su naturaleza específica, tamaño reducido o dependencia de factores externos como la demanda global. Observamos claramente que son datos con mucho ruido y un gran incremento en los últimos años, y por lo tanto es normal que nos apreceisen como outliers.
+Ramas como "Extracción de minerales metálicos" y "Actividades de organismos extraterritoriales" se destacan por su comportamiento atípico. Estas ramas tienen una dinámica de empleo inusual debido a su naturaleza específica, tamaño reducido o dependencia de factores externos como la demanda global. Observamos claramente que son datos con mucho ruido y un gran incremento en los últimos años, y por lo tanto es normal que nos apareciesen como outliers.
 
 ## Clusterización y proyección
 
-Tras observar la proyección tratamos de semntar los datos en agrupaciones naturales, es por ello que tratamos de hacer un clustering que nos permita agruapar cuantitativamente aquellas ramas de actividad que han tenido un comportamiento similar entre ellas (con los datos normalizados). Para ello se opta en primer lugar por el algoitm más típico en clustering, y se analizaa sus resultados para ver si son satisfactorios. Además, como método para la selección del hiperparámetro `k`, se opta por le método del codo. Sin embargo, este resultado se analizar´para saber si es satisfactorio o si deberiamos coger otro método, o alterar ligeramente el número de clusters obtenidos.
+Tras observar la proyección tratamos de segmentar los datos en agrupaciones naturales, es por ello que tratamos de hacer un clustering que nos permita agrupar cuantitativamente aquellas ramas de actividad que han tenido un comportamiento similar entre ellas (con los datos normalizados). Para ello se opta en primer lugar por el algoritmo más típico en clustering (k-means), y se analiza sus resultados para ver si son satisfactorios. Además, como método para la selección del hiperparámetro `k`, se opta por el método del codo. Sin embargo, este resultado se analizará para saber si es adecuado, si sería necesario alterar ligeramente el número de clusters obtenidos o si directamente deberíamos escoger otro método.
 
 ```{r}
 # Establecer semilla
@@ -368,7 +359,7 @@ print(elbow_plot)
 
 ```
 
-A pesar que la gráfica del codo parece indicar ser mejor `k=4`, como se observa que el añadir el quinto lo que hace es crear un cluster propio a los outliers, optamos por coger `k=5`, pues esto puede ser beneficioso para eliminar el ruido de estos, sin la necesidad de eliminarlos de por sí.
+A pesar que la gráfica del codo parece indicar que el mejor es `k=4`, como se observa que al añadir el quinto lo que hace es crear un cluster propio para los outliers, optamos por coger `k=5`, pues esto puede ser beneficioso para eliminar el ruido de estos sin la necesidad de eliminarlos de por si.
 
 ```{r}
 set.seed(123)
@@ -386,7 +377,7 @@ grafica_interactiva <- ggplotly(grafica_mds)
 grafica_interactiva
 ```
 
-Los resultados con k-means parecen positivos, por lo que por simplicidad del modelo, nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y se trata de averiguar si cada cluster tiene una interpretación clara natural.
+Los resultados con k-means parecen positivos, por lo que por simplicidad del modelo nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y trataremos de averiguar si tienen una interpretación natural clara.
 
 ```{r}
 medias_por_cluster <- data_wide %>%
@@ -438,7 +429,6 @@ lista_ramas_por_cluster <- data_wide %>%
 
 lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_cluster$Cluster))
 print(lista_ramas)
-
 ```
 
-Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento durante los últimos 16 años, cosa a esperar proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clusteres con la evolución negativa, en los cuales ha habido un decrecimiento (cluster 5) o estancamiento (cluster 4) de los trabajadores. Por otra parte el cluster 3 parece presentar ramas con ligeros resultados positivos, y el cluster 1 con marcados resuldos postivios, aunque con menor número de ramas que los anteriores. Por último, el cluster 2 se trata del cluster de outliers. 
+Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento durante los últimos 16 años, cosa a esperar proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa, en los cuales ha habido un decrecimiento (cluster 5) o estancamiento (cluster 4) de los trabajadores. Por otra parte el cluster 3 parece presentar ramas con ligeros resultados positivos, y el cluster 1 con marcados resultados positivos, aunque con menor número de ramas que los anteriores. Por último, el cluster 2 se trata del cluster de outliers. 
