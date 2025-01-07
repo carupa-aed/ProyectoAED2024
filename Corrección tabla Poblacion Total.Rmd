@@ -32,6 +32,6 @@ head(total_limpio)
 ```
 
 ```{r}
-write.csv2(total_limpio, 'data/Poblacion Total.csv')
+write.csv2(total_limpio, 'data/Poblacion Total.csv', row.names=FALSE)
 ```
 
