@@ -24,7 +24,7 @@ rm(list = ls())
 
 # https://www.ine.es/jaxiT3/files/t/es/csv_bdsc/65285.csv?nocab=1
 # Población total
-Poblacion <- read_delim("data/65285.csv", 
+Poblacion <- read_delim("data/Poblacion Total.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
     locale = locale(decimal_mark = ",", grouping_mark = "."), 
     trim_ws = TRUE)
@@ -151,11 +151,6 @@ mapa_comunidades <- st_read(geojson_path)
 
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(sf)
-library(patchwork)
-
 # Lista de tasas para iterar
 tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
 
@@ -213,9 +208,6 @@ crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades) {
   # Crear el mapa
   mapa_clustering <- ggplot(mapa) +
     geom_sf(aes(fill = Cluster)) +
-    labs(
-      caption = "Fuente: GeoJSON + Dataset EPA"
-    ) +
     theme_minimal() +
     theme(legend.position = "none")
   
@@ -235,11 +227,6 @@ for (tasa in tasas) {
 ```
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(sf)
-library(patchwork)
-
 # Lista de tasas para iterar
 tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
 
@@ -297,9 +284,6 @@ crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades) {
   # Crear el mapa
   mapa_clustering <- ggplot(mapa) +
     geom_sf(aes(fill = Cluster)) +
-    labs(
-      caption = "Fuente: GeoJSON + Dataset EPA"
-    ) +
     theme_minimal() +
     theme(legend.position = "none")
   
@@ -319,11 +303,6 @@ for (tasa in tasas) {
 ```
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-library(sf)
-library(patchwork)
-
 # Lista de tasas para iterar
 tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
 
@@ -381,9 +360,6 @@ crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades) {
   # Crear el mapa
   mapa_clustering <- ggplot(mapa) +
     geom_sf(aes(fill = Cluster)) +
-    labs(
-      caption = "Fuente: GeoJSON + Dataset EPA"
-    ) +
     theme_minimal() +
     theme(legend.position = "none")
   
