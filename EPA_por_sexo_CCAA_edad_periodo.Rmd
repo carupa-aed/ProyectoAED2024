@@ -10,10 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-library("readr")
-library("dplyr")
-library("tidyr")
-library("ggplot2")
+if(!require(dplyr)) install.packages("dplyr")
+if(!require(tidyr)) install.packages("tidyr")
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(plotly)) install.packages("plotly")
+if(!require(readr)) install.packages("readr")
+if(!require(sf)) install.packages("sf")
+if(!require(patchwork)) install.packages("patchwork")
 ```
 
 ```{r}
@@ -112,7 +115,9 @@ datos <- Poblacion_edad_trabajar %>%
   mutate(Inactivos = Inactivos$Inactivos) %>%
   mutate(Ocupados = Ocupados$Ocupados) %>%
   mutate(Parados = Parados$Parados) %>%
-  mutate(`Comunidades y Ciudades Autónomas` = gsub("^\\d{2} ", "", `Comunidades y Ciudades Autónomas`))
+  filter(`Comunidades y Ciudades Autónomas` != "Total Nacional") %>%
+  separate(`Comunidades y Ciudades Autónomas`, into = c("Codigo", "Comunidades y Ciudades Autónomas"), sep = " ", extra = "merge")
+
 
 sacarFechas <- function(x) {
   año <- as.numeric(substr(x, 1, 4))
@@ -139,6 +144,257 @@ datos <- datos %>%
 ```
 
 ```{r}
+# Cargar el archivo GeoJSON (ajusta la ruta a tu archivo)
+geojson_path <- "./data/spain-communities.geojson"
+mapa_comunidades <- st_read(geojson_path)
+```
+
+
+```{r}
+# Lista de tasas para iterar
+tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
+
+# Función para calcular clustering y generar gráficos y mapas
+crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades) {
+  
+  # Calcular la media de la tasa seleccionada por comunidad
+  dataset_2007 <- datos %>%
+    filter(format(Periodo, "%Y") == "2007") %>%
+    group_by(Codigo, `Comunidades y Ciudades Autónomas`) %>%
+    summarise(TasaMedia = mean(.data[[tasa]], na.rm = TRUE), .groups = "drop")
+  
+  # Escalar la tasa
+  dataset_scaled <- scale(dataset_2007$TasaMedia)
+  
+  # Aplicar clustering
+  set.seed(123)
+  kmeans_result <- kmeans(dataset_scaled, centers = 3)
+  
+  # Añadir los clusters al dataset
+  dataset_2007$Cluster <- as.factor(kmeans_result$cluster)
+  
+  # Reordenar los clusters basándose en los valores de TasaMedia
+  cluster_ordenado <- dataset_2007 %>%
+    group_by(Cluster) %>%
+    summarise(TasaPromedio = mean(TasaMedia)) %>%
+    arrange(TasaPromedio) %>%
+    mutate(ClusterOrdenado = factor(Cluster, levels = Cluster[order(TasaPromedio)]))
+  
+  # Mapear los nuevos clusters ordenados al dataset original
+  dataset_2007 <- dataset_2007 %>%
+    left_join(cluster_ordenado, by = "Cluster") %>%
+    mutate(Cluster = ClusterOrdenado)
+  
+  # Crear gráfico de barras agrupadas por cluster
+  grafico_barras <- ggplot(dataset_2007, aes(x = reorder(`Comunidades y Ciudades Autónomas`, TasaMedia), 
+                                             y = TasaMedia, fill = Cluster)) +
+    geom_col() +
+     geom_text(aes(label = round(TasaMedia, 1)), # Añadir los valores
+              hjust = 1, # Ajustar la posición del texto fuera de la barra
+              size = 3) +  # Tamaño del texto
+    coord_flip() +
+    labs(
+      x = "Comunidades Autónomas",
+      y = paste(tasa, "(%)"),
+      fill = "Cluster"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Unir el dataset con el GeoJSON
+  mapa <- mapa_comunidades %>%
+    left_join(dataset_2007, by = c("cod_ccaa" = "Codigo"))
+  
+  # Crear el mapa
+  mapa_clustering <- ggplot(mapa) +
+    geom_sf(aes(fill = Cluster)) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Combinar ambos gráficos con patchwork
+  combinado <- grafico_barras + mapa_clustering + 
+    plot_layout(ncol = 2) + # Disposición en una sola columna
+    plot_annotation(title = paste("Análisis de Clustering y Mapa para", tasa, "(2007)"))
+  
+  # Mostrar el gráfico combinado
+  print(combinado)
+}
+
+# Iterar sobre todas las tasas y generar los gráficos y mapas
+for (tasa in tasas) {
+  crear_clustering_grafico_mapa(tasa, mapa_comunidades)
+}
+```
+
+```{r}
+# Lista de tasas para iterar
+tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
+
+# Función para calcular clustering y generar gráficos y mapas
+crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades) {
+  
+  # Calcular la media de la tasa seleccionada por comunidad
+  dataset_2013 <- datos %>%
+    filter(format(Periodo, "%Y") == "2013") %>%
+    group_by(Codigo, `Comunidades y Ciudades Autónomas`) %>%
+    summarise(TasaMedia = mean(.data[[tasa]], na.rm = TRUE), .groups = "drop")
+  
+  # Escalar la tasa
+  dataset_scaled <- scale(dataset_2013$TasaMedia)
+  
+  # Aplicar clustering
+  set.seed(123)
+  kmeans_result <- kmeans(dataset_scaled, centers = 3)
+  
+  # Añadir los clusters al dataset
+  dataset_2013$Cluster <- as.factor(kmeans_result$cluster)
+  
+  # Reordenar los clusters basándose en los valores de TasaMedia
+  cluster_ordenado <- dataset_2013 %>%
+    group_by(Cluster) %>%
+    summarise(TasaPromedio = mean(TasaMedia)) %>%
+    arrange(TasaPromedio) %>%
+    mutate(ClusterOrdenado = factor(Cluster, levels = Cluster[order(TasaPromedio)]))
+  
+  # Mapear los nuevos clusters ordenados al dataset original
+  dataset_2013 <- dataset_2013 %>%
+    left_join(cluster_ordenado, by = "Cluster") %>%
+    mutate(Cluster = ClusterOrdenado)
+  
+  # Crear gráfico de barras agrupadas por cluster
+  grafico_barras <- ggplot(dataset_2013, aes(x = reorder(`Comunidades y Ciudades Autónomas`, TasaMedia), 
+                                             y = TasaMedia, fill = Cluster)) +
+    geom_col() +
+     geom_text(aes(label = round(TasaMedia, 1)), # Añadir los valores
+              hjust = 1, # Ajustar la posición del texto fuera de la barra
+              size = 3) +  # Tamaño del texto
+    coord_flip() +
+    labs(
+      x = "Comunidades Autónomas",
+      y = paste(tasa, "(%)"),
+      fill = "Cluster"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Unir el dataset con el GeoJSON
+  mapa <- mapa_comunidades %>%
+    left_join(dataset_2013, by = c("cod_ccaa" = "Codigo"))
+  
+  # Crear el mapa
+  mapa_clustering <- ggplot(mapa) +
+    geom_sf(aes(fill = Cluster)) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Combinar ambos gráficos con patchwork
+  combinado <- grafico_barras + mapa_clustering + 
+    plot_layout(ncol = 2) + # Disposición en una sola columna
+    plot_annotation(title = paste("Análisis de Clustering y Mapa para", tasa, "(2013)"))
+  
+  # Mostrar el gráfico combinado
+  print(combinado)
+}
+
+# Iterar sobre todas las tasas y generar los gráficos y mapas
+for (tasa in tasas) {
+  crear_clustering_grafico_mapa(tasa, mapa_comunidades)
+}
+```
+
+```{r}
+# Lista de tasas para iterar
+tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
+
+# Función para calcular clustering y generar gráficos y mapas
+crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades) {
+  
+  # Calcular la media de la tasa seleccionada por comunidad
+  dataset_2019 <- datos %>%
+    filter(format(Periodo, "%Y") == "2019") %>%
+    group_by(Codigo, `Comunidades y Ciudades Autónomas`) %>%
+    summarise(TasaMedia = mean(.data[[tasa]], na.rm = TRUE), .groups = "drop")
+  
+  # Escalar la tasa
+  dataset_scaled <- scale(dataset_2019$TasaMedia)
+  
+  # Aplicar clustering
+  set.seed(123)
+  kmeans_result <- kmeans(dataset_scaled, centers = 3)
+  
+  # Añadir los clusters al dataset
+  dataset_2019$Cluster <- as.factor(kmeans_result$cluster)
+  
+  # Reordenar los clusters basándose en los valores de TasaMedia
+  cluster_ordenado <- dataset_2019 %>%
+    group_by(Cluster) %>%
+    summarise(TasaPromedio = mean(TasaMedia)) %>%
+    arrange(TasaPromedio) %>%
+    mutate(ClusterOrdenado = factor(Cluster, levels = Cluster[order(TasaPromedio)]))
+  
+  # Mapear los nuevos clusters ordenados al dataset original
+  dataset_2019 <- dataset_2019 %>%
+    left_join(cluster_ordenado, by = "Cluster") %>%
+    mutate(Cluster = ClusterOrdenado)
+  
+  # Crear gráfico de barras agrupadas por cluster
+  grafico_barras <- ggplot(dataset_2019, aes(x = reorder(`Comunidades y Ciudades Autónomas`, TasaMedia), 
+                                             y = TasaMedia, fill = Cluster)) +
+    geom_col() +
+     geom_text(aes(label = round(TasaMedia, 1)), # Añadir los valores
+              hjust = 1, # Ajustar la posición del texto fuera de la barra
+              size = 3) +  # Tamaño del texto
+    coord_flip() +
+    labs(
+      x = "Comunidades Autónomas",
+      y = paste(tasa, "(%)"),
+      fill = "Cluster"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Unir el dataset con el GeoJSON
+  mapa <- mapa_comunidades %>%
+    left_join(dataset_2019, by = c("cod_ccaa" = "Codigo"))
+  
+  # Crear el mapa
+  mapa_clustering <- ggplot(mapa) +
+    geom_sf(aes(fill = Cluster)) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Combinar ambos gráficos con patchwork
+  combinado <- grafico_barras + mapa_clustering + 
+    plot_layout(ncol = 2) + # Disposición en una sola columna
+    plot_annotation(title = paste("Análisis de Clustering y Mapa para", tasa, "(2019)"))
+  
+  # Mostrar el gráfico combinado
+  print(combinado)
+}
+
+# Iterar sobre todas las tasas y generar los gráficos y mapas
+for (tasa in tasas) {
+  crear_clustering_grafico_mapa(tasa, mapa_comunidades)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 # Filtrar los datos para Andalucía y edad de 16 a 19 años
 data_filtered <- datos %>%
   filter(Sexo == "Hombres" &
@@ -148,7 +404,7 @@ data_filtered <- datos %>%
 # Crear el gráfico
 ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = `Comunidades y Ciudades Autónomas`)) +
   geom_line() +
-  labs(title = "Evolución de la Tasa de Ocupación en Andalucía (25-34 años)",
+  labs(title = "Evolución de la Tasa de Ocupación (25-34 años)",
        x = "Periodo",
        y = "Tasa de Ocupación") +
   theme_minimal()
