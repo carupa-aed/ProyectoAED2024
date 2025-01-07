@@ -26,7 +26,7 @@ spain_map <- function(data, periodo, title, edad = "Total", sexo = "Ambos sexos"
             lwd = .3
     ) +
     ggtitle(title) +
-    geom_sf(data = Can, color = "grey70") +
+    geom_sf(data = Box, color = "grey70") +
     geom_sf_label(aes(label = Total),
                   fill = "white", alpha = 0.5,
                   size = 3,
@@ -72,7 +72,7 @@ spain_map_relative <- function(data, rel_data, periodo, title, edad = "Total", s
             lwd = .3
     )  +
     ggtitle(title) +
-    geom_sf(data = Can, color = "grey70") +
+    geom_sf(data = Box, color = "grey70") +
     geom_sf_label(aes(label = Porc_lab),
                   fill = "white", alpha = 0.5,
                   size = 3,
