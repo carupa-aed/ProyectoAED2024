@@ -153,8 +153,49 @@ crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades, anio) {
   # Combinar ambos gráficos con patchwork
   combinado <- grafico_barras + mapa_clustering + 
     plot_layout(ncol = 2) + 
-    plot_annotation(title = paste("Análisis de Clustering y Mapa para", tasa, "(", anio, ")", sep = ""))
+    plot_annotation(title = paste("Análisis de Clustering y Mapa para ", tasa, " (", anio, ")", sep = ""))
   
   # Mostrar el gráfico combinado
   print(combinado)
+}
+
+
+
+
+# Función para calcular el gráfico de codo
+grafico_codo <- function(tasa, anio, datos) {
+  # Calcular la media de la tasa seleccionada por comunidad para el año dado
+  dataset_anio <- datos %>%
+    filter(format(Periodo, "%Y") == anio) %>%
+    group_by(Codigo, `Comunidades y Ciudades Autónomas`) %>%
+    summarise(TasaMedia = mean(.data[[tasa]], na.rm = TRUE), .groups = "drop")
+  
+  # Escalar la tasa
+  dataset_scaled <- scale(dataset_anio$TasaMedia)
+  
+  # Calcular WSS para un rango de k
+  k_range <- 1:10  # Número máximo de clusters a evaluar
+  wss <- sapply(k_range, function(k) {
+    kmeans(dataset_scaled, centers = k, nstart = 10)$tot.withinss
+  })
+  
+  # Crear un data frame para graficar
+  codo_data <- data.frame(Clusters = k_range, WSS = wss)
+  
+  # Generar el gráfico de codo
+  codo <- ggplot(codo_data, aes(x = Clusters, y = WSS)) +
+    geom_line(size = 1, color = "steelblue") +
+    geom_point(size = 3, color = "darkblue") +
+    labs(
+      title = paste("Gráfico de Codo para", tasa, "(", anio, ")", sep = " "),
+      x = "Número de Clusters (k)",
+      y = "Suma de Cuadrados Dentro del Cluster (WSS)"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+      axis.text = element_text(size = 10),
+      axis.title = element_text(size = 12)
+    )
+  print(codo)
 }

@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include=FALSE}
 if(!require(dplyr)) install.packages("dplyr")
 if(!require(tidyr)) install.packages("tidyr")
 if(!require(ggplot2)) install.packages("ggplot2")
@@ -19,10 +19,9 @@ if(!require(sf)) install.packages("sf")
 if(!require(patchwork)) install.packages("patchwork")
 ```
 
-```{r}
+```{r, warning=FALSE}
 rm(list = ls())
 
-# https://www.ine.es/jaxiT3/files/t/es/csv_bdsc/65285.csv?nocab=1
 # Población total
 Poblacion <- read_delim("data/Poblacion Total.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
@@ -114,10 +113,7 @@ datos <- Poblacion_edad_trabajar %>%
   mutate(Activos = Activos$Activos) %>%
   mutate(Inactivos = Inactivos$Inactivos) %>%
   mutate(Ocupados = Ocupados$Ocupados) %>%
-  mutate(Parados = Parados$Parados) %>%
-  filter(`Comunidades y Ciudades Autónomas` != "Total Nacional") %>%
-  separate(`Comunidades y Ciudades Autónomas`, into = c("Codigo", "Comunidades y Ciudades Autónomas"), sep = " ", extra = "merge")
-
+  mutate(Parados = Parados$Parados)
 
 sacarFechas <- function(x) {
   año <- as.numeric(substr(x, 1, 4))
@@ -143,74 +139,568 @@ datos <- datos %>%
   mutate(`Tasa de Desempleo` = (datos$Parados/datos$Activos)*100)
 ```
 
+
+```{r, warning=FALSE}
+inicio_crisis <- as.Date("2008-01-01")   # Inicio de la crisis (enero 2008)
+fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
+inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
+
+# Crear un gráfico de lineas para la Tasa de Actividad
+data_filtered <- datos %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+TA <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Actividad`)) +
+  geom_line(color = "steelblue", size = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Evolución de la Tasa de Actividad",
+    x = "Periodo",
+    y = "Tasa de Actividad (%)",
+    caption = "Fuente: Encuesta de Población Activa (EPA)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic")
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 48,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 48,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 46,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+
+# Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
+# Filtrar los datos para Hombres y Mujeres a nivel nacional
+data_filtered <- datos %>%
+  filter(Sexo %in% c("Hombres", "Mujeres") &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+# Calcular la diferencia entre hombres y mujeres en la Tasa de Actividad
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Actividad`[Sexo == "Hombres"] - `Tasa de Actividad`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+
+TA_Sexo <- ggplot() +
+  geom_line(data = data_filtered, aes(x = Periodo, y = `Tasa de Actividad`, colour = Sexo), size = 1.2) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia), fill = "black", alpha = 0.7) +
+  labs(
+    title = "Evolución de la Tasa de Actividad por Sexo",
+    x = "Periodo",
+    y = "Tasa de Actividad (%)",
+    caption = "Fuente: Encuesta de Población Activa (EPA)",
+    colour = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic"),
+    legend.position = "bottom"
+  ) +
+  scale_colour_manual(values = c("Hombres" = "steelblue", "Mujeres" = "darkred")) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 30,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 30,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 30,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+
+# Crear un gráfico de líneas para cada grupo de edad
+data_filtered <- datos %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad != "Total")
+
+
+TA_Edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Actividad`, colour = Edad, group = Edad)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Evolución de la Tasa de Actividad por Grupo de Edad",
+    x = "Periodo",
+    y = "Tasa de Actividad (%)",
+    colour = "Grupo de Edad",
+    caption = "Fuente: Encuesta de Población Activa (EPA)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic"),
+    legend.position = "bottom"
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 40,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 40,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 36,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+print(TA)
+print(TA_Sexo)
+print(TA_Edad)
+
+rm(list = setdiff(ls(), "datos"))
+```
+
+```{r, warning=FALSE}
+inicio_crisis <- as.Date("2008-01-01")   # Inicio de la crisis (enero 2008)
+fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
+inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
+
+# Crear un gráfico de lineas para la Tasa de Empleo
+data_filtered <- datos %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+TE <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Empleo`)) +
+  geom_line(color = "steelblue", size = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Evolución de la Tasa de Empleo",
+    x = "Periodo",
+    y = "Tasa de Empleo (%)",
+    caption = "Fuente: Encuesta de Población Activa (EPA)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic")
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 70,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 85,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 70,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+
+# Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
+# Filtrar los datos para Hombres y Mujeres a nivel nacional
+data_filtered <- datos %>%
+  filter(Sexo %in% c("Hombres", "Mujeres") &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+# Calcular la diferencia entre hombres y mujeres en la Tasa de Empleo
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Empleo`[Sexo == "Hombres"] - `Tasa de Empleo`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+
+TE_Sexo <- ggplot() +
+  geom_line(data = data_filtered, aes(x = Periodo, y = `Tasa de Empleo`, colour = Sexo), size = 1.2) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia), fill = "black", alpha = 0.7) +
+  labs(
+    title = "Evolución de la Tasa de Empleo por Sexo",
+    x = "Periodo",
+    y = "Tasa de Empleo (%)",
+    caption = "Fuente: Encuesta de Población Activa (EPA)",
+    colour = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic"),
+    legend.position = "bottom"
+  ) +
+  scale_colour_manual(values = c("Hombres" = "steelblue", "Mujeres" = "darkred")) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 40,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 40,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 40,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+
+# Crear un gráfico de líneas para cada grupo de edad
+data_filtered <- datos %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad != "Total")
+
+
+TE_Edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Empleo`, colour = Edad, group = Edad)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Evolución de la Tasa de Empleo por Grupo de Edad",
+    x = "Periodo",
+    y = "Tasa de Empleo (%)",
+    colour = "Grupo de Edad",
+    caption = "Fuente: Encuesta de Población Activa (EPA)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic"),
+    legend.position = "bottom"
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 40,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = 1.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 40,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 30,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+print(TE)
+print(TE_Sexo)
+print(TE_Edad)
+
+rm(list = setdiff(ls(), "datos"))
+```
+
+```{r, warning=FALSE}
+inicio_crisis <- as.Date("2008-01-01")   # Inicio de la crisis (enero 2008)
+fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
+inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
+
+# Crear un gráfico de lineas para la Tasa de Ocupación
+data_filtered <- datos %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+TO <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`)) +
+  geom_line(color = "steelblue", size = 1.2) +
+  geom_point(color = "darkblue", size = 2) +
+  labs(
+    title = "Evolución de la Tasa de Ocupación",
+    x = "Periodo",
+    y = "Tasa de Ocupación (%)",
+    caption = "Fuente: Encuesta de Población Activa (EPA)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic")
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 38,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 43,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 38,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+
+# Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
+# Filtrar los datos para Hombres y Mujeres a nivel nacional
+data_filtered <- datos %>%
+  filter(Sexo %in% c("Hombres", "Mujeres") &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+# Calcular la diferencia entre hombres y mujeres en la Tasa de Ocupación
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Ocupación`[Sexo == "Hombres"] - `Tasa de Ocupación`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+
+TO_Sexo <- ggplot() +
+  geom_line(data = data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = Sexo), size = 1.2) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia), fill = "black", alpha = 0.7) +
+  labs(
+    title = "Evolución de la Tasa de Ocupación por Sexo",
+    x = "Periodo",
+    y = "Tasa de Ocupación (%)",
+    caption = "Fuente: Encuesta de Población Activa (EPA)",
+    colour = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic"),
+    legend.position = "bottom"
+  ) +
+  scale_colour_manual(values = c("Hombres" = "steelblue", "Mujeres" = "darkred")) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 22,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 22,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 22,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+
+# Crear un gráfico de líneas para cada grupo de edad
+data_filtered <- datos %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad != "Total")
+
+
+TO_Edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = Edad, group = Edad)) +
+  geom_line(size = 1) +
+  labs(
+    title = "Evolución de la Tasa de Ocupación por Grupo de Edad",
+    x = "Periodo",
+    y = "Tasa de Ocupación (%)",
+    colour = "Grupo de Edad",
+    caption = "Fuente: Encuesta de Población Activa (EPA)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    plot.caption = element_text(size = 8, face = "italic"),
+    legend.position = "bottom"
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 30,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 50,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 50,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 3,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+print(TO)
+print(TO_Sexo)
+print(TO_Edad)
+
+rm(list = setdiff(ls(), "datos"))
+```
+
+```{r}
+datos <- datos %>%
+  filter(`Comunidades y Ciudades Autónomas` != "Total Nacional") %>%
+  separate(`Comunidades y Ciudades Autónomas`, into = c("Codigo", "Comunidades y Ciudades Autónomas"), sep = " ", extra = "merge")
+```
+
 ```{r}
 # Cargar el archivo GeoJSON
 geojson_path <- "./data/spain-communities.geojson"
 mapa_comunidades <- st_read(geojson_path)
 ```
 
-```{r}
-# Lista de tasas para iterar
-tasas <- c("Tasa de Empleo", "Tasa de Actividad", "Tasa de Ocupación")
 
+```{r}
+# Cargamos las funciones
+source("functions.R")
+
+# Lista de tasas para iterar
+tasas <- c("Tasa de Actividad", "Tasa de Empleo", "Tasa de Ocupación")
+
+for (tasa in tasas) {
+  grafico_codo(tasa, "2007", datos)
+}
+```
+
+
+```{r}
 for (tasa in tasas) {
   crear_clustering_grafico_mapa(tasa, mapa_comunidades, "2007")
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
-# Filtrar los datos para Andalucía y edad de 16 a 19 años
-data_filtered <- datos %>%
-  filter(Sexo == "Hombres" &
-         `Comunidades y Ciudades Autónomas` %in% c("Andalucía", "Navarra, Comunidad Foral de", "Comunitat Valenciana", "Melilla") &
-         Edad == "De 25 a 34 años")
-
-# Crear el gráfico
-ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = `Comunidades y Ciudades Autónomas`)) +
-  geom_line() +
-  labs(title = "Evolución de la Tasa de Ocupación (25-34 años)",
-       x = "Periodo",
-       y = "Tasa de Ocupación") +
-  theme_minimal()
+for (tasa in tasas) {
+  grafico_codo(tasa, "2013", datos)
+}
 ```
 
 ```{r}
-# Filtrar los datos para Andalucía y edad de 16 a 19 años
-data_filtered <- datos %>%
-  filter(Sexo %in% c("Hombres", "Mujeres"),
-         `Comunidades y Ciudades Autónomas` == "Andalucía" &
-         Edad == "De 16 a 19 años")
+for (tasa in tasas) {
+  crear_clustering_grafico_mapa(tasa, mapa_comunidades, "2013")
+}
+```
 
-# Calcular la diferencia de Tasa de Actividad entre Hombres y Mujeres
+```{r}
+for (tasa in tasas) {
+  grafico_codo(tasa, "2023", datos)
+}
+```
+
+```{r}
+for (tasa in tasas) {
+  crear_clustering_grafico_mapa(tasa, mapa_comunidades, "2023")
+}
+```
+
+
+
+```{r}
+# Filtrar datos para hombres y mujeres
+data_filtered <- datos %>%
+  filter(Sexo %in% c("Hombres", "Mujeres") & Edad == "Total")
+
+# Calcular las diferencias entre hombres y mujeres para cada tasa
 data_diff <- data_filtered %>%
-  group_by(Periodo) %>%
-  summarise(Diferencia = `Tasa de Actividad`[Sexo == "Hombres"] - `Tasa de Actividad`[Sexo == "Mujeres"],
-            .groups = 'drop')
-
-# Crear el gráfico
-ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Actividad`)) +
-  geom_line(aes(colour = Sexo)) +
-  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia))
-  labs(title = "Evolución de la Tasa de Actividad en Andalucía (16-19 años)",
-       x = "Periodo",
-       y = "Tasa de Actividad") +
-  theme_minimal()
-
+  group_by(Codigo, `Comunidades y Ciudades Autónomas`, Periodo) %>%
+  summarise(
+    TE_Diferencia = `Tasa de Empleo`[Sexo == "Hombres"] - `Tasa de Empleo`[Sexo == "Mujeres"],
+    TA_Diferencia = `Tasa de Actividad`[Sexo == "Hombres"] - `Tasa de Actividad`[Sexo == "Mujeres"],
+    TO_Diferencia = `Tasa de Ocupación`[Sexo == "Hombres"] - `Tasa de Ocupación`[Sexo == "Mujeres"],
+    .groups = 'drop'
+  )
 ```
+
+```{r}
+# Filtrar datos para diferentes grupos de edad
+data_filtered <- datos %>%
+  filter(Edad %in% c("De 20 a 24 años", "De 45 a 54 años") & Sexo == "Ambos sexos")
+
+# Calcular las diferencias entre diferentes grupos de edad
+data_diff <- data_filtered %>%
+  group_by(Codigo, `Comunidades y Ciudades Autónomas`, Periodo) %>%
+  summarise(
+    TE_Diferencia = `Tasa de Empleo`[Edad == "De 45 a 54 años"] - `Tasa de Empleo`[Edad == "De 20 a 24 años"],
+    TA_Diferencia = `Tasa de Actividad`[Edad == "De 45 a 54 años"] - `Tasa de Actividad`[Edad == "De 20 a 24 años"],
+    TO_Diferencia = `Tasa de Ocupación`[Edad == "De 45 a 54 años"] - `Tasa de Ocupación`[Edad == "De 20 a 24 años"],
+    .groups = 'drop'
+  )
+```
+
 
