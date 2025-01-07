@@ -89,3 +89,72 @@ spain_map_relative <- function(data, rel_data, periodo, title, edad = "Total", s
     theme_void() +
     theme(legend.position = c(0.1, 0.6), plot.title = element_text(size = 17, hjust = 0.5))
 }
+
+
+
+
+# Función para calcular clustering y generar gráficos y mapas
+crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades, anio) {
+  
+  # Calcular la media de la tasa seleccionada por comunidad para el año dado
+  dataset_anio <- datos %>%
+    filter(format(Periodo, "%Y") == anio) %>%
+    group_by(Codigo, `Comunidades y Ciudades Autónomas`) %>%
+    summarise(TasaMedia = mean(.data[[tasa]], na.rm = TRUE), .groups = "drop")
+  
+  # Escalar la tasa
+  dataset_scaled <- scale(dataset_anio$TasaMedia)
+  
+  # Aplicar clustering
+  set.seed(123)
+  kmeans_result <- kmeans(dataset_scaled, centers = 3)
+  
+  # Añadir los clusters al dataset
+  dataset_anio$Cluster <- as.factor(kmeans_result$cluster)
+  
+  # Reordenar los clusters basándose en los valores de TasaMedia
+  cluster_ordenado <- dataset_anio %>%
+    group_by(Cluster) %>%
+    summarise(TasaPromedio = mean(TasaMedia)) %>%
+    arrange(TasaPromedio) %>%
+    mutate(ClusterOrdenado = factor(Cluster, levels = Cluster[order(TasaPromedio)]))
+  
+  # Mapear los nuevos clusters ordenados al dataset original
+  dataset_anio <- dataset_anio %>%
+    left_join(cluster_ordenado, by = "Cluster") %>%
+    mutate(Cluster = ClusterOrdenado)
+  
+  # Crear gráfico de barras agrupadas por cluster
+  grafico_barras <- ggplot(dataset_anio, aes(x = reorder(`Comunidades y Ciudades Autónomas`, TasaMedia), 
+                                             y = TasaMedia, fill = Cluster)) +
+    geom_col() +
+    geom_text(aes(label = round(TasaMedia, 1)), # Añadir los valores
+              hjust = 1, # Ajustar la posición del texto fuera de la barra
+              size = 3) +  # Tamaño del texto
+    coord_flip() +
+    labs(
+      x = "Comunidades Autónomas",
+      y = paste(tasa, "(%)"),
+      fill = "Cluster"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Unir el dataset con el GeoJSON
+  mapa <- mapa_comunidades %>%
+    left_join(dataset_anio, by = c("cod_ccaa" = "Codigo"))
+  
+  # Crear el mapa
+  mapa_clustering <- ggplot(mapa) +
+    geom_sf(aes(fill = Cluster)) +
+    theme_minimal() +
+    theme(legend.position = "none")
+  
+  # Combinar ambos gráficos con patchwork
+  combinado <- grafico_barras + mapa_clustering + 
+    plot_layout(ncol = 2) + 
+    plot_annotation(title = paste("Análisis de Clustering y Mapa para", tasa, "(", anio, ")", sep = ""))
+  
+  # Mostrar el gráfico combinado
+  print(combinado)
+}
