@@ -199,3 +199,43 @@ grafico_codo <- function(tasa, anio, datos) {
     )
   print(codo)
 }
+
+
+
+
+# Función para calcular el gráfico de codo usando la media global
+grafico_codo_global <- function(tasa, datos) {
+  # Calcular la media de la tasa seleccionada por comunidad para todos los años
+  dataset_global <- datos %>%
+    group_by(Codigo, `Comunidades y Ciudades Autónomas`) %>%
+    summarise(TasaMedia = mean(.data[[tasa]], na.rm = TRUE), .groups = "drop")
+  
+  # Escalar la tasa
+  dataset_scaled <- scale(dataset_global$TasaMedia)
+  
+  # Calcular WSS para un rango de k
+  k_range <- 1:10  # Número máximo de clusters a evaluar
+  wss <- sapply(k_range, function(k) {
+    kmeans(dataset_scaled, centers = k, nstart = 10)$tot.withinss
+  })
+  
+  # Crear un data frame para graficar
+  codo_data <- data.frame(Clusters = k_range, WSS = wss)
+  
+  # Generar el gráfico de codo
+  codo <- ggplot(codo_data, aes(x = Clusters, y = WSS)) +
+    geom_line(size = 1, color = "steelblue") +
+    geom_point(size = 3, color = "darkblue") +
+    labs(
+      title = paste("Gráfico de Codo para la", tasa),
+      x = "Número de Clusters (k)",
+      y = "Suma de Cuadrados Dentro del Cluster (WSS)"
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+      axis.text = element_text(size = 10)
+    )
+  
+  print(codo)
+}
