@@ -3,8 +3,8 @@ title: "Población Activa"
 author: "Pablo Catret"
 date: "2024-10-26"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
