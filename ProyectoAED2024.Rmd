@@ -49,6 +49,25 @@ output:
     extra_dependencies: longtable
 ---
 
+```{r, include=FALSE}
+if(!require(knitr)) install.packages("knitr")
+if(!require(dplyr)) install.packages("dplyr")
+if(!require(tidyr)) install.packages("tidyr")
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(plotly)) install.packages("plotly")
+if(!require(readr)) install.packages("readr")
+if(!require(sf)) install.packages("sf")
+if(!require(patchwork)) install.packages("patchwork")
+if(!require(stats)) install.packages("stats")
+if(!require(treemapify)) install.packages("treemapify")
+if(!require(reshape2)) install.packages("reshape2")
+if(!require(scales)) install.packages("scales")
+if(!require(transformr)) install.packages("transformr")
+if(!require(gganimate)) install.packages("gganimate")
+
+# Cargar funciones desde el archivo functions.r
+source("functions.r")
+```
 
 # Introducción
 
@@ -77,3 +96,81 @@ Como se ha mencionado anteriormente en la introducción, la EPA es realizada tri
 
 Cabe destacar que estos datasets están desglosados por comunidad y ciudad autónoma, sexo y grupo de edad, con las tres columnas expresadas en "miles de personas" como unidad. El periodo de los datos figura desde el primer trismestre de 2002 hasta el tercer trimestre de 2024.
 
+```{r, warning=FALSE}
+Poblacion <- read_delim("data/Poblacion Total.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+
+Activos <- read_delim("data/Activos.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+Activos <- Activos %>% rename(`Activos` = `Total`)
+
+Inactivos <- read_delim("data/Inactivos.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+Inactivos <- Inactivos %>% rename(`Inactivos` = `Total`)
+
+Ocupados <- read_delim("data/Ocupados.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+Ocupados <- Ocupados %>% rename(`Ocupados` = `Total`)
+
+Parados <- read_delim("data/Parados.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
+    locale = locale(decimal_mark = ",", grouping_mark = "."), 
+    trim_ws = TRUE)
+Parados <- Parados %>% rename(`Parados` = `Total`)
+```
+
+Al tratarse de un análisis del mercado laboral eliminaremos al grupo de población menor a 16 años pues no tienen edad suficiente para trabajar. Notamos que en el dataset Población hay una columna que solo contiene la cadena "Total Nacional", por lo que la eliminamos. Además, en la columna "Comunidades y Ciudades Autónomas" hay valores faltantes que coinciden con las filas del propio Total Nacional, de modo que los completamos con dicha cadena.
+
+```{r}
+Poblacion_edad_trabajar <- Poblacion %>%
+  rename(`Población en edad de trabajar` = `Total`) %>%
+  filter(Edad != "Menores de 16") %>%
+  select(-contains("Total Nacional")) %>%
+  mutate(`Comunidades y Ciudades Autónomas` = replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
+```
+
+Notamos que para el conjunto de datos de población total en edad de trabajar y población inactiva hay un intervalo de edad más que para el resto de datasets: se divide l"55 y más años" en los grupos "De 55 a 64 años" y "65 y más años". Dado que buscamos obtener un dataset único y compacto uniremos ambos grupos de edad como en el resto de datasets.
+
+```{r}
+Poblacion_edad_trabajar <- Poblacion_edad_trabajar %>%
+  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
+  group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
+  summarise(`Población en edad de trabajar` = sum(`Población en edad de trabajar`, na.rm = TRUE), .groups = 'drop')
+
+Inactivos <- Inactivos %>%
+  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
+  group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
+  summarise(`Inactivos` = sum(`Inactivos`, na.rm = TRUE), .groups = 'drop')
+```
+
+Una vez hemos normalizado la estructura de los datasets podemos unificar todos los datos en uno solo.
+
+```{r}
+datos_EPA <- left_join(Poblacion_edad_trabajar, Activos, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
+                left_join(., Inactivos, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
+                left_join(., Ocupados, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
+                left_join(., Parados, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo"))
+```
+
+Observamos que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date.
+
+```{r}
+datos_EPA$Periodo <- as.Date(sapply(datos_EPA$Periodo, sacarFechas), format = "%Y-%m-%d")
+
+# Borramos los datasets innecesarios
+rm(list = setdiff(ls(), "datos_EPA"))
+```
+
+Observemos el formato final del dataset con el que trabajaremos.
+
+```{r, echo=FALSE}
+kable(head(datos_EPA, 4), caption = "Primeras 4 filas del dataset")
+```

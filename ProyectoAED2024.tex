@@ -191,11 +191,63 @@ subject discipline.).}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Pandoc syntax highlighting
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 
 % tightlist command for lists without linebreak
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
+% From pandoc table feature
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 
 
 \usepackage{longtable}
@@ -244,11 +296,12 @@ abordar preguntas clave sobre el mercado laboral, tales como:
 \begin{itemize}
 \tightlist
 \item
-  ¿Cómo varía la participación laboral entre comunidades autónomas y
-  grupos de edad?
+  ¿Cómo varía la participación laboral entre comunidades autónomas?
+\item
+  ¿Cómo varía la participación laboral entre grupos de edad?
 \item
   ¿Qué sectores han experimentado los mayores cambios tras eventos
-  históricos como la crisis de 2008 o la pandemia?
+  históricos como la crisis de 2008 o la pandemia de COVID-19?
 \end{itemize}
 
 Este análisis exploratorio busca no solo describir el estado actual del
@@ -263,8 +316,8 @@ datos}\label{importaciuxf3n-y-tratamiento-de-datos}
 
 En primer lugar, se han descargado los datos directamente desde la base
 de datos abierta INE Base. Estos datos se presentan en un formato de
-csv, separado por el carácter \texttt{;}, y con el uso de marca de
-decimales española \texttt{,}.
+csv, separado por el carácter `;', y con el uso de marca de decimales
+española `,'.
 
 \subsection{Encuesta de Población
 Activa}\label{encuesta-de-poblaciuxf3n-activa}
@@ -272,11 +325,178 @@ Activa}\label{encuesta-de-poblaciuxf3n-activa}
 Como se ha mencionado anteriormente en la introducción, la EPA es
 realizada trimestralmente por el Instituto Nacional de Estadística, por
 lo que se han extraído cinco datasets de su base de datos: población
-total, activa, inactiva, ocupada y parada. Cabe destacar que estos
-datasets están desglosados por comunidad y ciudad autónoma, sexo y grupo
-de edad, con las tres columnas expresadas en ``miles de personas'' como
-unidad. El periodo de los datos figura desde el primer trismestre de
-2002 hasta el tercer trimestre de 2024.
+total, activa, inactiva, ocupada y parada.
+
+Cabe destacar que estos datasets están desglosados por comunidad y
+ciudad autónoma, sexo y grupo de edad, con las tres columnas expresadas
+en ``miles de personas'' como unidad. El periodo de los datos figura
+desde el primer trismestre de 2002 hasta el tercer trimestre de 2024.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Poblacion }\OtherTok{\textless{}{-}} \FunctionTok{read\_delim}\NormalTok{(}\StringTok{"data/Poblacion Total.csv"}\NormalTok{, }
+    \AttributeTok{delim =} \StringTok{";"}\NormalTok{, }\AttributeTok{escape\_double =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{col\_types =} \FunctionTok{cols}\NormalTok{(}\AttributeTok{Total =} \FunctionTok{col\_number}\NormalTok{()), }
+    \AttributeTok{locale =} \FunctionTok{locale}\NormalTok{(}\AttributeTok{decimal\_mark =} \StringTok{","}\NormalTok{, }\AttributeTok{grouping\_mark =} \StringTok{"."}\NormalTok{), }
+    \AttributeTok{trim\_ws =} \ConstantTok{TRUE}\NormalTok{)}
+
+\NormalTok{Activos }\OtherTok{\textless{}{-}} \FunctionTok{read\_delim}\NormalTok{(}\StringTok{"data/Activos.csv"}\NormalTok{, }
+    \AttributeTok{delim =} \StringTok{";"}\NormalTok{, }\AttributeTok{escape\_double =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{col\_types =} \FunctionTok{cols}\NormalTok{(}\AttributeTok{Total =} \FunctionTok{col\_number}\NormalTok{()), }
+    \AttributeTok{locale =} \FunctionTok{locale}\NormalTok{(}\AttributeTok{decimal\_mark =} \StringTok{","}\NormalTok{, }\AttributeTok{grouping\_mark =} \StringTok{"."}\NormalTok{), }
+    \AttributeTok{trim\_ws =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{Activos }\OtherTok{\textless{}{-}}\NormalTok{ Activos }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{rename}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Activos}\StringTok{\textasciigrave{}} \OtherTok{=} \StringTok{\textasciigrave{}}\AttributeTok{Total}\StringTok{\textasciigrave{}}\NormalTok{)}
+
+\NormalTok{Inactivos }\OtherTok{\textless{}{-}} \FunctionTok{read\_delim}\NormalTok{(}\StringTok{"data/Inactivos.csv"}\NormalTok{, }
+    \AttributeTok{delim =} \StringTok{";"}\NormalTok{, }\AttributeTok{escape\_double =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{col\_types =} \FunctionTok{cols}\NormalTok{(}\AttributeTok{Total =} \FunctionTok{col\_number}\NormalTok{()), }
+    \AttributeTok{locale =} \FunctionTok{locale}\NormalTok{(}\AttributeTok{decimal\_mark =} \StringTok{","}\NormalTok{, }\AttributeTok{grouping\_mark =} \StringTok{"."}\NormalTok{), }
+    \AttributeTok{trim\_ws =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{Inactivos }\OtherTok{\textless{}{-}}\NormalTok{ Inactivos }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{rename}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Inactivos}\StringTok{\textasciigrave{}} \OtherTok{=} \StringTok{\textasciigrave{}}\AttributeTok{Total}\StringTok{\textasciigrave{}}\NormalTok{)}
+
+\NormalTok{Ocupados }\OtherTok{\textless{}{-}} \FunctionTok{read\_delim}\NormalTok{(}\StringTok{"data/Ocupados.csv"}\NormalTok{, }
+    \AttributeTok{delim =} \StringTok{";"}\NormalTok{, }\AttributeTok{escape\_double =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{col\_types =} \FunctionTok{cols}\NormalTok{(}\AttributeTok{Total =} \FunctionTok{col\_number}\NormalTok{()), }
+    \AttributeTok{locale =} \FunctionTok{locale}\NormalTok{(}\AttributeTok{decimal\_mark =} \StringTok{","}\NormalTok{, }\AttributeTok{grouping\_mark =} \StringTok{"."}\NormalTok{), }
+    \AttributeTok{trim\_ws =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{Ocupados }\OtherTok{\textless{}{-}}\NormalTok{ Ocupados }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{rename}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Ocupados}\StringTok{\textasciigrave{}} \OtherTok{=} \StringTok{\textasciigrave{}}\AttributeTok{Total}\StringTok{\textasciigrave{}}\NormalTok{)}
+
+\NormalTok{Parados }\OtherTok{\textless{}{-}} \FunctionTok{read\_delim}\NormalTok{(}\StringTok{"data/Parados.csv"}\NormalTok{, }
+    \AttributeTok{delim =} \StringTok{";"}\NormalTok{, }\AttributeTok{escape\_double =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{col\_types =} \FunctionTok{cols}\NormalTok{(}\AttributeTok{Total =} \FunctionTok{col\_number}\NormalTok{()), }
+    \AttributeTok{locale =} \FunctionTok{locale}\NormalTok{(}\AttributeTok{decimal\_mark =} \StringTok{","}\NormalTok{, }\AttributeTok{grouping\_mark =} \StringTok{"."}\NormalTok{), }
+    \AttributeTok{trim\_ws =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{Parados }\OtherTok{\textless{}{-}}\NormalTok{ Parados }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{rename}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Parados}\StringTok{\textasciigrave{}} \OtherTok{=} \StringTok{\textasciigrave{}}\AttributeTok{Total}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Al tratarse de un análisis del mercado laboral eliminaremos al grupo de
+población menor a 16 años pues no tienen edad suficiente para trabajar.
+Notamos que en el dataset Población hay una columna que solo contiene la
+cadena ``Total Nacional'', por lo que la eliminamos. Además, en la
+columna ``Comunidades y Ciudades Autónomas'' hay valores faltantes que
+coinciden con las filas del propio Total Nacional, de modo que los
+completamos con dicha cadena.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Poblacion\_edad\_trabajar }\OtherTok{\textless{}{-}}\NormalTok{ Poblacion }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Población en edad de trabajar}\StringTok{\textasciigrave{}} \OtherTok{=} \StringTok{\textasciigrave{}}\AttributeTok{Total}\StringTok{\textasciigrave{}}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(Edad }\SpecialCharTok{!=} \StringTok{"Menores de 16"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{contains}\NormalTok{(}\StringTok{"Total Nacional"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Comunidades y Ciudades Autónomas}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{replace\_na}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Comunidades y Ciudades Autónomas}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{"Total Nacional"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Notamos que para el conjunto de datos de población total en edad de
+trabajar y población inactiva hay un intervalo de edad más que para el
+resto de datasets: se divide l''55 y más años'' en los grupos ``De 55 a
+64 años'' y ``65 y más años''. Dado que buscamos obtener un dataset
+único y compacto uniremos ambos grupos de edad como en el resto de
+datasets.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Poblacion\_edad\_trabajar }\OtherTok{\textless{}{-}}\NormalTok{ Poblacion\_edad\_trabajar }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Edad =} \FunctionTok{ifelse}\NormalTok{(Edad }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"De 55 a 64 años"}\NormalTok{, }\StringTok{"65 y más años"}\NormalTok{), }\StringTok{"55 y más años"}\NormalTok{, Edad)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Sexo, }\StringTok{\textasciigrave{}}\AttributeTok{Comunidades y Ciudades Autónomas}\StringTok{\textasciigrave{}}\NormalTok{, Edad, Periodo) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Población en edad de trabajar}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{sum}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Población en edad de trabajar}\StringTok{\textasciigrave{}}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{Inactivos }\OtherTok{\textless{}{-}}\NormalTok{ Inactivos }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Edad =} \FunctionTok{ifelse}\NormalTok{(Edad }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"De 55 a 64 años"}\NormalTok{, }\StringTok{"65 y más años"}\NormalTok{), }\StringTok{"55 y más años"}\NormalTok{, Edad)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Sexo, }\StringTok{\textasciigrave{}}\AttributeTok{Comunidades y Ciudades Autónomas}\StringTok{\textasciigrave{}}\NormalTok{, Edad, Periodo) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Inactivos}\StringTok{\textasciigrave{}} \OtherTok{=} \FunctionTok{sum}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Inactivos}\StringTok{\textasciigrave{}}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Una vez hemos normalizado la estructura de los datasets podemos unificar
+todos los datos en uno solo.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{datos\_EPA }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(Poblacion\_edad\_trabajar, Activos, }\AttributeTok{by=}\FunctionTok{c}\NormalTok{(}\StringTok{"Sexo"}\NormalTok{, }\StringTok{"Comunidades y Ciudades Autónomas"}\NormalTok{, }\StringTok{"Edad"}\NormalTok{, }\StringTok{"Periodo"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+                \FunctionTok{left\_join}\NormalTok{(., Inactivos, }\AttributeTok{by=}\FunctionTok{c}\NormalTok{(}\StringTok{"Sexo"}\NormalTok{, }\StringTok{"Comunidades y Ciudades Autónomas"}\NormalTok{, }\StringTok{"Edad"}\NormalTok{, }\StringTok{"Periodo"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+                \FunctionTok{left\_join}\NormalTok{(., Ocupados, }\AttributeTok{by=}\FunctionTok{c}\NormalTok{(}\StringTok{"Sexo"}\NormalTok{, }\StringTok{"Comunidades y Ciudades Autónomas"}\NormalTok{, }\StringTok{"Edad"}\NormalTok{, }\StringTok{"Periodo"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+                \FunctionTok{left\_join}\NormalTok{(., Parados, }\AttributeTok{by=}\FunctionTok{c}\NormalTok{(}\StringTok{"Sexo"}\NormalTok{, }\StringTok{"Comunidades y Ciudades Autónomas"}\NormalTok{, }\StringTok{"Edad"}\NormalTok{, }\StringTok{"Periodo"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Observamos que los datos de la columna ``Periodo'' son cadenas; para
+solucionarlo, definimos y empleamos la función ``SacarFechas'' para
+transformarlos a tipo Date.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{datos\_EPA}\SpecialCharTok{$}\NormalTok{Periodo }\OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(}\FunctionTok{sapply}\NormalTok{(datos\_EPA}\SpecialCharTok{$}\NormalTok{Periodo, sacarFechas), }\AttributeTok{format =} \StringTok{"\%Y{-}\%m{-}\%d"}\NormalTok{)}
+
+\CommentTok{\# Borramos los datasets innecesarios}
+\FunctionTok{rm}\NormalTok{(}\AttributeTok{list =} \FunctionTok{setdiff}\NormalTok{(}\FunctionTok{ls}\NormalTok{(), }\StringTok{"datos\_EPA"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Observemos el formato final del dataset con el que trabajaremos.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0889}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.2444}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1037}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0815}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.2222}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0593}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0741}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0667}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0593}}@{}}
+\caption{Primeras 4 filas del dataset}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sexo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Comunidades y Ciudades Autónomas
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Edad
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Periodo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Población en edad de trabajar
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Activos
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Inactivos
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Ocupados
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Parados
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sexo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Comunidades y Ciudades Autónomas
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Edad
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Periodo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Población en edad de trabajar
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Activos
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Inactivos
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Ocupados
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Parados
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Ambos sexos & 01 Andalucía & 55 y más años & 2002-03-01 & 1736.7 & 268.1
+& 1468.6 & 231.7 & 36.4 \\
+Ambos sexos & 01 Andalucía & 55 y más años & 2002-06-01 & 1744.5 & 269.7
+& 1474.7 & 232.4 & 37.4 \\
+Ambos sexos & 01 Andalucía & 55 y más años & 2002-09-01 & 1753.6 & 270.5
+& 1483.1 & 227.9 & 42.5 \\
+Ambos sexos & 01 Andalucía & 55 y más años & 2002-12-01 & 1763.6 & 272.6
+& 1490.9 & 231.0 & 41.7 \\
+\end{longtable}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

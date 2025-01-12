@@ -239,3 +239,11 @@ grafico_codo_global <- function(tasa, datos) {
   
   print(codo)
 }
+
+
+sacarFechas <- function(x) {
+  año <- as.numeric(substr(x, 1, 4))
+  trimestre <- substr(x, 6, 6)
+  mes <- switch(trimestre, "1" = "03", "2" = "06", "3" = "09", "4" = "12")
+  paste(año, mes, "01", sep = "-")
+}
