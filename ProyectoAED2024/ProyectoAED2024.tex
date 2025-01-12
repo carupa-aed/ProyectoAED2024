@@ -100,7 +100,7 @@ Martínez, M.}
 
 % Affiliations / Addresses (Add [1] after \address if there is only one affiliation.)
 \address{%
-$^{1}$ \quad Universidad de Valencia - Escola Tècnica Superior
+$^{1}$ \quad Universitat de València - Escola Tècnica Superior
 d'Enginyeria (ETSE) Avinguda de l'Universitat, 46100 Burjassot,
 Valencia; \\
 }
@@ -206,213 +206,77 @@ subject discipline.).}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Introduction}\label{introduction}
+\section{Introducción}\label{introducciuxf3n}
 
-The introduction should briefly place the study in a broad context and
-highlight why it is important. It should define the purpose of the work
-and its significance. The current state of the research field should be
-reviewed carefully and key publications cited. Please highlight
-controversial and diverging hypotheses when necessary. Finally, briefly
-mention the main aim of the work and highlight the principal
-conclusions. As far as possible, please keep the introduction
-comprehensible to scientists outside your particular field of research.
-Citing a journal paper
-\citep{bertrand-krajewski_distribution_1998, leutnant_stormwater_2016}.
-And now citing a book reference \citet{gujer_systems_2008}. Some MDPI
-journals use Chicago and others use APA, this template should choose the
-correct citation format for you once you specify the journal in the YAML
-header.
+El mercado laboral en España es un sistema complejo y dinámico que
+refleja las interacciones entre diversos factores económicos, sociales y
+demográficos. Este trabajo de análisis exploratorio de datos combina dos
+pilares fundamentales para entender las dinámicas laborales: la Encuesta
+de Población Activa (EPA) y la Clasificación Nacional de Actividades
+Económicas (CNAE-2009). A través de estas fuentes, se busca ofrecer una
+visión integral de las tasas de empleo, actividad y ocupación,
+desglosadas por género, grupo de edad y comunidad autónoma, así como por
+ramas de actividad económica.
 
-To use endnotes, change \texttt{endnotes:\ true} in the YAML header,
-then use \texttt{\textbackslash{}endnote\{This\ is\ an\ endnote.\}}.
+La EPA, realizada trimestralmente por el Instituto Nacional de
+Estadística (INE), proporciona información detallada sobre la
+participación laboral de la población, permitiendo analizar las
+diferencias en el acceso al empleo según el género, la edad y el
+territorio. En esta parte del estudio, se examinan las tasas del mercado
+laboral en las distintas comunidades autónomas y cómo estas se ven
+influenciadas por eventos como la crisis financiera de 2008 o la
+pandemia de COVID-19. Además, se busca identificar desigualdades
+estructurales y dinámicas regionales que puedan servir como base para
+estudios más específicos o el diseño de políticas públicas.
 
-\section{Materials and Methods}\label{materials-and-methods}
+Por otro lado, la CNAE-2009 aporta un marco estándar para clasificar las
+actividades económicas en las que se desempeñan los trabajadores,
+permitiendo analizar cómo se distribuye la fuerza laboral entre
+diferentes sectores. Este enfoque complementario permite explorar no
+solo el ``dónde'' y ``quién'' trabaja, sino también el ``en qué''
+trabaja la población, revelando patrones de especialización sectorial y
+el impacto de la transformación económica a lo largo de los años.
 
-Materials and Methods should be described with sufficient details to
-allow others to replicate and build on published results. Please note
-that publication of your manuscript implicates that you must make all
-materials, data, computer code, and protocols associated with the
-publication available to readers. Please disclose at the submission
-stage any restrictions on the availability of materials or information.
-New methods and protocols should be described in detail while
-well-established methods can be briefly described and appropriately
-cited.
-
-Research manuscripts reporting large datasets that are deposited in a
-publicly available database should specify where the data have been
-deposited and provide the relevant accession numbers. If the accession
-numbers have not yet been obtained at the time of submission, please
-state that they will be provided during review. They must be provided
-prior to publication.
-
-Interventionary studies involving animals or humans, and other studies
-require ethical approval must list the authority that provided approval
-and the corresponding ethical approval code.
-
-\section{Results}\label{results}
-
-This section may be divided by subheadings. It should provide a concise
-and precise description of the experimental results, their
-interpretation as well as the experimental conclusions that can be
-drawn.
-
-\subsection{Subsection Heading Here}\label{subsection-heading-here}
-
-Subsection text here.
-
-\subsubsection{Subsubsection Heading
-Here}\label{subsubsection-heading-here}
-
-Bulleted lists look like this:
+La combinación de ambas perspectivas ---la distribución demográfica y
+regional desde la EPA y la estructura sectorial desde la CNAE--- permite
+abordar preguntas clave sobre el mercado laboral, tales como:
 
 \begin{itemize}
 \tightlist
 \item
-  First bullet
+  ¿Cómo varía la participación laboral entre comunidades autónomas y
+  grupos de edad?
 \item
-  Second bullet
-\item
-  Third bullet
+  ¿Qué sectores han experimentado los mayores cambios tras eventos
+  históricos como la crisis de 2008 o la pandemia?
 \end{itemize}
 
-Numbered lists can be added as follows:
+Este análisis exploratorio busca no solo describir el estado actual del
+mercado laboral en España, sino también identificar tendencias,
+desigualdades y oportunidades de mejora. El objetivo final es
+proporcionar una base sólida para futuros estudios y contribuir al
+diseño de estrategias efectivas en el ámbito económico, social y
+político.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  First item
-\item
-  Second item
-\item
-  Third item
-\end{enumerate}
+\section{Importación y tratamiento de
+datos}\label{importaciuxf3n-y-tratamiento-de-datos}
 
-The text continues here.
+En primer lugar, se han descargado los datos directamente desde la base
+de datos abierta INE Base. Estos datos se presentan en un formato de
+csv, separado por el carácter \texttt{;}, y con el uso de marca de
+decimales española \texttt{,}.
 
-\subsection{Figures, Tables and
-Schemes}\label{figures-tables-and-schemes}
+\subsection{Encuesta de Población
+Activa}\label{encuesta-de-poblaciuxf3n-activa}
 
-All figures and tables should be cited in the main text as Figure
-\ref{fig:fig1}, \ref{tab:tab1}, etc. To get cross-reference to figure
-generated by R chunks include the
-\texttt{\textbackslash{}\textbackslash{}label\{\}} tag in the
-\texttt{fig.cap} attribute of the R chunk:
-\texttt{fig.cap\ =\ "Fancy\ Caption\textbackslash{}\textbackslash{}label\{fig:plot\}"}.
-
-\begin{figure}
-\centering
-\includegraphics{ProyectoAED2024_files/figure-latex/fig1-1.pdf}
-\caption{A figure added with a code chunk.\label{fig:fig1}}
-\end{figure}
-
-When making tables using \texttt{kable}, it is suggested to use the
-\texttt{format="latex"} and \texttt{tabl.envir="table"} arguments to
-ensure table numbering and compatibility with the mdpi document class.
-
-\begin{table}[H]
-
-\caption{\label{tab:tab1}This is a table caption. Tables should be placed in the 
-             main text near to the first time they are~cited.}
-\begin{tabular}[t]{lccc}
-\toprule
-  & mpg & cyl & disp\\
-\midrule
-Mazda RX4 & 21.0 & 6 & 160\\
-Mazda RX4 Wag & 21.0 & 6 & 160\\
-Datsun 710 & 22.8 & 4 & 108\\
-Hornet 4 Drive & 21.4 & 6 & 258\\
-Hornet Sportabout & 18.7 & 8 & 360\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-For a very wide table, landscape layouts are allowed.
-
-\startlandscape
-
-\begin{table}[H]
-
-\caption{\label{tab:tab2}This is a very wide table}
-\begin{tabular}[t]{cccc}
-\toprule
-Title.1 & Title.2 & Title.3 & Title.4\\
-\midrule
-Entry 1 & Data & Data & This cell has some longer content that runs over
-                               two lines\\
-Entry 2 & Data & Data & Data\\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\finishlandscape
-
-\subsection{Formatting of Mathematical
-Components}\label{formatting-of-mathematical-components}
-
-This is an example of an equation:
-
-\[
-a = 1.
-\]
-
-If you want numbered equations use Latex and wrap in the equation
-environment:
-
-\begin{equation}
-a = 1,
-\end{equation}
-
-the text following an equation need not be a new paragraph. Please
-punctuate equations as regular text.
-
-This is the example 2 of equation:
-
-\begin{adjustwidth}{-\extralength}{0cm}
-\begin{equation}
-a = b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r + s + t + 
-u + v + w + x + y + z
-\end{equation}
-\end{adjustwidth}
-
-Theorem-type environments (including propositions, lemmas, corollaries
-etc.) can be formatted as follows:
-
-Example of a theorem:
-
-\begin{Theorem}
-Example text of a theorem
-
-\end{Theorem}
-
-The text continues here. Proofs must be formatted as follows:
-
-Example of a proof:
-
-\begin{proof}[Proof of Theorem1]
-Text of the proof. Note that the phrase ``of Theorem 1'\,' is optional
-if it is clear which theorem is being referred to.
-
-\end{proof}
-
-The text continues here.
-
-\section{Discussion}\label{discussion}
-
-Authors should discuss the results and how they can be interpreted in
-perspective of previous studies and of the working hypotheses. The
-findings and their implications should be discussed in the broadest
-context possible. Future research directions may also be highlighted.
-
-\section{Conclusion}\label{conclusion}
-
-This section is not mandatory, but can be added to the manuscript if the
-discussion is unusually long or complex.
-
-\section{Patents}\label{patents}
-
-This section is not mandatory, but may be added if there are patents
-resulting from the work reported in this manuscript.
+Como se ha mencionado anteriormente en la introducción, la EPA es
+realizada trimestralmente por el Instituto Nacional de Estadística, por
+lo que se han extraído cinco datasets de su base de datos: población
+total, activa, inactiva, ocupada y parada. Cabe destacar que estos
+datasets están desglosados por comunidad y ciudad autónoma, sexo y grupo
+de edad, con las tres columnas expresadas en ``miles de personas'' como
+unidad. El periodo de los datos figura desde el primer trismestre de
+2002 hasta el tercer trimestre de 2024.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
