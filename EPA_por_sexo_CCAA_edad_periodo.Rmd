@@ -42,11 +42,12 @@ Este análisis exploratorio busca no solo describir el estado actual del mercado
 
 ### 1. Importación y tratamiento de los datos
 
-Como se ha mencionado anteriormente en la introducción, la Encuesta de Población Activa es realizada trimestralmente por el Instituto Nacional de Estadística, por lo que se han extraído cinco datasets de su base de datos: población total, activa, inactiva, ocupada y parada. Todos en miles de personas
+Como se ha mencionado anteriormente en la introducción, la Encuesta de Población Activa es realizada trimestralmente por el Instituto Nacional de Estadística, por lo que se han extraído cinco datasets de su base de datos: población total, activa, inactiva, ocupada y parada.
 
-También cabe destacar que estos datasets están desglosados por comunidad y ciudad autónoma, sexo y grupo de edad. El periodo de los datos figura desde el primer trismestre de 2002 hasta el tercer trimestre de 2024.
+Cabe destacar que estos datasets están desglosados por comunidad y ciudad autónoma, sexo y grupo de edad, con las tres columnas expresadas en "miles de personas" como unidad. El periodo de los datos figura desde el primer trismestre de 2002 hasta el tercer trimestre de 2024.
 
-Posteriormente, con el objetivo de cumplir con los criterios aprendidos en la asignatura y facilitar el trabajo, se van a unificar los datos en un único dataset que se aproxime a un conjunto tidy lo máximo posible.
+Posteriormente, con el objetivo de cumplir con los criterios aprendidos en la asignatura y facilitar el trabajo, se van a unificar los datos en un único dataset que se aproxime a un conjunto 'tidy' lo máximo posible.
+
 ```{r, warning=FALSE, include=FALSE}
 rm(list = ls())
 
@@ -82,9 +83,9 @@ Parados <- read_delim("data/Parados.csv",
 ```
 
 ```{r, include=FALSE}
-# Al tratarse de un análisis del mercado laboral tenemos que eliminar al grupo de población menor a 16 años pues no tienen la edad para trabajar
+# Al tratarse de un análisis del mercado laboral tenemos que eliminar al grupo de población menor a 16 años pues no tienen edad suficiente para trabajar
 # Renombramos las columnas
-# Como hay una columna que solo contiene "Total Nacional" la eliminamos. Además dentro de Comunidades y Ciudades Autónomas hay valores faltantes que coinciden con el Total de España por lo que los renombramos a "Total Nacional"
+# Como hay una columna que solo contiene "Total Nacional", la eliminamos. Además, dentro de Comunidades y Ciudades Autónomas hay valores faltantes que coinciden con el propio Total Nacional por lo que los renombramos a "Total Nacional"
 Poblacion_edad_trabajar <- Poblacion %>%
   rename(`Población en edad de trabajar` = `Total`) %>%
   filter(Edad != "Menores de 16") %>%
