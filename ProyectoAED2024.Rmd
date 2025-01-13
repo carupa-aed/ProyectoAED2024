@@ -130,7 +130,7 @@ Parados <- Parados %>% rename(`Parados` = `Total`)
 
 Al tratarse de un análisis del mercado laboral eliminaremos al grupo de población menor a 16 años pues no tienen edad suficiente para trabajar. Notamos que en el dataset Población hay una columna que solo contiene la cadena "Total Nacional", por lo que la eliminamos. Además, en la columna "Comunidades y Ciudades Autónomas" hay valores faltantes que coinciden con las filas del propio Total Nacional, de modo que los completamos con dicha cadena.
 
-```{r}
+```{r, include=FALSE}
 Poblacion_edad_trabajar <- Poblacion %>%
   rename(`Población en edad de trabajar` = `Total`) %>%
   filter(Edad != "Menores de 16") %>%
@@ -139,9 +139,9 @@ Poblacion_edad_trabajar <- Poblacion %>%
            replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
 ```
 
-Notamos que para el conjunto de datos de población total en edad de trabajar y población inactiva hay un intervalo de edad más que para el resto de datasets: se divide l"55 y más años" en los grupos "De 55 a 64 años" y "65 y más años". Dado que buscamos obtener un dataset único y compacto uniremos ambos grupos de edad como en el resto de datasets.
+Notamos que para el conjunto de datos de población total en edad de trabajar y población inactiva hay un intervalo de edad más que para el resto de datasets: se divide l"55 y más años" en los grupos "De 55 a 64 años" y "65 y más años". Dado que buscamos obtener un dataset único y compacto uniremos ambos grupos de edad como en el resto de datasets. Una vez normalizada la estructura de los datasets podemos unificar todas las tablas en una sola.
 
-```{r}
+```{r, include=FALSE}
 Poblacion_edad_trabajar <- Poblacion_edad_trabajar %>%
   mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), 
                        "55 y más años", Edad)) %>%
@@ -156,9 +156,7 @@ Inactivos <- Inactivos %>%
   summarise(`Inactivos` = sum(`Inactivos`, na.rm = TRUE), .groups = 'drop')
 ```
 
-Una vez hemos normalizado la estructura de los datasets podemos unificar todos los datos en uno solo.
-
-```{r}
+```{r, include=FALSE}
 datos_EPA <- left_join(Poblacion_edad_trabajar, Activos, 
       by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
                 left_join(., Inactivos, 
@@ -169,9 +167,9 @@ datos_EPA <- left_join(Poblacion_edad_trabajar, Activos,
       by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo"))
 ```
 
-Observamos que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date.
+Otra circunstancia a corregir que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date. Una vez corregido, comprobaremos si existen datos faltantes en nuestro dataset.
 
-```{r}
+```{r, include=FALSE}
 datos_EPA$Periodo <- as.Date(sapply(datos_EPA$Periodo, sacarFechas), 
                              format = "%Y-%m-%d")
 ```
@@ -182,16 +180,14 @@ rm(list = c("Poblacion", "Poblacion_edad_trabajar", "Activos", "Inactivos",
             "Ocupados", "Parados"))
 ```
 
-Observemos si existen datos faltantes en nuestro dataset.
-
-```{r}
+```{r, echo=FALSE}
 sapply(datos_EPA, function(x) sum(is.na(x)))
 ```
 
 Existe únicamente un porcentaje muy bajo de valores faltantes entre las columnas "Activos", "Ocupados" y "Parados". Veamos un ejemplo de estos casos.
 
 
-```{r}
+```{r, echo=FALSE}
 miss_datos_EPA <- datos_EPA %>% mutate(miss_parados = is.na(Parados)) %>% 
   mutate(miss_ocupados = is.na(Ocupados)) %>%
   mutate(miss_activos = is.na(Activos)) %>%
@@ -201,7 +197,7 @@ lapply(miss_datos_EPA[,c("Comunidades y Ciudades Autónomas", "Edad")], table)
 
 Los datos se concentran en Comunidades y Ciudades Autónomas con proporcionalmente poca población y en rangos de edades donde es poco habitual estar parado (ya que para que se cumpla dicha condición se debe estar buscando activamente trabajo). De hecho, el único valor que podría resultar extraño es que exista un valor faltante para un Total de edades, pero al comprobar la localización y fecha notamos que es razonable.
 
-```{r}
+```{r, echo=FALSE}
 miss_datos_EPA[miss_datos_EPA$Edad == "Total",
                c("Sexo", "Comunidades y Ciudades Autónomas", "Periodo")]
 ```
@@ -215,16 +211,17 @@ Dicho patrón parece reflejar que muy poca población de esas características s
 ```{r, include=FALSE}
 datos_EPA <- datos_EPA %>% 
   mutate(Parados = ifelse(is.na(Parados), 0, Parados)) %>%
-  mutate(Ocupados = ifelse(is.na(Ocupados), 0, Parados)) %>%
-  mutate(Activos = ifelse(is.na(Activos), 0, Parados))
+  mutate(Ocupados = ifelse(is.na(Ocupados), 0, Ocupados)) %>%
+  mutate(Activos = ifelse(is.na(Activos), 0, Activos))
 ```
 
 ## Clasificación Nacional de Actividades Económicas (CNAE-2009)
 
 Este dataset divide los datos según rama de actividad, sexo y fecha en el periodo comprendido entre el primer trimestre de 2008 y el tercer trimestre de 2024, usando las mismas unidades que en el resto de datasets. No obstante, en este caso podemos encontrar los datos segmentado en dos subconjuntos principales:
 
-· Porcentajes ("Total_abs"): Representan la proporción de ocupación de cada rama de actividad con respecto al total del sexo correspondiente.
-· Valores absolutos ("Total_porc"): Proporcionan el número total de empleados en cada rama.
++ Porcentajes ("Total_abs"): Representan la proporción de ocupación de cada rama de actividad con respecto al total del sexo correspondiente.
+
++ Valores absolutos ("Total_porc"): Proporcionan el número total de empleados en cada rama.
 
 Esta separación permite analizar tanto las tendencias globales (valores absolutos) como la estructura relativa de los sectores (porcentajes).
 
@@ -233,13 +230,13 @@ datos_CNAE <- read.csv("data/CNAE.csv", sep=";", dec=",")
 datos_CNAE$Total <- as.numeric(gsub(",", ".", gsub("\\.", "", datos_CNAE$Total)))
 ```
 
-Nos encontramos de nuevo con el problema del formato de las fechas, por lo que volveremos a aplicar la función SacarFechas. Además, para diferenciar entre cada tipo de dato (valor absoluto y porcentaje) vamos a extraerlos en dos datasets para posteriormente realizar un join, esencialmente como si se realizara un pivote.
+Nos encontramos de nuevo con el problema del formato de las fechas, por lo que volveremos a aplicar la función SacarFechas. Además, para diferenciar entre cada tipo de dato (valor absoluto y porcentaje) vamos a extraerlos en dos datasets para posteriormente realizar un join, esencialmente como si se realizara un pivote. Una vez hemos unificado la tabla es recomendable realizar un análisis de datos faltantes.
 
 ```{r, include=FALSE}
 datos_CNAE$Periodo <- as.Date(sapply(datos_CNAE$Periodo, sacarFechas), format = "%Y-%m-%d")
 ```
 
-```{r}
+```{r, include=FALSE}
 datos_CNAE_porc <- datos_CNAE[datos_CNAE$Unidad=="Porcentaje",]
 datos_CNAE_porc <- datos_CNAE_porc[, !names(datos_CNAE_porc) %in% "Unidad"]
 
@@ -257,18 +254,19 @@ if (dim(datos_CNAE_abs)[1] == dim(datos_CNAE_porc)[1] & dim(datos_CNAE_abs)[2] =
 rm(list = c("datos_CNAE_abs", "datos_CNAE_porc"))
 ```
 
-Una vez tenemos la tabla unificada es recomendable realizar un análisis de datos faltantes.
-
-```{r}
+```{r, echo=FALSE}
 sapply(datos_CNAE, function(x) sum(is.na(x)))
 ```
 
 Observamos que para un pequeño subconjunto de filas no existen cifras totales. Veamos si siguen algún patrón.
 
-```{r}
+```{r, echo=FALSE}
 miss_datos_CNAE <- datos_CNAE %>% mutate(miss_total = is.na(Total_abs)) %>% 
   filter(miss_total == TRUE)
 head(unique(miss_datos_CNAE$Rama.de.actividad.CNAE.2009), 4)
+```
+
+```{r, include=FALSE}
 rm(list=c("miss_datos_CNAE"))
 ```
 
@@ -280,11 +278,9 @@ datos_CNAE <- datos_CNAE %>%
   mutate(Total_porc = ifelse(is.na(Total_porc), 0, Total_porc))
 ```
 
-Por último, añadiremos una columna que calcula la variación entre un periodo y el siguiente, lo que permitirá identificar momentos de cambio significativo en el mercado laboral, detectando tendencias positivas o negativas a lo largo del tiempo. Esto también permitirá ver de manera rápida la estacionalidad de la ocupación, sobre todo en ciertas ramas de actividad.
+Por último, añadiremos una columna que calcula la variación entre un periodo y el siguiente, lo que permitirá identificar momentos de cambio significativo en el mercado laboral, detectando tendencias positivas o negativas a lo largo del tiempo. Esto también permitirá ver de manera rápida la estacionalidad de la ocupación, sobre todo en ciertas ramas de actividad. Es importante mencionar que realizar las diferencias entre un periodo y el siguiente genera NAs para el primer periodo de cada rama, por lo que sustituiremos estos valores faltantes por ceros.
 
-Es importante mencionar que realizar las diferencias entre un periodo y el siguiente genera NAs para el primer periodo de cada rama, por lo que sustituiremos estos valores faltantes por ceros.
-
-```{r}
+```{r, include=FALSE}
 datos_CNAE$Diferencia_Total <- NA
 
 for (sexo in unique(datos_CNAE$Sexo)) {
@@ -307,3 +303,339 @@ rm(list = c("subset"))
 ```
 
 
+# Representación y análisis de datos
+
+Una vez preparados, los datos se visualizan a través de gráficos y tasas que permiten interpretar patrones, tendencias y distribuciones de manera más clara y directa.
+
+## Encuesta de Población Activa (EPA)
+
+Las tasas del mercado de trabajo, como la de actividad, empleo y ocupación, son fundamentales para este análisis porque permiten comparar de forma clara y estandarizada las dinámicas laborales entre comunidades autónomas y grupos poblacionales. Estas métricas facilitan el estudio de tendencias temporales y desigualdades estructurales, como las brechas de género o regionales, que no serían evidentes al observar valores absolutos. Además, su uso es clave para identificar áreas críticas y evaluar el impacto de eventos económicos, como la crisis de 2008 o la pandemia de COVID-19, en la participación laboral de la población.
+
+Por ello, las siguientes tasas quedan incorporadas dentro del dataset anteriormente mencionado:
+
++ Tasa de Actividad (TA): $\frac{\text{Activos}}{\text{Población} > 16}*100$
+
++ Tasa de Inactividad (TI): $\frac{\text{Inactivos}}{\text{Población} > 16}*100$
+
++ Tasa de Ocupación (TO): $\frac{\text{Ocupados}}{\text{Población} > 16}*100$
+
++ Tasa de Empleo (TE): $\frac{\text{Ocupados}}{\text{Activos}}*100$
+
++ Tasa de Desempleo (TD): $\frac{\text{Parados}}{\text{Activos}}*100$
+
+```{r, include=FALSE}
+datos_EPA <- datos_EPA %>%
+  mutate(`Tasa de Actividad` = (datos_EPA$Activos/datos_EPA$`Población en edad de trabajar`)*100) %>%
+  mutate(`Tasa de Inactividad` = (datos_EPA$Inactivos/datos_EPA$`Población en edad de trabajar`)*100) %>%
+  mutate(`Tasa de Ocupación` = (datos_EPA$Ocupados/datos_EPA$`Población en edad de trabajar`)*100) %>%
+  mutate(`Tasa de Empleo` = (datos_EPA$Ocupados/datos_EPA$Activos)*100) %>%
+  mutate(`Tasa de Desempleo` = (datos_EPA$Parados/datos_EPA$Activos)*100)
+```
+
+Notamos que las tasas de inactividad y desempleo no proporcionan información nueva ya que se pueden obtener mediante la de actividad y empleo respectivamente: $TI = 1 - TA$ y $TD = 1 - TE$.
+
+```{r, include=FALSE}
+inicio_crisis <- as.Date("2008-01-01")   # Inicio de la crisis (enero 2008)
+fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
+inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
+```
+
+```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+# Crear un gráfico de lineas para la Tasa de Actividad
+data_filtered <- datos_EPA %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+TA <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Actividad`)) +
+  geom_line(color = "steelblue", size = 0.8) +
+  geom_point(color = "darkblue", size = 1) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Actividad (%)",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 48,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 48,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 46,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+# Crear un gráfico de lineas para la Tasa de Empleo
+TE <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Empleo`)) +
+  geom_line(color = "steelblue", size = 0.8) +
+  geom_point(color = "darkblue", size = 1) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Empleo (%)",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 70,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 85,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 70,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+# Crear un gráfico de lineas para la Tasa de Ocupación
+TO <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`)) +
+  geom_line(color = "steelblue", size = 0.8) +
+  geom_point(color = "darkblue", size = 1) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Ocupación (%)",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 38,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 43,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 38,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+combinado <- TA + TE + TO +
+  plot_layout(ncol = 2, heights = c(1.2, 1.2)) + # Ajustar espacio entre filas
+  plot_annotation(title = "Evolución de las Tasas del Mercado de Trabajo",
+                  theme = theme(plot.title = element_text(size = 14, face = "bold")))
+```
+
+```{r, echo=FALSE, warning=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+# Lo hacemos en dos chunks porque el código anterior muestra por pantalla 
+#una tabla que no queremos mostrar
+combinado
+```
+
+La figura 1 muestra la evolución de tres indicadores clave del mercado laboral en España: la tasa de actividad, la tasa de empleo y la tasa de ocupación, desde 2002 hasta prácticamente la actualidad, reflejando periodos de estabilidad y cambios abruptos relacionados con eventos económicos y sociales. Entre 2002 y 2008, todas las tasas experimentan un crecimiento sostenido, impulsado por la bonanza económica previa a la crisis financiera global, con un auge en sectores como la construcción y los servicios, y una incorporación activa de la población al mercado laboral.
+
+El inicio de la crisis en 2008 genera un comportamiento diferenciado: mientras que la tasa de actividad se mantiene relativamente estable hasta 2013, las tasas de empleo y ocupación muestran un descenso significativo, reflejando el impacto directo de la destrucción de empleo y la pérdida de capacidad de absorción del mercado laboral. Esto indica que, aunque muchas personas siguieron buscando trabajo activamente (evitando una caída en la actividad), el deterioro de las condiciones laborales afectó severamente las oportunidades de empleo. La tasa de empleo pasó de más del 90% a por debajo del 75% en 2013, o que es lo mismo, un desempleo de más del 25% en la población.
+
+A partir de 2013, con los primeros signos de recuperación económica, la tasa de actividad decrece levemente, posiblemente asociada a una menor presión en el mercado laboral y una reducción del abandono escolar, mientras que las tasas de empleo y ocupación comienzan una recuperación progresiva. Este periodo refleja una estabilización del mercado laboral con la recuperación de ciertos sectores clave.
+
+El impacto de la pandemia de COVID-19 en 2020 es evidente en todas las tasas, con caídas abruptas, especialmente en la tasa de ocupación, debido al cierre temporal de actividades económicas y restricciones de movilidad. Este impacto fue más pronunciado que el de la crisis financiera. Desde 2021, se observa una recuperación acelerada en las tres tasas, marcada por la reincorporación de trabajadores al mercado laboral y el dinamismo de sectores como los servicios digitales, el comercio y el turismo.
+
+```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+# Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
+# Filtrar los datos para Hombres y Mujeres a nivel nacional
+data_filtered <- datos_EPA %>%
+  filter(Sexo %in% c("Hombres", "Mujeres") &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad == "Total")
+
+# Calcular la diferencia entre hombres y mujeres en la Tasa de Actividad
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Actividad`[Sexo == "Hombres"] - `Tasa de Actividad`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+
+TA_sexo <- ggplot() +
+  geom_line(data = data_filtered, aes(x = Periodo, y = `Tasa de Actividad`, colour = Sexo), size = 1) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia), fill = "black", alpha = 0.7) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Actividad (%)",
+    colour = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    legend.position = "none"
+  ) +
+  scale_colour_manual(values = c("Hombres" = "steelblue", "Mujeres" = "darkred")) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1),
+    breaks = seq(0, 60, by = 10)
+    ) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 30,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 20,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 30,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+# Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
+# Calcular la diferencia entre hombres y mujeres en la Tasa de Empleo
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Empleo`[Sexo == "Hombres"] - `Tasa de Empleo`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+
+TE_sexo <- ggplot() +
+  geom_line(data = data_filtered, aes(x = Periodo, y = `Tasa de Empleo`, colour = Sexo), size = 1) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia), fill = "black", alpha = 0.7) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Empleo (%)",
+    colour = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    legend.position = "none"
+  ) +
+  scale_colour_manual(values = c("Hombres" = "steelblue", "Mujeres" = "darkred")) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1),
+    breaks = seq(0, 100, by = 10)
+    ) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 40,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 30,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 40,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+# Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
+# Calcular la diferencia entre hombres y mujeres en la Tasa de Ocupación
+data_diff <- data_filtered %>%
+  group_by(Periodo) %>%
+  summarise(Diferencia = `Tasa de Ocupación`[Sexo == "Hombres"] - `Tasa de Ocupación`[Sexo == "Mujeres"],
+            .groups = 'drop')
+
+
+TO_sexo <- ggplot() +
+  geom_line(data = data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = Sexo), size = 1) +
+  geom_col(data = data_diff, aes(x = Periodo, y = Diferencia), fill = "black", alpha = 0.7) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Ocupación (%)",
+    colour = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    legend.position = "right"
+  ) +
+  scale_colour_manual(values = c("Hombres" = "steelblue", "Mujeres" = "darkred")) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1),
+    breaks = seq(0, 60, by = 10)
+    ) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 22,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 15,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 22,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+combinado2 <- TA_sexo + TE_sexo + TO_sexo +
+  plot_layout(ncol = 2, heights = c(1.2, 1.2)) + # Ajustar espacio entre filas
+  plot_annotation(title = "Evolución de las Tasas del Mercado de Trabajo por Sexo",
+                  theme = theme(plot.title = element_text(size = 14, face = "bold")))
+```
+
+```{r, echo=FALSE, warning=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+combinado2
+```
+
+La figura muestra la evolución de las tasas de actividad, empleo y ocupación desglosadas por género, evidenciando patrones de desigualdad, convergencia y algunas diferencias clave entre estos indicadores. La tasa de actividad masculina, consistentemente más alta que la femenina, experimenta un descenso gradual entre 2008 y 2020, probablemente vinculado a los cambios estructurales tras la crisis financiera. En contraste, la tasa de actividad femenina ha crecido de forma sostenida desde 2002, impulsada por cambios sociales y legislativos, aunque este crecimiento se ralentiza a partir de 2008. Este proceso ha reducido la brecha de género de casi un 20% en 2002 a cerca de un 8% en años recientes, como reflejan las barras grises que representan esta diferencia.
+
+En la tasa de empleo, sin embargo, las diferencias entre hombres y mujeres son mucho más reducidas, lo que sugiere que la principal disparidad radica en la población activa. Esto se explica porque la tasa de empleo mide únicamente a las personas empleadas dentro de la población activa, mientras que la tasa de ocupación considera a toda la población en edad de trabajar. Por ello, las diferencias en la tasa de ocupación entre hombres y mujeres son más marcadas, reflejando no solo las desigualdades en el empleo, sino también las disparidades en la incorporación al mercado laboral.
+
+Durante la pandemia de COVID-19 en 2020, todas las tasas muestran un descenso significativo, seguido de una recuperación que resalta la resiliencia del mercado laboral. Este análisis pone en evidencia tanto los avances hacia la igualdad de género en términos laborales como las áreas donde persisten desigualdades estructurales, especialmente en la población activa y su impacto en las tasas de ocupación.
