@@ -172,7 +172,7 @@ rm(list = c("Poblacion", "Poblacion_edad_trabajar", "Activos", "Inactivos", "Ocu
 
 Observemos si existen datos faltantes en nuestro dataset.
 
-```{r}
+```{r fig.width=4, fig.height=4}
 vis_miss(datos_EPA)
 ```
 
@@ -234,7 +234,7 @@ rm(list = c("datos_CNAE_abs", "datos_CNAE_porc"))
 
 Una vez tenemos la tabla unificada es recomendable realizar un análisis de datos faltantes.
 
-```{r}
+```{r fig.width=4, fig.height=4}
 vis_miss(datos_CNAE)
 ```
 
