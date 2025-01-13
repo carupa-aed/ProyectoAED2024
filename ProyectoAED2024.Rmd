@@ -639,3 +639,218 @@ La figura muestra la evolución de las tasas de actividad, empleo y ocupación d
 En la tasa de empleo, sin embargo, las diferencias entre hombres y mujeres son mucho más reducidas, lo que sugiere que la principal disparidad radica en la población activa. Esto se explica porque la tasa de empleo mide únicamente a las personas empleadas dentro de la población activa, mientras que la tasa de ocupación considera a toda la población en edad de trabajar. Por ello, las diferencias en la tasa de ocupación entre hombres y mujeres son más marcadas, reflejando no solo las desigualdades en el empleo, sino también las disparidades en la incorporación al mercado laboral.
 
 Durante la pandemia de COVID-19 en 2020, todas las tasas muestran un descenso significativo, seguido de una recuperación que resalta la resiliencia del mercado laboral. Este análisis pone en evidencia tanto los avances hacia la igualdad de género en términos laborales como las áreas donde persisten desigualdades estructurales, especialmente en la población activa y su impacto en las tasas de ocupación.
+
+```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+# Crear un gráfico de líneas para cada grupo de edad
+data_filtered <- datos_EPA %>%
+  filter(Sexo == "Ambos sexos" &
+           `Comunidades y Ciudades Autónomas` == "Total Nacional" &
+           Edad != "Total")
+
+
+TA_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Actividad`, colour = Edad, group = Edad)) +
+  geom_line(size = 0.8) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Actividad (%)",
+    colour = "Grupo de Edad",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    legend.position = "none"
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1),
+    breaks = seq(0, 90, by = 10)
+    ) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 40,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 33,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 36,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+# Crear un gráfico de líneas para cada grupo de edad
+TE_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Empleo`, colour = Edad, group = Edad)) +
+  geom_line(size = 0.8) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Empleo (%)",
+    colour = "Grupo de Edad",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    legend.position = "none"
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1),
+    breaks = seq(20, 100, by = 10)
+    ) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 40,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = 1.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 40,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 30,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+
+# Crear un gráfico de líneas para cada grupo de edad
+TO_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colour = Edad, group = Edad)) +
+  geom_line(size = 0.8) +
+  labs(
+    x = "Periodo",
+    y = "Tasa de Ocupación (%)",
+    colour = "Grupo de Edad",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    legend.position = "right"
+  ) +
+  scale_x_date(date_labels = "%Y", date_breaks = "2 years") +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 1),
+    breaks = seq(0, 80, by = 10)
+    ) +
+  
+  geom_vline(xintercept = as.numeric(inicio_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
+  
+  geom_text(aes(x = inicio_crisis, y = 30,
+                label = "Inicio de la crisis\n (2008)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = fin_crisis, y = 50,
+                label = "Fin de la crisis\n (2013)"), 
+                color = "grey30", size = 1.8, fontface = "italic",
+            hjust = -0.04, vjust = 0) +
+  geom_text(aes(x = inicio_covid, y = 50,
+                label = "Inicio COVID\n (2020)" 
+                ), color = "grey30", size = 1.8,fontface = "italic",
+            hjust = -0.04, vjust = 0)
+
+
+combinado3 <- TA_edad + TE_edad + TO_edad +
+  plot_layout(ncol = 2, heights = c(1.2, 1.2)) + # Ajustar espacio entre filas
+  plot_annotation(title = "Evolución de las Tasas del Mercado de Trabajo por Sexo",
+                  theme = theme(plot.title = element_text(size = 14, face = "bold")))
+```
+
+```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+combinado3
+```
+
+Por último, desglosadando la población por grupos de edad, se puede observar cómo cada segmento ha experimentado diferentes dinámicas en el mercado laboral. Los grupos de mayor edad, como los de 35 a 44 años y 45 a 54 años, destacan por mantener tasas de actividad superiores al 80 %, significativamente más altas y estables a lo largo del tiempo, reflejando su integración consolidada en el mercado laboral. En contraste, los grupos más jóvenes, especialmente el de 16 a 19 años, presentan tasas considerablemente más bajas, con una caída pronunciada desde 2008. Por ejemplo, en 2013, la tasa de empleo de este grupo se sitúa por debajo del 30 %, lo que implica un desempleo superior al 70 %. Este fenómeno puede atribuirse a que este grupo se encontraba principalmente en el sector de la construcción, el cual sufrió más el efecto de la recesión. Por otro lado, el aumento de la escolarización y la prolongación de los estudios produjo la caída en su actividad.
+
+Además, en los grupos jóvenes, como los de 16 a 19 años y 20 a 24 años, se observa una marcada estacionalidad a lo largo del periodo, probablemente vinculada a los meses de verano, cuando muchos estudiantes se incorporan temporalmente al mercado laboral, especialmente en sectores como la hostelería. Por su parte, en la tasa de actividad y ocupación, el grupo de 55 y más años presenta niveles considerablemente más bajos debido a la jubilación, ya que estos ciudadanos son considerados población inactiva. Sin embargo, este fenómeno no se refleja de la misma forma en la tasa de empleo, ya que este indicador se calcula en función de la población activa, excluyendo a los inactivos como los jubilados.
+
+### Clustering por Comunidades y Ciudades Autónomas
+
+En este apartado del proyecto se va a proceder a realizar un clustering de la tasa de empleo para las distintas Comunidades y Ciudades Autónomas de España en los siguientes años: 2007, 2013 y 2023.
+El principal motivo por el cual escogemos esta tasa se debe a que se mide como el porcentaje de personas ocupadas respecto a la población activa, es decir, las que se encuentran activamente en el mercado laboral.
+
+Como método de clusterización se utilizará el k-means, que organiza los datos en grupos basados en su similitud. Este algoritmo comienza eligiendo un número de clusters (`k`) y seleccionando centroides iniciales al azar. Cada punto se asigna al cluster cuyo centroide está más cercano, y luego los centroides se recalculan como el promedio de los puntos en cada grupo.
+Es un proceso que se repite hasta que los centroides dejan de cambiar o se alcanza un límite de iteraciones. Al finalizar, las comunidades quedan agrupadas en k clusters, representando cada uno un conjunto de puntos con características similares.
+
+Por otro lado, como método para la selección del hiperparámetro `k` se opta por el método del codo. Este método Consiste en graficar la suma de cuadrados dentro del cluster (WSS) frente a distintos valores de `k`. El punto donde la disminución de WSS se ralentiza significativamente, formando un "codo", indica el número adecuado de clusters.
+
+```{r, include=FALSE}
+# Eliminamos el total nacional puesto que ahora nos centramos en la CCAA
+datos_EPA <- datos_EPA %>%
+  filter(`Comunidades y Ciudades Autónomas` != "Total Nacional") %>%
+  separate(`Comunidades y Ciudades Autónomas`, into = c("Codigo", "Comunidades y Ciudades Autónomas"), sep = " ", extra = "merge")
+```
+
+```{r, include=FALSE}
+# Cargamos el archivo GeoJSON
+geojson_path <- "./data/spain-communities.geojson"
+mapa_comunidades <- st_read(geojson_path)
+```
+
+```{r, include=FALSE}
+tasas <- c("Tasa de Actividad", "Tasa de Empleo", "Tasa de Ocupación")
+```
+
+
+```{r, warning=FALSE, echo=FALSE, out.width='60%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+grafico_codo_global("Tasa de Empleo", datos_EPA)
+```
+
+Observando el gráfico anterior, se puede considerar que el número de clusters a partir del cual la WSS se ralentiza es en `k=3`, pues es en donde se forma el "codo".
+
+Posteriormente, y como se ha mencionado al principio del apartado, vamos a hacer un clustering con el objetivo de agrupar las CCAA según su tasa de empleo en distintos periodos. Posteriormente los colores de los clusters se representan en un mapa de España dividido por dichas regiones para visualizar de forma clara y efectiva los patrones espaciales.
+
+La intención de esta medida es identificar patrones regionales y analizar las diferencias en las dinámicas del mercado laboral a nivel territorial. Este enfoque permite agrupar regiones con características similares, facilitando la comparación interregional y destacando aquellas con tasas de empleo altas, medias o bajas. Además, es útil para detectar desigualdades laborales y sectoriales entre regiones comprendendiendo cómo estas evolucionan a lo largo del tiempo.
+
+```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+crear_clustering_grafico_mapa(datos_EPA, "Tasa de Empleo", mapa_comunidades, "2007")
+```
+La figura muestra el análisis de clustering y el mapa correspondiente a la tasa de empleo de las comunidades autónomas en España en el año 2007, justo antes del inicio de la crisis financiera. En el gráfico de barras, se observa que comunidades como Navarra, Aragón, Cantabria y Cataluña presentan las tasas de empleo más altas, superando el 90%. Estas regiones, representadas en azul en el mapa, se agrupan en un mismo clúster, lo que sugiere un desempeño laboral favorable en estas áreas, posiblemente asociado a economías diversificadas y mercados laborales más sólidos tales como el tecnológico o el industrial.
+
+Por otro lado, comunidades como Ceuta, Melilla, Extremadura y Andalucía tienen las tasas de empleo más bajas, por debajo del 85%, y se agrupan en un clúster diferenciado, marcado en rojo en el mapa. Esto refleja un mercado laboral más débil en estas regiones, históricamente caracterizadas por mayores tasas de desempleo y una dependencia económica de sectores menos dinámicos.
+
+El clúster intermedio, representado en verde, incluye comunidades como Galicia, Castilla-La Mancha y Murcia, con tasas de empleo moderadas, entre el 85% y el 90%. Este grupo muestra un desempeño laboral estable, aunque menos destacado en comparación con las regiones líderes.
+
+En su conjunto, la figura permite identificar con claridad las disparidades regionales en el mercado laboral español en 2007 desde el sur hasta el norte del país, proporcionando una línea base para evaluar cómo estas dinámicas se vieron afectadas por la crisis económica que comenzaría poco después.
+
+```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+crear_clustering_grafico_mapa(datos_EPA, "Tasa de Empleo", mapa_comunidades, "2013")
+```
+
+Por otro lado, la figura muestra el análisis de clustering y el mapa en 2013, el momento más crítico de la crisis económica en España. En comparación con 2007, se observa una disminución generalizada de las tasas de empleo en todas las regiones, reflejando el impacto severo de la crisis en el mercado laboral. Las comunidades con tasas de empleo más altas, como País Vasco, La Rioja y Navarra, apenas superan el 70%, situándose muy por debajo de los niveles precrisis que superaban el 90%. Estas regiones, representadas en azul en el mapa, se mantienen como las de mejor desempeño relativo, aunque con una caída significativa respecto a 2007.
+
+Las comunidades con tasas más bajas, como Andalucía, Canarias y Extremadura, presentan tasas de empleo inferiores al 60%, destacando Andalucía con un preocupante 55.5%. Este grupo, representado en rojo en el mapa, evidencia el fuerte deterioro del mercado laboral en regiones tradicionalmente más vulnerables, donde la crisis intensificó los problemas estructurales de empleo.
+
+El clúster intermedio, en verde, agrupa comunidades como Galicia, Castilla y León, y Cataluña, con tasas de empleo entre el 63% y el 70%. Este grupo muestra una reducción importante en comparación con los niveles previos a la crisis, pero logra mantenerse en un rango moderado frente a las regiones con peor desempeño.
+
+En conjunto, la figura refleja cómo la crisis económica impactó de manera desigual en el territorio español, exacerbando las disparidades regionales en el empleo. Aunque las regiones líderes lograron mantener una relativa ventaja, la caída generalizada evidencia la magnitud del daño económico y social provocado por la crisis. Este análisis destaca la importancia de entender las dinámicas regionales para diseñar políticas efectivas de recuperación y fortalecimiento del mercado laboral.
+
+```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+crear_clustering_grafico_mapa(datos_EPA, "Tasa de Empleo", mapa_comunidades, "2023")
+```
+
+Por último lugar, y relacionado con la actualidad, la figura de 2023 refleja una clara recuperación del mercado laboral tras los efectos de la crisis económica de 2008-2013 y la pandemia de COVID-19. Comparado con 2007, la tasa de empleo aún no alcanza los niveles previos a la crisis, pero muestra una mejora significativa respecto a 2013, lo que indica una tendencia hacia la estabilización y el fortalecimiento del empleo en el país.
+
+En 2023, las comunidades con mejor desempeño, representadas en azul, poseen tasas de empleo que superan el 84%. Aunque aún por debajo del 90% que caracterizaba a las regiones líderes en 2007, estas comunidades han logrado una recuperación considerable desde 2013, cuando sus tasas apenas superaban el 70%.
+
+El grupo intermedio, representado en verde, posee unos valores de empleo alrededor del 80%. Este grupo muestra una notable mejora frente a los niveles de 2013, cuando sus tasas se encontraban en torno al 65%-70%. La recuperación en estas regiones evidencia un crecimiento sostenido que les permite acercarse al desempeño de las regiones líderes.
+
+Las comunidades con menor tasa de empleo, como Ceuta, Melilla, Andalucía y Extremadura, representadas en rojo, registran tasas por debajo del 75%. Aunque muestran avances significativos respecto a 2013, cuando sus tasas eran inferiores al 60%, estas regiones siguen siendo las más afectadas por problemas estructurales en el mercado laboral. Andalucía, por ejemplo, ha alcanzado una tasa del 74.3%, un progreso importante desde el 55.5% en 2013, pero aún distante de las regiones con mejor desempeño.
+
+En conclusión, en comparación con 2007 el panorama de 2023 refleja un mercado laboral más o menos parecido pero con más desempleo, persistiendo también las disparidades regionales. Las comunidades más vulnerables han avanzado considerablemente, pero no han cerrado la brecha con las regiones líderes. Este análisis realizado con clustering subraya la importancia de continuar impulsando políticas orientadas a fortalecer el empleo en las regiones más rezagadas, fomentando la cohesión territorial y reduciendo las desigualdades en el mercado laboral español.

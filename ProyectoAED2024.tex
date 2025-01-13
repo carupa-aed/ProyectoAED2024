@@ -552,6 +552,224 @@ los avances hacia la igualdad de género en términos laborales como las
 áreas donde persisten desigualdades estructurales, especialmente en la
 población activa y su impacto en las tasas de ocupación.
 
+\begin{figure}[h]
+
+{\centering \includegraphics[width=1\linewidth]{ProyectoAED2024_files/figure-latex/unnamed-chunk-30-1} 
+
+}
+
+\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-30}
+\end{figure}
+
+Por último, desglosadando la población por grupos de edad, se puede
+observar cómo cada segmento ha experimentado diferentes dinámicas en el
+mercado laboral. Los grupos de mayor edad, como los de 35 a 44 años y 45
+a 54 años, destacan por mantener tasas de actividad superiores al 80 \%,
+significativamente más altas y estables a lo largo del tiempo,
+reflejando su integración consolidada en el mercado laboral. En
+contraste, los grupos más jóvenes, especialmente el de 16 a 19 años,
+presentan tasas considerablemente más bajas, con una caída pronunciada
+desde 2008. Por ejemplo, en 2013, la tasa de empleo de este grupo se
+sitúa por debajo del 30 \%, lo que implica un desempleo superior al 70
+\%. Este fenómeno puede atribuirse a que este grupo se encontraba
+principalmente en el sector de la construcción, el cual sufrió más el
+efecto de la recesión. Por otro lado, el aumento de la escolarización y
+la prolongación de los estudios produjo la caída en su actividad.
+
+Además, en los grupos jóvenes, como los de 16 a 19 años y 20 a 24 años,
+se observa una marcada estacionalidad a lo largo del periodo,
+probablemente vinculada a los meses de verano, cuando muchos estudiantes
+se incorporan temporalmente al mercado laboral, especialmente en
+sectores como la hostelería. Por su parte, en la tasa de actividad y
+ocupación, el grupo de 55 y más años presenta niveles considerablemente
+más bajos debido a la jubilación, ya que estos ciudadanos son
+considerados población inactiva. Sin embargo, este fenómeno no se
+refleja de la misma forma en la tasa de empleo, ya que este indicador se
+calcula en función de la población activa, excluyendo a los inactivos
+como los jubilados.
+
+\subsubsection{Clustering por Comunidades y Ciudades
+Autónomas}\label{clustering-por-comunidades-y-ciudades-autuxf3nomas}
+
+En este apartado del proyecto se va a proceder a realizar un clustering
+de la tasa de empleo para las distintas Comunidades y Ciudades Autónomas
+de España en los siguientes años: 2007, 2013 y 2023. El principal motivo
+por el cual escogemos esta tasa se debe a que se mide como el porcentaje
+de personas ocupadas respecto a la población activa, es decir, las que
+se encuentran activamente en el mercado laboral.
+
+Como método de clusterización se utilizará el k-means, que organiza los
+datos en grupos basados en su similitud. Este algoritmo comienza
+eligiendo un número de clusters (\texttt{k}) y seleccionando centroides
+iniciales al azar. Cada punto se asigna al cluster cuyo centroide está
+más cercano, y luego los centroides se recalculan como el promedio de
+los puntos en cada grupo. Es un proceso que se repite hasta que los
+centroides dejan de cambiar o se alcanza un límite de iteraciones. Al
+finalizar, las comunidades quedan agrupadas en k clusters, representando
+cada uno un conjunto de puntos con características similares.
+
+Por otro lado, como método para la selección del hiperparámetro
+\texttt{k} se opta por el método del codo. Este método Consiste en
+graficar la suma de cuadrados dentro del cluster (WSS) frente a
+distintos valores de \texttt{k}. El punto donde la disminución de WSS se
+ralentiza significativamente, formando un ``codo'', indica el número
+adecuado de clusters.
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=0.6\linewidth]{ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1} 
+
+}
+
+\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-34}
+\end{figure}
+
+Observando el gráfico anterior, se puede considerar que el número de
+clusters a partir del cual la WSS se ralentiza es en \texttt{k=3}, pues
+es en donde se forma el ``codo''.
+
+Posteriormente, y como se ha mencionado al principio del apartado, vamos
+a hacer un clustering con el objetivo de agrupar las CCAA según su tasa
+de empleo en distintos periodos. Posteriormente los colores de los
+clusters se representan en un mapa de España dividido por dichas
+regiones para visualizar de forma clara y efectiva los patrones
+espaciales.
+
+La intención de esta medida es identificar patrones regionales y
+analizar las diferencias en las dinámicas del mercado laboral a nivel
+territorial. Este enfoque permite agrupar regiones con características
+similares, facilitando la comparación interregional y destacando
+aquellas con tasas de empleo altas, medias o bajas. Además, es útil para
+detectar desigualdades laborales y sectoriales entre regiones
+comprendendiendo cómo estas evolucionan a lo largo del tiempo.
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=1\linewidth]{ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1} 
+
+}
+
+\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-35}
+\end{figure}
+
+La figura muestra el análisis de clustering y el mapa correspondiente a
+la tasa de empleo de las comunidades autónomas en España en el año 2007,
+justo antes del inicio de la crisis financiera. En el gráfico de barras,
+se observa que comunidades como Navarra, Aragón, Cantabria y Cataluña
+presentan las tasas de empleo más altas, superando el 90\%. Estas
+regiones, representadas en azul en el mapa, se agrupan en un mismo
+clúster, lo que sugiere un desempeño laboral favorable en estas áreas,
+posiblemente asociado a economías diversificadas y mercados laborales
+más sólidos tales como el tecnológico o el industrial.
+
+Por otro lado, comunidades como Ceuta, Melilla, Extremadura y Andalucía
+tienen las tasas de empleo más bajas, por debajo del 85\%, y se agrupan
+en un clúster diferenciado, marcado en rojo en el mapa. Esto refleja un
+mercado laboral más débil en estas regiones, históricamente
+caracterizadas por mayores tasas de desempleo y una dependencia
+económica de sectores menos dinámicos.
+
+El clúster intermedio, representado en verde, incluye comunidades como
+Galicia, Castilla-La Mancha y Murcia, con tasas de empleo moderadas,
+entre el 85\% y el 90\%. Este grupo muestra un desempeño laboral
+estable, aunque menos destacado en comparación con las regiones líderes.
+
+En su conjunto, la figura permite identificar con claridad las
+disparidades regionales en el mercado laboral español en 2007 desde el
+sur hasta el norte del país, proporcionando una línea base para evaluar
+cómo estas dinámicas se vieron afectadas por la crisis económica que
+comenzaría poco después.
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=1\linewidth]{ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1} 
+
+}
+
+\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-36}
+\end{figure}
+
+Por otro lado, la figura muestra el análisis de clustering y el mapa en
+2013, el momento más crítico de la crisis económica en España. En
+comparación con 2007, se observa una disminución generalizada de las
+tasas de empleo en todas las regiones, reflejando el impacto severo de
+la crisis en el mercado laboral. Las comunidades con tasas de empleo más
+altas, como País Vasco, La Rioja y Navarra, apenas superan el 70\%,
+situándose muy por debajo de los niveles precrisis que superaban el
+90\%. Estas regiones, representadas en azul en el mapa, se mantienen
+como las de mejor desempeño relativo, aunque con una caída significativa
+respecto a 2007.
+
+Las comunidades con tasas más bajas, como Andalucía, Canarias y
+Extremadura, presentan tasas de empleo inferiores al 60\%, destacando
+Andalucía con un preocupante 55.5\%. Este grupo, representado en rojo en
+el mapa, evidencia el fuerte deterioro del mercado laboral en regiones
+tradicionalmente más vulnerables, donde la crisis intensificó los
+problemas estructurales de empleo.
+
+El clúster intermedio, en verde, agrupa comunidades como Galicia,
+Castilla y León, y Cataluña, con tasas de empleo entre el 63\% y el
+70\%. Este grupo muestra una reducción importante en comparación con los
+niveles previos a la crisis, pero logra mantenerse en un rango moderado
+frente a las regiones con peor desempeño.
+
+En conjunto, la figura refleja cómo la crisis económica impactó de
+manera desigual en el territorio español, exacerbando las disparidades
+regionales en el empleo. Aunque las regiones líderes lograron mantener
+una relativa ventaja, la caída generalizada evidencia la magnitud del
+daño económico y social provocado por la crisis. Este análisis destaca
+la importancia de entender las dinámicas regionales para diseñar
+políticas efectivas de recuperación y fortalecimiento del mercado
+laboral.
+
+\begin{figure}[h]
+
+{\centering \includegraphics[width=1\linewidth]{ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1} 
+
+}
+
+\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-37}
+\end{figure}
+
+Por último lugar, y relacionado con la actualidad, la figura de 2023
+refleja una clara recuperación del mercado laboral tras los efectos de
+la crisis económica de 2008-2013 y la pandemia de COVID-19. Comparado
+con 2007, la tasa de empleo aún no alcanza los niveles previos a la
+crisis, pero muestra una mejora significativa respecto a 2013, lo que
+indica una tendencia hacia la estabilización y el fortalecimiento del
+empleo en el país.
+
+En 2023, las comunidades con mejor desempeño, representadas en azul,
+poseen tasas de empleo que superan el 84\%. Aunque aún por debajo del
+90\% que caracterizaba a las regiones líderes en 2007, estas comunidades
+han logrado una recuperación considerable desde 2013, cuando sus tasas
+apenas superaban el 70\%.
+
+El grupo intermedio, representado en verde, posee unos valores de empleo
+alrededor del 80\%. Este grupo muestra una notable mejora frente a los
+niveles de 2013, cuando sus tasas se encontraban en torno al 65\%-70\%.
+La recuperación en estas regiones evidencia un crecimiento sostenido que
+les permite acercarse al desempeño de las regiones líderes.
+
+Las comunidades con menor tasa de empleo, como Ceuta, Melilla, Andalucía
+y Extremadura, representadas en rojo, registran tasas por debajo del
+75\%. Aunque muestran avances significativos respecto a 2013, cuando sus
+tasas eran inferiores al 60\%, estas regiones siguen siendo las más
+afectadas por problemas estructurales en el mercado laboral. Andalucía,
+por ejemplo, ha alcanzado una tasa del 74.3\%, un progreso importante
+desde el 55.5\% en 2013, pero aún distante de las regiones con mejor
+desempeño.
+
+En conclusión, en comparación con 2007 el panorama de 2023 refleja un
+mercado laboral más o menos parecido pero con más desempleo,
+persistiendo también las disparidades regionales. Las comunidades más
+vulnerables han avanzado considerablemente, pero no han cerrado la
+brecha con las regiones líderes. Este análisis realizado con clustering
+subraya la importancia de continuar impulsando políticas orientadas a
+fortalecer el empleo en las regiones más rezagadas, fomentando la
+cohesión territorial y reduciendo las desigualdades en el mercado
+laboral español.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \vspace{6pt}

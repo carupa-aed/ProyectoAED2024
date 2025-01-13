@@ -94,7 +94,7 @@ spain_map_relative <- function(data, rel_data, periodo, title, edad = "Total", s
 
 
 # Función para calcular clustering y generar gráficos y mapas
-crear_clustering_grafico_mapa <- function(tasa, mapa_comunidades, anio) {
+crear_clustering_grafico_mapa <- function(datos, tasa, mapa_comunidades, anio) {
   
   # Calcular la media de la tasa seleccionada por comunidad para el año dado
   dataset_anio <- datos %>%
