@@ -42,7 +42,7 @@ keywords: |
   keyword 1; keyword 2; keyword 3 (list three to ten pertinent keywords specific 
   to the article, yet reasonably common within the subject discipline.).
 bibliography: mybibfile.bib
-appendix: appendix.tex
+#appendix: appendix.tex
 endnotes: false
 output: 
   rticles::mdpi_article:
@@ -97,7 +97,7 @@ Como se ha mencionado anteriormente en la introducción, la EPA es realizada tri
 
 Cabe destacar que estos datasets están desglosados por comunidad y ciudad autónoma, sexo y grupo de edad, con las tres columnas expresadas en "miles de personas" como unidad. El periodo de los datos figura desde el primer trismestre de 2002 hasta el tercer trimestre de 2024.
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, include=FALSE}
 Poblacion <- read_delim("data/Poblacion Total.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(Total = col_number()), 
     locale = locale(decimal_mark = ",", grouping_mark = "."), 
@@ -135,19 +135,23 @@ Poblacion_edad_trabajar <- Poblacion %>%
   rename(`Población en edad de trabajar` = `Total`) %>%
   filter(Edad != "Menores de 16") %>%
   select(-contains("Total Nacional")) %>%
-  mutate(`Comunidades y Ciudades Autónomas` = replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
+  mutate(`Comunidades y Ciudades Autónomas` =
+           replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
 ```
 
 Notamos que para el conjunto de datos de población total en edad de trabajar y población inactiva hay un intervalo de edad más que para el resto de datasets: se divide l"55 y más años" en los grupos "De 55 a 64 años" y "65 y más años". Dado que buscamos obtener un dataset único y compacto uniremos ambos grupos de edad como en el resto de datasets.
 
 ```{r}
 Poblacion_edad_trabajar <- Poblacion_edad_trabajar %>%
-  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
+  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), 
+                       "55 y más años", Edad)) %>%
   group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
-  summarise(`Población en edad de trabajar` = sum(`Población en edad de trabajar`, na.rm = TRUE), .groups = 'drop')
+  summarise(`Población en edad de trabajar` = 
+              sum(`Población en edad de trabajar`, na.rm = TRUE), .groups = 'drop')
 
 Inactivos <- Inactivos %>%
-  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), "55 y más años", Edad)) %>%
+  mutate(Edad = ifelse(Edad %in% c("De 55 a 64 años", "65 y más años"), 
+                       "55 y más años", Edad)) %>%
   group_by(Sexo, `Comunidades y Ciudades Autónomas`, Edad, Periodo) %>%
   summarise(`Inactivos` = sum(`Inactivos`, na.rm = TRUE), .groups = 'drop')
 ```
@@ -155,45 +159,64 @@ Inactivos <- Inactivos %>%
 Una vez hemos normalizado la estructura de los datasets podemos unificar todos los datos en uno solo.
 
 ```{r}
-datos_EPA <- left_join(Poblacion_edad_trabajar, Activos, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
-                left_join(., Inactivos, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
-                left_join(., Ocupados, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
-                left_join(., Parados, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo"))
+datos_EPA <- left_join(Poblacion_edad_trabajar, Activos, 
+      by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
+                left_join(., Inactivos, 
+      by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
+                left_join(., Ocupados, 
+      by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo")) %>%
+                left_join(., Parados, 
+      by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo"))
 ```
 
-Observamos que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date. Del mismo modo
+Observamos que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date.
 
 ```{r}
-datos_EPA$Periodo <- as.Date(sapply(datos_EPA$Periodo, sacarFechas), format = "%Y-%m-%d")
+datos_EPA$Periodo <- as.Date(sapply(datos_EPA$Periodo, sacarFechas), 
+                             format = "%Y-%m-%d")
+```
 
+```{r, include=FALSE}
 # Borramos los datasets innecesarios
-rm(list = c("Poblacion", "Poblacion_edad_trabajar", "Activos", "Inactivos", "Ocupados", "Parados"))
+rm(list = c("Poblacion", "Poblacion_edad_trabajar", "Activos", "Inactivos", 
+            "Ocupados", "Parados"))
 ```
 
 Observemos si existen datos faltantes en nuestro dataset.
 
-```{r fig.width=4, fig.height=4}
-vis_miss(datos_EPA)
+```{r}
+sapply(datos_EPA, function(x) sum(is.na(x)))
 ```
 
-Existe únicamente un porcentaje muy bajo de valores faltantes en la columna "Parados". Veamos un ejemplo de estos casos.
+Existe únicamente un porcentaje muy bajo de valores faltantes entre las columnas "Activos", "Ocupados" y "Parados". Veamos un ejemplo de estos casos.
+
 
 ```{r}
-miss_datos_EPA <- datos_EPA %>% mutate(miss_parados = is.na(Parados)) %>% filter(miss_parados == TRUE)
+miss_datos_EPA <- datos_EPA %>% mutate(miss_parados = is.na(Parados)) %>% 
+  mutate(miss_ocupados = is.na(Ocupados)) %>%
+  mutate(miss_activos = is.na(Activos)) %>%
+  filter(miss_parados == TRUE | miss_ocupados == TRUE | miss_activos == TRUE)
 lapply(miss_datos_EPA[,c("Comunidades y Ciudades Autónomas", "Edad")], table)
 ```
 
 Los datos se concentran en Comunidades y Ciudades Autónomas con proporcionalmente poca población y en rangos de edades donde es poco habitual estar parado (ya que para que se cumpla dicha condición se debe estar buscando activamente trabajo). De hecho, el único valor que podría resultar extraño es que exista un valor faltante para un Total de edades, pero al comprobar la localización y fecha notamos que es razonable.
 
 ```{r}
-miss_datos_EPA[miss_datos_EPA$Edad == "Total",c("Sexo", "Comunidades y Ciudades Autónomas", "Periodo")]
+miss_datos_EPA[miss_datos_EPA$Edad == "Total",
+               c("Sexo", "Comunidades y Ciudades Autónomas", "Periodo")]
+```
+
+```{r, include=FALSE}
 rm(list=c("miss_datos_EPA"))
 ```
 
 Dicho patrón parece reflejar que muy poca población de esas características se encontraba parada; por tanto, sustituiremos los valores faltantes del dataset por ceros.
 
-```{r}
-datos_EPA <- datos_EPA %>% mutate(Parados = ifelse(is.na(Parados), 0, Parados))
+```{r, include=FALSE}
+datos_EPA <- datos_EPA %>% 
+  mutate(Parados = ifelse(is.na(Parados), 0, Parados)) %>%
+  mutate(Ocupados = ifelse(is.na(Ocupados), 0, Parados)) %>%
+  mutate(Activos = ifelse(is.na(Activos), 0, Parados))
 ```
 
 ## Clasificación Nacional de Actividades Económicas (CNAE-2009)
@@ -205,18 +228,16 @@ Este dataset divide los datos según rama de actividad, sexo y fecha en el perio
 
 Esta separación permite analizar tanto las tendencias globales (valores absolutos) como la estructura relativa de los sectores (porcentajes).
 
-```{r}
+```{r, include=FALSE}
 datos_CNAE <- read.csv("data/CNAE.csv", sep=";", dec=",")
+datos_CNAE$Total <- as.numeric(gsub(",", ".", gsub("\\.", "", datos_CNAE$Total)))
 ```
 
-Esta vez al usar la función "read.csv" tendremos que modificar el tipo de dato de la columna "Total" de cadena de texto a numérico. Además, nos encontramos de nuevo con el problema del formato de las fechas, por lo que volveremos a aplicar la función SacarFechas.
+Nos encontramos de nuevo con el problema del formato de las fechas, por lo que volveremos a aplicar la función SacarFechas. Además, para diferenciar entre cada tipo de dato (valor absoluto y porcentaje) vamos a extraerlos en dos datasets para posteriormente realizar un join, esencialmente como si se realizara un pivote.
 
-```{r}
-datos_CNAE$Total <- as.numeric(gsub(",", ".", gsub("\\.", "", datos_CNAE$Total)))
+```{r, include=FALSE}
 datos_CNAE$Periodo <- as.Date(sapply(datos_CNAE$Periodo, sacarFechas), format = "%Y-%m-%d")
 ```
-
-Para diferenciar entre cada tipo de dato (valor absoluto y porcentaje) vamos a extraerlos en dos datasets para posteriormente realizar un join, esencialmente como si se realizara un pivote.
 
 ```{r}
 datos_CNAE_porc <- datos_CNAE[datos_CNAE$Unidad=="Porcentaje",]
@@ -226,35 +247,42 @@ datos_CNAE_abs <- datos_CNAE[datos_CNAE$Unidad=="Valor absoluto",]
 datos_CNAE_abs <- datos_CNAE_abs[, !names(datos_CNAE_abs) %in% "Unidad"]
 
 if (dim(datos_CNAE_abs)[1] == dim(datos_CNAE_porc)[1] & dim(datos_CNAE_abs)[2] == dim(datos_CNAE_porc)[2]){
-  datos_CNAE <- left_join(datos_CNAE_abs, datos_CNAE_porc, by = c("Rama.de.actividad.CNAE.2009", "Sexo", "Periodo"), suffix = c("_abs", "_porc"))
+  datos_CNAE <- left_join(datos_CNAE_abs, datos_CNAE_porc, 
+                      by = c("Rama.de.actividad.CNAE.2009", "Sexo", "Periodo"), 
+                      suffix = c("_abs", "_porc"))
 }
+```
 
+```{r, include=FALSE}
 rm(list = c("datos_CNAE_abs", "datos_CNAE_porc"))
 ```
 
 Una vez tenemos la tabla unificada es recomendable realizar un análisis de datos faltantes.
 
-```{r fig.width=4, fig.height=4}
-vis_miss(datos_CNAE)
+```{r}
+sapply(datos_CNAE, function(x) sum(is.na(x)))
 ```
 
 Observamos que para un pequeño subconjunto de filas no existen cifras totales. Veamos si siguen algún patrón.
 
 ```{r}
-miss_datos_CNAE <- datos_CNAE %>% mutate(miss_total = is.na(Total_abs)) %>% filter(miss_total == TRUE)
+miss_datos_CNAE <- datos_CNAE %>% mutate(miss_total = is.na(Total_abs)) %>% 
+  filter(miss_total == TRUE)
 head(unique(miss_datos_CNAE$Rama.de.actividad.CNAE.2009), 4)
 rm(list=c("miss_datos_CNAE"))
 ```
 
 Notamos que los valores faltantes se encuentran en ramas de actividades poco comunes relacionadas con la industria pesada, por lo que dichos NA reflejarán que muy poca población se dedica a ello, probablemente menos del mínimo registrable; en consecuencia sustituiremos dichos valores por ceros.
 
-```{r}
-datos_CNAE <- datos_CNAE %>% mutate(Total_abs = ifelse(is.na(Total_abs), 0, Total_abs)) %>% mutate(Total_porc = ifelse(is.na(Total_porc), 0, Total_porc))
+```{r, include=FALSE}
+datos_CNAE <- datos_CNAE %>% 
+  mutate(Total_abs = ifelse(is.na(Total_abs), 0, Total_abs)) %>% 
+  mutate(Total_porc = ifelse(is.na(Total_porc), 0, Total_porc))
 ```
 
 Por último, añadiremos una columna que calcula la variación entre un periodo y el siguiente, lo que permitirá identificar momentos de cambio significativo en el mercado laboral, detectando tendencias positivas o negativas a lo largo del tiempo. Esto también permitirá ver de manera rápida la estacionalidad de la ocupación, sobre todo en ciertas ramas de actividad.
 
-Es importante menciona que realizar las diferencias entre un periodo y el siguiente genera NAs para el primer periodo de cada rama, por lo que sustituiremos estos valores faltantes por ceros.
+Es importante mencionar que realizar las diferencias entre un periodo y el siguiente genera NAs para el primer periodo de cada rama, por lo que sustituiremos estos valores faltantes por ceros.
 
 ```{r}
 datos_CNAE$Diferencia_Total <- NA
@@ -265,12 +293,16 @@ for (sexo in unique(datos_CNAE$Sexo)) {
                         datos_CNAE$Rama.de.actividad.CNAE.2009 == rama, ]
     
     datos_CNAE$Diferencia_Total[datos_CNAE$Sexo == sexo & 
-                                datos_CNAE$Rama.de.actividad.CNAE.2009 == rama & datos_CNAE$Periodo != min(datos_CNAE$Periodo)] <- 
+              datos_CNAE$Rama.de.actividad.CNAE.2009 == rama 
+             & datos_CNAE$Periodo != min(datos_CNAE$Periodo)] <- 
       diff(subset$Total_abs)
   }
 }
 
 datos_CNAE$Diferencia_Total[datos_CNAE$Periodo == min(datos_CNAE$Periodo)] <- 0
+```
+
+```{r, include=FALSE}
 rm(list = c("subset"))
 ```
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.1.12)  13 JAN 2025 11:46
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.1.12)  13 JAN 2025 17:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1190,7 +1190,7 @@ Package epstopdf Info: Source file: <Definitions/logo-mdpi.eps>
 (epstopdf)             Command: <repstopdf --outfile=Definitions/logo-mdpi-eps-converted-to.pdf Definitions/logo-mdpi.eps>
 (epstopdf)             \includegraphics on input line 244.
 Package epstopdf Info: Output file is already uptodate.
-<Definitions/logo-mdpi-eps-converted-to.pdf, id=42, 88.33pt x 58.2175pt>
+<Definitions/logo-mdpi-eps-converted-to.pdf, id=30, 88.33pt x 58.2175pt>
 File: Definitions/logo-mdpi-eps-converted-to.pdf Graphic file (type pdf)
 <use Definitions/logo-mdpi-eps-converted-to.pdf>
 Package pdftex.def Info: Definitions/logo-mdpi-eps-converted-to.pdf  used on input line 244.
@@ -1224,7 +1224,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 326.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 334.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `cmtt' (encoding: TS1).
 (microtype)             For optimal results, create family-specific settings.
@@ -1239,11 +1239,15 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
 [2]
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-7-1.pdf, id=68, 216.81pt x 289.08pt>
-File: ProyectoAED2024_files/figure-latex/unnamed-chunk-7-1.pdf Graphic file (type pdf)
-<use ProyectoAED2024_files/figure-latex/unnamed-chunk-7-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-7-1.pdf  used on input line 429.
-(pdftex.def)             Requested size: 216.80946pt x 289.07928pt.
+Overfull \hbox (36.03967pt too wide) in paragraph at lines 451--451
+[]\T1/cmtt/m/n/10 ##   55 y más años De 16 a 19 años De 20 a 24 años De 25 a 34 años De 35 a 44 años[] 
+ []
+
+
+Overfull \hbox (36.03967pt too wide) in paragraph at lines 451--451
+[]\T1/cmtt/m/n/10 ##             101             345              18               1              13[] 
+ []
+
 
 
 
@@ -1254,16 +1258,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
 [3]
-Overfull \hbox (36.03967pt too wide) in paragraph at lines 459--459
-[]\T1/cmtt/m/n/10 ##   55 y más años De 16 a 19 años De 20 a 24 años De 25 a 34 años De 35 a 44 años[] 
- []
-
-
-Overfull \hbox (36.03967pt too wide) in paragraph at lines 459--459
-[]\T1/cmtt/m/n/10 ##             101             114              15               1              13[] 
- []
-
-
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1272,36 +1266,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[4 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-7-1.pdf>]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 16.18796pt, for example:
-(fancyhdr)                \setlength{\headheight}{16.18796pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
-
-[5]
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-14-1.pdf, id=88, 469.755pt x 325.215pt>
-File: ProyectoAED2024_files/figure-latex/unnamed-chunk-14-1.pdf Graphic file (type pdf)
-<use ProyectoAED2024_files/figure-latex/unnamed-chunk-14-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-14-1.pdf  used on input line 562.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-
-Overfull \hbox (96.73819pt too wide) in paragraph at lines 562--563
-[][] 
- []
-
-
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 16.18796pt, for example:
-(fancyhdr)                \setlength{\headheight}{16.18796pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
-
-[6 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-14-1.pdf>] (./appendix.tex)
+[4]
 No file ProyectoAED2024.bbl.
 
 
@@ -1312,7 +1277,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[7] 
+[5] 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
 (./ProyectoAED2024.aux)
  ***********
@@ -1320,21 +1285,21 @@ LaTeX2e <2024-11-01> patch level 1
 L3 programming layer <2024-12-25>
  ***********
 Package rerunfilecheck Info: File `ProyectoAED2024.out' has not changed.
-(rerunfilecheck)             Checksum: A439B529B76809FDEABD835E02050114;1084.
+(rerunfilecheck)             Checksum: 34DE005161D05ADD9FE7747AAC25020A;962.
  ) 
 Here is how much of TeX's memory you used:
- 33652 strings out of 475177
- 636148 string characters out of 5764471
- 1111043 words of memory out of 5000000
- 55753 multiletter control sequences out of 15000+600000
- 613227 words of font info for 288 fonts, out of 8000000 for 9000
+ 33613 strings out of 475177
+ 634875 string characters out of 5764471
+ 1117043 words of memory out of 5000000
+ 55728 multiletter control sequences out of 15000+600000
+ 612594 words of font info for 283 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  123i,12n,135p,1012b,753s stack positions out of 10000i,1000n,20000p,200000b,200000s
- <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecit1000.600pk> <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tctt1000.600pk> <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk> <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss0800.375pk><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on ProyectoAED2024.pdf (7 pages, 155384 bytes).
+ <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tctt1000.600pk> <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk> <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss0800.375pk><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
+Output written on ProyectoAED2024.pdf (5 pages, 136036 bytes).
 PDF statistics:
- 250 PDF objects out of 1000 (max. 8388607)
- 109 compressed objects within 2 object streams
- 15 named destinations out of 1000 (max. 500000)
- 89684 words of extra memory for PDF output out of 106986 (max. 10000000)
+ 191 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
+ 10 named destinations out of 1000 (max. 500000)
+ 89138 words of extra memory for PDF output out of 89155 (max. 10000000)
 
