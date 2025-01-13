@@ -64,6 +64,7 @@ if(!require(reshape2)) install.packages("reshape2")
 if(!require(scales)) install.packages("scales")
 if(!require(transformr)) install.packages("transformr")
 if(!require(gganimate)) install.packages("gganimate")
+if(!require(visdat)) install.packages("visdat")
 
 # Cargar funciones desde el archivo functions.r
 source("functions.r")
@@ -90,7 +91,7 @@ Este análisis exploratorio busca no solo describir el estado actual del mercado
 
 En primer lugar, se han descargado los datos directamente desde la base de datos abierta INE Base. Estos datos se presentan en un formato de csv, separado por el carácter ';', y con el uso de marca de decimales española ','.
 
-## Encuesta de Población Activa
+## Encuesta de Población Activa (EPA)
 
 Como se ha mencionado anteriormente en la introducción, la EPA es realizada trimestralmente por el Instituto Nacional de Estadística, por lo que se han extraído cinco datasets de su base de datos: población total, activa, inactiva, ocupada y parada. 
 
@@ -160,17 +161,117 @@ datos_EPA <- left_join(Poblacion_edad_trabajar, Activos, by=c("Sexo", "Comunidad
                 left_join(., Parados, by=c("Sexo", "Comunidades y Ciudades Autónomas", "Edad", "Periodo"))
 ```
 
-Observamos que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date.
+Observamos que los datos de la columna "Periodo" son cadenas; para solucionarlo, definimos y empleamos la función "SacarFechas" para transformarlos a tipo Date. Del mismo modo
 
 ```{r}
 datos_EPA$Periodo <- as.Date(sapply(datos_EPA$Periodo, sacarFechas), format = "%Y-%m-%d")
 
 # Borramos los datasets innecesarios
-rm(list = setdiff(ls(), "datos_EPA"))
+rm(list = c("Poblacion", "Poblacion_edad_trabajar", "Activos", "Inactivos", "Ocupados", "Parados"))
 ```
 
-Observemos el formato final del dataset con el que trabajaremos.
+Observemos si existen datos faltantes en nuestro dataset.
 
-```{r, echo=FALSE}
-kable(head(datos_EPA, 4), caption = "Primeras 4 filas del dataset")
+```{r}
+vis_miss(datos_EPA)
 ```
+
+Existe únicamente un porcentaje muy bajo de valores faltantes en la columna "Parados". Veamos un ejemplo de estos casos.
+
+```{r}
+miss_datos_EPA <- datos_EPA %>% mutate(miss_parados = is.na(Parados)) %>% filter(miss_parados == TRUE)
+lapply(miss_datos_EPA[,c("Comunidades y Ciudades Autónomas", "Edad")], table)
+```
+
+Los datos se concentran en Comunidades y Ciudades Autónomas con proporcionalmente poca población y en rangos de edades donde es poco habitual estar parado (ya que para que se cumpla dicha condición se debe estar buscando activamente trabajo). De hecho, el único valor que podría resultar extraño es que exista un valor faltante para un Total de edades, pero al comprobar la localización y fecha notamos que es razonable.
+
+```{r}
+miss_datos_EPA[miss_datos_EPA$Edad == "Total",c("Sexo", "Comunidades y Ciudades Autónomas", "Periodo")]
+rm(list=c("miss_datos_EPA"))
+```
+
+Dicho patrón parece reflejar que muy poca población de esas características se encontraba parada; por tanto, sustituiremos los valores faltantes del dataset por ceros.
+
+```{r}
+datos_EPA <- datos_EPA %>% mutate(Parados = ifelse(is.na(Parados), 0, Parados))
+```
+
+## Clasificación Nacional de Actividades Económicas (CNAE-2009)
+
+Este dataset divide los datos según rama de actividad, sexo y fecha en el periodo comprendido entre el primer trimestre de 2008 y el tercer trimestre de 2024, usando las mismas unidades que en el resto de datasets. No obstante, en este caso podemos encontrar los datos segmentado en dos subconjuntos principales:
+
+· Porcentajes ("Total_abs"): Representan la proporción de ocupación de cada rama de actividad con respecto al total del sexo correspondiente.
+· Valores absolutos ("Total_porc"): Proporcionan el número total de empleados en cada rama.
+
+Esta separación permite analizar tanto las tendencias globales (valores absolutos) como la estructura relativa de los sectores (porcentajes).
+
+```{r}
+datos_CNAE <- read.csv("data/CNAE.csv", sep=";", dec=",")
+```
+
+Esta vez al usar la función "read.csv" tendremos que modificar el tipo de dato de la columna "Total" de cadena de texto a numérico. Además, nos encontramos de nuevo con el problema del formato de las fechas, por lo que volveremos a aplicar la función SacarFechas.
+
+```{r}
+datos_CNAE$Total <- as.numeric(gsub(",", ".", gsub("\\.", "", datos_CNAE$Total)))
+datos_CNAE$Periodo <- as.Date(sapply(datos_CNAE$Periodo, sacarFechas), format = "%Y-%m-%d")
+```
+
+Para diferenciar entre cada tipo de dato (valor absoluto y porcentaje) vamos a extraerlos en dos datasets para posteriormente realizar un join, esencialmente como si se realizara un pivote.
+
+```{r}
+datos_CNAE_porc <- datos_CNAE[datos_CNAE$Unidad=="Porcentaje",]
+datos_CNAE_porc <- datos_CNAE_porc[, !names(datos_CNAE_porc) %in% "Unidad"]
+
+datos_CNAE_abs <- datos_CNAE[datos_CNAE$Unidad=="Valor absoluto",]
+datos_CNAE_abs <- datos_CNAE_abs[, !names(datos_CNAE_abs) %in% "Unidad"]
+
+if (dim(datos_CNAE_abs)[1] == dim(datos_CNAE_porc)[1] & dim(datos_CNAE_abs)[2] == dim(datos_CNAE_porc)[2]){
+  datos_CNAE <- left_join(datos_CNAE_abs, datos_CNAE_porc, by = c("Rama.de.actividad.CNAE.2009", "Sexo", "Periodo"), suffix = c("_abs", "_porc"))
+}
+
+rm(list = c("datos_CNAE_abs", "datos_CNAE_porc"))
+```
+
+Una vez tenemos la tabla unificada es recomendable realizar un análisis de datos faltantes.
+
+```{r}
+vis_miss(datos_CNAE)
+```
+
+Observamos que para un pequeño subconjunto de filas no existen cifras totales. Veamos si siguen algún patrón.
+
+```{r}
+miss_datos_CNAE <- datos_CNAE %>% mutate(miss_total = is.na(Total_abs)) %>% filter(miss_total == TRUE)
+head(unique(miss_datos_CNAE$Rama.de.actividad.CNAE.2009), 4)
+rm(list=c("miss_datos_CNAE"))
+```
+
+Notamos que los valores faltantes se encuentran en ramas de actividades poco comunes relacionadas con la industria pesada, por lo que dichos NA reflejarán que muy poca población se dedica a ello, probablemente menos del mínimo registrable; en consecuencia sustituiremos dichos valores por ceros.
+
+```{r}
+datos_CNAE <- datos_CNAE %>% mutate(Total_abs = ifelse(is.na(Total_abs), 0, Total_abs)) %>% mutate(Total_porc = ifelse(is.na(Total_porc), 0, Total_porc))
+```
+
+Por último, añadiremos una columna que calcula la variación entre un periodo y el siguiente, lo que permitirá identificar momentos de cambio significativo en el mercado laboral, detectando tendencias positivas o negativas a lo largo del tiempo. Esto también permitirá ver de manera rápida la estacionalidad de la ocupación, sobre todo en ciertas ramas de actividad.
+
+Es importante menciona que realizar las diferencias entre un periodo y el siguiente genera NAs para el primer periodo de cada rama, por lo que sustituiremos estos valores faltantes por ceros.
+
+```{r}
+datos_CNAE$Diferencia_Total <- NA
+
+for (sexo in unique(datos_CNAE$Sexo)) {
+  for (rama in unique(datos_CNAE$Rama.de.actividad.CNAE.2009)) {
+    subset <- datos_CNAE[datos_CNAE$Sexo == sexo & 
+                        datos_CNAE$Rama.de.actividad.CNAE.2009 == rama, ]
+    
+    datos_CNAE$Diferencia_Total[datos_CNAE$Sexo == sexo & 
+                                datos_CNAE$Rama.de.actividad.CNAE.2009 == rama & datos_CNAE$Periodo != min(datos_CNAE$Periodo)] <- 
+      diff(subset$Total_abs)
+  }
+}
+
+datos_CNAE$Diferencia_Total[datos_CNAE$Periodo == min(datos_CNAE$Periodo)] <- 0
+rm(list = c("subset"))
+```
+
+
