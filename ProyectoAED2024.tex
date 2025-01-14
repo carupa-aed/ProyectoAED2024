@@ -823,7 +823,6 @@ final (2024T3) del análisis. Estos gráficos muestran cómo se distribuye
 el empleo entre las diferentes ramas económicas según su peso relativo.
 
 \includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf}
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-38-2.pdf}
 Se observa cómo algunas ramas han ganado o perdido relevancia en
 términos de empleo total a lo largo del tiempo. Por ejemplo, sectores
 relacionados con la educación y la administración pública han aumentado
@@ -840,8 +839,6 @@ relevantes, como el fin de la crisis económica de 2013 y el inicio de la
 pandemia en 2020.
 
 \includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf}
-
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf}
 
 Se destaca cómo el empleo masculino y femenino responden de manera
 diferente a los shocks económicos. Por ejemplo, los hombres
@@ -863,7 +860,7 @@ otros más concretos, empezando por un número. Es por ello que se
 realizan dos gráficas separadas que muestran la matriz de correlaciones
 entre ramas.
 
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-41-1.pdf}
+\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf}
 
 Se observa que la mayoría de las ramas parecen estar correlacionadas
 positivamente, salvo aquellos puestos relacionados con el personal
@@ -885,22 +882,21 @@ se proyectan en dos dimensiones utilizando MDS, lo que permite
 visualizar las relaciones entre ramas en función de sus patrones de
 empleo a lo largo del tiempo.
 
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf}
+\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf}
 
 Se forman agrupaciones naturales de ramas con patrones similares.
 Además, se observan claramente algunos outliers, que puede ser de gran
 interés analizarlos individualmente.
 
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-44-1.pdf}
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-44-2.pdf}
+\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf}
 
-Ramas como ``Extracción de minerales metálicos'' y ``Actividades de
+Ramas como ``Extracción de minerales metálicos'', ``Actividades de apoyo
+a las industrias extractivas'' o ``Actividades de organizaciones y
 organismos extraterritoriales'' se destacan por su comportamiento
 atípico. Estas ramas tienen una dinámica de empleo inusual debido a su
 naturaleza específica, tamaño reducido o dependencia de factores
 externos como la demanda global. Observamos claramente que son datos con
-mucho ruido y un gran incremento en los últimos años, y por lo tanto es
-normal que nos apareciesen como outliers.
+mucho ruido, y por lo tanto es normal que nos apareciesen como outliers.
 
 \subsubsection{Clusterización por Ramas de
 Actividad}\label{clusterizaciuxf3n-por-ramas-de-actividad}
@@ -919,51 +915,15 @@ directamente deberíamos escoger otro método.
 
 \includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf}
 
-A pesar que la gráfica del codo parece indicar que el mejor es
-\texttt{k=4}, como se observa que al añadir el quinto lo que hace es
-crear un cluster propio para los outliers, optamos por coger
-\texttt{k=5}, pues esto puede ser beneficioso para eliminar el ruido de
-estos sin la necesidad de eliminarlos de por si.
-
 \includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf}
 
-Los resultados con k-means parecen positivos, por lo que por simplicidad
-del modelo nos quedamos con esta elección. Pasamos a estudiar por
-separado el comportamiento de cada cluster y trataremos de averiguar si
-tienen una interpretación natural clara.
+El método del codo parece indicarnos que la mejor selección es \(k=3\) y
+observamos que los resultados parecen satisfactorios. Por lo tanto,
+debido a la simplicidad del modelo nos quedamos con esta elección.
+Pasamos a estudiar por separado el comportamiento de cada cluster y
+trataremos de averiguar si tienen una interpretación natural clara.
 
 \includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-47-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{data\_wide}\SpecialCharTok{$}\NormalTok{Cluster }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(mds\_data}\SpecialCharTok{$}\NormalTok{Cluster)}
-
-\NormalTok{data\_long }\OtherTok{\textless{}{-}}\NormalTok{ data\_wide }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pivot\_longer}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(Rama.de.actividad.CNAE}\FloatTok{.2009}\NormalTok{, Cluster), }\AttributeTok{names\_to =} \StringTok{"Periodo"}\NormalTok{, }\AttributeTok{values\_to =} \StringTok{"Total\_Normalizado"}\NormalTok{)}
-
-\NormalTok{cuantiles\_por\_cluster }\OtherTok{\textless{}{-}}\NormalTok{ data\_long }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(Cluster, Periodo) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{summarise}\NormalTok{(}
-    \AttributeTok{Cuantil\_25 =} \FunctionTok{quantile}\NormalTok{(Total\_Normalizado, }\FloatTok{0.25}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
-    \AttributeTok{Cuantil\_50 =} \FunctionTok{quantile}\NormalTok{(Total\_Normalizado, }\FloatTok{0.50}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
-    \AttributeTok{Cuantil\_75 =} \FunctionTok{quantile}\NormalTok{(Total\_Normalizado, }\FloatTok{0.75}\NormalTok{, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
-    \AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}
-\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{pivot\_longer}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(Cluster, Periodo), }\AttributeTok{names\_to =} \StringTok{"Cuantil"}\NormalTok{, }\AttributeTok{values\_to =} \StringTok{"Valor"}\NormalTok{)}
-
-\NormalTok{grafico\_cuantiles }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(cuantiles\_por\_cluster, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Periodo, }\AttributeTok{y =}\NormalTok{ Valor, }\AttributeTok{color =}\NormalTok{ Cluster, }\AttributeTok{group =} \FunctionTok{interaction}\NormalTok{(Cluster, Cuantil))) }\SpecialCharTok{+}
-  \FunctionTok{geom\_line}\NormalTok{(}\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{2}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{facet\_wrap}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{ Cuantil, }\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{scales =} \StringTok{"free\_y"}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Cuantiles de Total Normalizado por Cluster a lo Largo del Tiempo"}\NormalTok{,}
-       \AttributeTok{x =} \StringTok{"Fecha"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Valor"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{axis.text.x =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{angle =} \DecValTok{45}\NormalTok{, }\AttributeTok{hjust =} \DecValTok{1}\NormalTok{)) }
-
-\FunctionTok{print}\NormalTok{(grafico\_cuantiles)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-48-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -978,39 +938,29 @@ tienen una interpretación natural clara.
 
 \begin{verbatim}
 ## $`1`
-## [1] "09 Actividades de apoyo a las industrias extractivas"
-## [2] "10 Industria de la alimentación"                     
-## [3] "17 Industria del papel"                              
+## [1] "37 Recogida y tratamiento de aguas residuales"                              
+## [2] "39 Actividades de descontaminación y otros servicios de gestión de residuos"
+## [3] "52 Almacenamiento y actividades anexas al transporte"                       
 ## 
 ## $`2`
-## [1] "39 Actividades de descontaminación y otros servicios de gestión de residuos"     
-## [2] "52 Almacenamiento y actividades anexas al transporte"                            
-## [3] "62 Programación, consultoría y otras actividades relacionadas con la informática"
+## [1] "03 Pesca y acuicultura"                          
+## [2] "05 Extracción de antracita, hulla y lignito"     
+## [3] "06 Extracción de crudo de petróleo y gas natural"
 ## 
 ## $`3`
-## [1] "05 Extracción de antracita, hulla y lignito"
-## [2] "08 Otras industrias extractivas"            
-## [3] "12 Industria del tabaco"                    
-## 
-## $`4`
 ## [1] "01 Agricultura, ganadería, caza y servicios relacionados con las mismas"
 ## [2] "02 Silvicultura y explotación forestal"                                 
-## [3] "03 Pesca y acuicultura"                                                 
-## 
-## $`5`
-## [1] "07 Extracción de minerales metálicos"
+## [3] "10 Industria de la alimentación"
 \end{verbatim}
 
 Analizando los cuantiles y medias de cada cluster, se observa que se
-agrupan segun rendimiento durante los últimos 16 años, cosa a esperar
-proviniendo de la métrica definida. Se observan que la mayoría de las
-ramas de actividad se acumulan en los clústeres con la evolución
-negativa, en los cuales ha habido un decrecimiento (cluster 5) o
-estancamiento (cluster 4) de los trabajadores. Por otra parte el cluster
-3 parece presentar ramas con ligeros resultados positivos, y el cluster
-1 con marcados resultados positivos, aunque con menor número de ramas
-que los anteriores. Por último, el cluster 2 se trata del cluster de
-outliers.
+agrupan segun rendimiento, cosa a esperada proviniendo de la métrica
+definida. Se observan que la mayoría de las ramas de actividad se
+acumulan en los clústeres con la evolución negativa o mediocre, en los
+cuales ha habido un decrecimiento (cluster 2) o estancamiento (cluster
+3) de los trabajadores. Por otra parte el cluster 1 parece presentar
+ramas con resultados positivos, aunque con menor número de ramas que los
+anteriores.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

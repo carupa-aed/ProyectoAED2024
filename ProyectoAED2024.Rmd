@@ -65,6 +65,7 @@ if(!require(scales)) install.packages("scales")
 if(!require(transformr)) install.packages("transformr")
 if(!require(gganimate)) install.packages("gganimate")
 if(!require(visdat)) install.packages("visdat")
+if(!require(stringr)) install.packages("stringr")
 
 # Cargar funciones desde el archivo functions.r
 source("functions.r")
@@ -862,12 +863,6 @@ En conclusión, en comparación con 2007 el panorama de 2023 refleja un mercado 
 En primer lugar se analiza la distribución de peso de las ramas de actividad en el total de la población empleada. Además, se busca comparar la evolución y el cambio sufrido por la estructura laboral española desde el primer trimestre de 2008 y el tercer trimestre de 2024. Para ello se generan treemaps para los periodos inicial (2008T1) y final (2024T3) del análisis. Estos gráficos muestran cómo se distribuye el empleo entre las diferentes ramas económicas según su peso relativo.
 
 ```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
-library(ggplot2)
-library(treemap)
-library(dplyr)
-library(patchwork)
-library(stringr)  # Para usar str_wrap()
-
 # Filtrado de los datos para 2024T3
 datos_filtrados_2024 <- na.omit(datos_CNAE[datos_CNAE$Sexo == "Ambos sexos" &
                                            datos_CNAE$Periodo == "2024-09-01" &
@@ -1304,7 +1299,7 @@ grafico_combinado
 
 
 
-```{r}
+```{r, echo=FALSE}
 lista_ramas_por_cluster <- data_wide %>%
   group_by(Cluster) %>%
   summarise(Ramas = list(unique(Rama.de.actividad.CNAE.2009)), .groups = 'drop')
@@ -1313,4 +1308,4 @@ lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_c
 print(lapply(lista_ramas, function(x) head(x, 3)))
 ```
 
-Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento, cosa a esperada proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (cluster 2) o estancamiento (cluster 3) de los trabajadores. Por otra parte el cluster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.
+Analizando los cuantiles y medias de cada clúster, se observa que se agrupan según rendimiento, cosa ya esperada proviniendo de la métrica definida. Se observa que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster 3) de los trabajadores. Por otra parte el clúster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.
