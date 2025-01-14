@@ -4,7 +4,7 @@ author:
   - name: Catret Ruber, Pablo
     affil: 1
   - name: Palazón Caballero, José Miguel
-    affil: 1,*
+    affil: 1
   - name: Rosique Martínez, Marcos
     affil: 1
 affiliation:
@@ -20,7 +20,7 @@ authorcitation: |
 correspondence: |
   jomipaca@alumni.uv.es.
 # document options
-journal: notspecified
+journal: Universitat de València
 type: article
 status: submit
 # front matter
@@ -39,8 +39,7 @@ abstract: |
   should not exaggerate the main conclusions.
 # back matter
 keywords: |
-  keyword 1; keyword 2; keyword 3 (list three to ten pertinent keywords specific 
-  to the article, yet reasonably common within the subject discipline.).
+  Mercado laboral; Tasa; Clustering; Pandemia COVID-19; Análisis exploratorio de datos
 bibliography: mybibfile.bib
 #appendix: appendix.tex
 endnotes: false
@@ -65,7 +64,9 @@ if(!require(scales)) install.packages("scales")
 if(!require(transformr)) install.packages("transformr")
 if(!require(gganimate)) install.packages("gganimate")
 if(!require(visdat)) install.packages("visdat")
+if(!require(treemap)) install.packages("treemap")
 if(!require(stringr)) install.packages("stringr")
+if(!require(tibble)) install.packages("tibble")
 
 # Cargar funciones desde el archivo functions.r
 source("functions.r")
@@ -182,25 +183,50 @@ rm(list = c("Poblacion", "Poblacion_edad_trabajar", "Activos", "Inactivos",
 ```
 
 ```{r, echo=FALSE}
-sapply(datos_EPA, function(x) sum(is.na(x)))
+# Calcular valores faltantes
+tabla_faltantes <- sapply(datos_EPA, function(NAs) sum(is.na(NAs))) %>%
+  as.data.frame() %>%  # Convertir a data frame
+  rownames_to_column("Variable")  # Mover nombres de fila a columna
+
+# Cambiar el nombre de la columna
+colnames(tabla_faltantes)[2] <- "Valores faltantes"
+
+# Mostrar la tabla con kable
+kable(tabla_faltantes, caption = "Frecuencias de datos faltantes en el conjunto de datos EPA")
+
 ```
 
 Existe únicamente un porcentaje muy bajo de valores faltantes entre las columnas "Activos", "Ocupados" y "Parados". Veamos un ejemplo de estos casos.
 
-
 ```{r, echo=FALSE}
-miss_datos_EPA <- datos_EPA %>% mutate(miss_parados = is.na(Parados)) %>% 
+# Generar los datos filtrados
+miss_datos_EPA <- datos_EPA %>% 
+  mutate(miss_parados = is.na(Parados)) %>% 
   mutate(miss_ocupados = is.na(Ocupados)) %>%
   mutate(miss_activos = is.na(Activos)) %>%
   filter(miss_parados == TRUE | miss_ocupados == TRUE | miss_activos == TRUE)
-lapply(miss_datos_EPA[,c("Comunidades y Ciudades Autónomas", "Edad")], table)
+
+# Tabla de comunidades autónomas
+tabla_comunidades <- as.data.frame(table(miss_datos_EPA$`Comunidades y Ciudades Autónomas`)) %>%
+  rename(Comunidad = Var1, `Valores faltantes` = Freq)
+
+# Tabla de grupos de edad
+tabla_edades <- as.data.frame(table(miss_datos_EPA$Edad)) %>%
+  rename(`Grupo de edad` = Var1, `Valores faltantes` = Freq)
+
+# Mostrar las tablas con kable
+kable(tabla_comunidades, caption = "Frecuencias de datos faltantes por Comunidad Autónoma en el conjunto de datos EPA")
+
+kable(tabla_edades, caption = "Frecuencias de datos faltantes por edad en el conjunto de datos EPA")
+
+
 ```
 
 Los datos se concentran en Comunidades y Ciudades Autónomas con proporcionalmente poca población y en rangos de edades donde es poco habitual estar parado (ya que para que se cumpla dicha condición se debe estar buscando activamente trabajo). De hecho, el único valor que podría resultar extraño es que exista un valor faltante para un Total de edades, pero al comprobar la localización y fecha notamos que es razonable.
 
 ```{r, echo=FALSE}
-miss_datos_EPA[miss_datos_EPA$Edad == "Total",
-               c("Sexo", "Comunidades y Ciudades Autónomas", "Periodo")]
+kable(miss_datos_EPA[miss_datos_EPA$Edad == "Total",
+               c("Sexo", "Comunidades y Ciudades Autónomas", "Periodo")], caption = "Valor faltante en el total de edades en el conjunto de datos EPA")
 ```
 
 ```{r, include=FALSE}
@@ -256,15 +282,31 @@ rm(list = c("datos_CNAE_abs", "datos_CNAE_porc"))
 ```
 
 ```{r, echo=FALSE}
-sapply(datos_CNAE, function(x) sum(is.na(x)))
+# Calcular valores faltantes
+tabla_faltantes <- sapply(datos_CNAE, function(NAs) sum(is.na(NAs))) %>%
+  as.data.frame() %>%  # Convertir a data frame
+  rownames_to_column("Variable")  # Mover nombres de fila a columna
+
+# Cambiar el nombre de la columna
+colnames(tabla_faltantes)[2] <- "Valores faltantes"
+
+# Mostrar la tabla con kable
+kable(tabla_faltantes, caption = "Frecuencias de datos faltantes en el conjunto de datos CNAE")
 ```
 
 Observamos que para un pequeño subconjunto de filas no existen cifras totales. Veamos si siguen algún patrón.
 
 ```{r, echo=FALSE}
-miss_datos_CNAE <- datos_CNAE %>% mutate(miss_total = is.na(Total_abs)) %>% 
+# Filtrar datos con valores faltantes
+miss_datos_CNAE <- datos_CNAE %>%
+  mutate(miss_total = is.na(Total_abs)) %>%
   filter(miss_total == TRUE)
-head(unique(miss_datos_CNAE$Rama.de.actividad.CNAE.2009), 4)
+
+# Extraer las actividades únicas y renombrar la columna
+tabla_actividades <- data.frame(Rama_de_actividad = unique(miss_datos_CNAE$Rama.de.actividad.CNAE.2009)[1:4])
+
+# Mostrar la tabla con kable
+kable(tabla_actividades, col.names = "Rama de actividad", caption = "Primeras cuatro actividades con valores faltantes en Total_abs")
 ```
 
 ```{r, include=FALSE}
@@ -458,7 +500,7 @@ combinado <- TA + TE + TO +
                   theme = theme(plot.title = element_text(size = 14, face = "bold")))
 ```
 
-```{r, echo=FALSE, warning=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, echo=FALSE, warning=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo en España", fig.pos="h"}
 # Lo hacemos en dos chunks porque el código anterior muestra por pantalla 
 #una tabla que no queremos mostrar
 combinado
@@ -472,7 +514,7 @@ A partir de 2013, con los primeros signos de recuperación económica, la tasa d
 
 El impacto de la pandemia de COVID-19 en 2020 es evidente en todas las tasas, con caídas abruptas, especialmente en la tasa de ocupación, debido al cierre temporal de actividades económicas y restricciones de movilidad. Este impacto fue más pronunciado que el de la crisis financiera. Desde 2021, se observa una recuperación acelerada en las tres tasas, marcada por la reincorporación de trabajadores al mercado laboral y el dinamismo de sectores como los servicios digitales, el comercio y el turismo.
 
-```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo por género en España", fig.pos="h"}
 # Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
 # Filtrar los datos para Hombres y Mujeres a nivel nacional
 data_filtered <- datos_EPA %>%
@@ -631,7 +673,7 @@ combinado2 <- TA_sexo + TE_sexo + TO_sexo +
                   theme = theme(plot.title = element_text(size = 14, face = "bold")))
 ```
 
-```{r, echo=FALSE, warning=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, echo=FALSE, warning=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo por género en España", fig.pos="h"}
 combinado2
 ```
 
@@ -641,7 +683,7 @@ En la tasa de empleo, sin embargo, las diferencias entre hombres y mujeres son m
 
 Durante la pandemia de COVID-19 en 2020, todas las tasas muestran un descenso significativo, seguido de una recuperación que resalta la resiliencia del mercado laboral. Este análisis pone en evidencia tanto los avances hacia la igualdad de género en términos laborales como las áreas donde persisten desigualdades estructurales, especialmente en la población activa y su impacto en las tasas de ocupación.
 
-```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo por grupo de edad en España", fig.pos="h"}
 # Crear un gráfico de líneas para cada grupo de edad
 data_filtered <- datos_EPA %>%
   filter(Sexo == "Ambos sexos" &
@@ -769,11 +811,11 @@ TO_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colo
 
 combinado3 <- TA_edad + TE_edad + TO_edad +
   plot_layout(ncol = 2, heights = c(1.2, 1.2)) + # Ajustar espacio entre filas
-  plot_annotation(title = "Evolución de las Tasas del Mercado de Trabajo por Sexo",
+  plot_annotation(title = "Evolución de las Tasas del Mercado de Trabajo por Edad",
                   theme = theme(plot.title = element_text(size = 14, face = "bold")))
 ```
 
-```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo por grupo de edad en España", fig.pos="h"}
 combinado3
 ```
 
@@ -809,7 +851,7 @@ tasas <- c("Tasa de Actividad", "Tasa de Empleo", "Tasa de Ocupación")
 ```
 
 
-```{r, warning=FALSE, echo=FALSE, out.width='60%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, warning=FALSE, echo=FALSE, out.width='60%', fig.align='center', fig.cap="Gráfico de codo global para la tasa de empleo", fig.pos="h"}
 grafico_codo_global("Tasa de Empleo", datos_EPA)
 ```
 
@@ -921,10 +963,6 @@ Se observa cómo algunas ramas han ganado o perdido relevancia en términos de e
 Además de realizar un análisis comparativo de cómo se distribuye por ramas de actividad la población trabajadora, se realiza un análisis visual de la evolución del empleo en España de manera absoluta agrupando por sexo, en conjunto con un análisis de la evolución de la diferencia trimestral en el empleo. Para ello se han empleado gráficos de lineas. Estos gráficos incluyen referencias visuales a eventos históricos relevantes, como el fin de la crisis económica de 2013 y el inicio de la pandemia en 2020.
 
 ```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
-library(ggplot2)
-library(scales)  # Para formatear los números
-library(patchwork)
-
 # Fin de la crisis (junio 2013) y Inicio de COVID (marzo 2020)
 fin_crisis <- as.Date("2013-06-01")      
 inicio_covid <- as.Date("2020-03-01")    
@@ -1077,12 +1115,6 @@ grafica_mds
 Se forman agrupaciones naturales de ramas con patrones similares. Además, se observan claramente algunos outliers, que puede ser de gran interés analizarlos individualmente.
 
 ```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
-library(ggplot2)
-library(patchwork)
-
-library(ggplot2)
-library(patchwork)
-
 # Primer gráfico
 plot1 <- ggplot(
   datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009 == 
@@ -1198,9 +1230,6 @@ print(elbow_plot)
 
 
 ```{r, warning=FALSE, echo=FALSE, fig.width=8, fig.height=3}
-library(ggplot2)
-library(patchwork)
-
 # Configurar semilla para reproducibilidad
 set.seed(123)
 
@@ -1243,11 +1272,6 @@ combined_plot
 El método del codo parece indicarnos que la mejor selección es $k=3$ y observamos que los resultados parecen satisfactorios. Por lo tanto, debido a la simplicidad del modelo nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y trataremos de averiguar si tienen una interpretación natural clara.
 
 ```{r, warning=FALSE, echo=FALSE, fig.width=8, fig.height=3}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-library(patchwork)
-
 # Suponiendo que tienes los datos en data_wide y mds_data como antes.
 
 # Procesamiento de datos
@@ -1296,16 +1320,18 @@ grafico_combinado
 
 ```
 
-
-
-
 ```{r, echo=FALSE}
-lista_ramas_por_cluster <- data_wide %>%
+# Agrupar las ramas por cluster y seleccionar las primeras tres ramas por cluster
+tabla_ramas <- data_wide %>%
   group_by(Cluster) %>%
-  summarise(Ramas = list(unique(Rama.de.actividad.CNAE.2009)), .groups = 'drop')
+  summarise(
+    Ramas = paste(head(unique(Rama.de.actividad.CNAE.2009), 3), collapse = "; "), 
+    .groups = 'drop'
+  )
 
-lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_cluster$Cluster))
-print(lapply(lista_ramas, function(x) head(x, 3)))
+# Mostrar la tabla con kable
+kable(tabla_ramas, col.names = c("Cluster", "Primeras tres Ramas de Actividad"), 
+      caption = "Ramas de actividad más representativas por cluster")
 ```
 
 Analizando los cuantiles y medias de cada clúster, se observa que se agrupan según rendimiento, cosa ya esperada proviniendo de la métrica definida. Se observa que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster 3) de los trabajadores. Por otra parte el clúster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.

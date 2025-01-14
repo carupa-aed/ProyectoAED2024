@@ -4,7 +4,8 @@
 %=================================================================
 % pandoc conditionals added to preserve backwards compatibility with previous versions of rticles
 
-\documentclass[notspecified,article,submit,moreauthors,pdftex]{Definitions/mdpi}
+\documentclass[Universitat de
+València,article,submit,moreauthors,pdftex]{Definitions/mdpi}
 
 
 %% Some pieces required from the pandoc template
@@ -82,7 +83,7 @@
 
 % Authors, for the paper (add full first names)
 \Author{Catret Ruber, Pablo$^{1}$, Palazón Caballero, José
-Miguel$^{1,*}$, Rosique Martínez, Marcos$^{1}$}
+Miguel$^{1}$, Rosique Martínez, Marcos$^{1}$}
 
 
 %\longauthorlist{yes}
@@ -139,9 +140,8 @@ not exaggerate the main conclusions.}
 
 
 % Keywords
-\keyword{keyword 1; keyword 2; keyword 3 (list three to ten pertinent
-keywords specific to the article, yet reasonably common within the
-subject discipline.).}
+\keyword{Mercado laboral; Tasa; Clustering; Pandemia COVID-19; Análisis
+exploratorio de datos}
 
 % The fields PACS, MSC, and JEL may be left empty or commented out if not applicable
 %\PACS{J0101}
@@ -191,52 +191,22 @@ subject discipline.).}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Pandoc syntax highlighting
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 
 % tightlist command for lists without linebreak
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
+% From pandoc table feature
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 
 
 \usepackage{longtable}
@@ -342,46 +312,81 @@ son cadenas; para solucionarlo, definimos y empleamos la función
 ``SacarFechas'' para transformarlos a tipo Date. Una vez corregido,
 comprobaremos si existen datos faltantes en nuestro dataset.
 
-\begin{verbatim}
-##                             Sexo Comunidades y Ciudades Autónomas 
-##                                0                                0 
-##                             Edad                          Periodo 
-##                                0                                0 
-##    Población en edad de trabajar                          Activos 
-##                                0                               43 
-##                        Inactivos                         Ocupados 
-##                                0                              277 
-##                          Parados 
-##                              272
-\end{verbatim}
+\begin{longtable}[]{@{}lr@{}}
+\caption{Frecuencias de datos faltantes en el conjunto de datos
+EPA}\tabularnewline
+\toprule\noalign{}
+Variable & Valores faltantes \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Variable & Valores faltantes \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Sexo & 0 \\
+Comunidades y Ciudades Autónomas & 0 \\
+Edad & 0 \\
+Periodo & 0 \\
+Población en edad de trabajar & 0 \\
+Activos & 43 \\
+Inactivos & 0 \\
+Ocupados & 277 \\
+Parados & 272 \\
+\end{longtable}
 
 Existe únicamente un porcentaje muy bajo de valores faltantes entre las
 columnas ``Activos'', ``Ocupados'' y ``Parados''. Veamos un ejemplo de
 estos casos.
 
-\begin{verbatim}
-## $`Comunidades y Ciudades Autónomas`
-## 
-##                      02 Aragón     03 Asturias, Principado de 
-##                              1                             12 
-##              04 Balears, Illes                    05 Canarias 
-##                              1                              5 
-##                   06 Cantabria                 11 Extremadura 
-##                             18                              6 
-## 15 Navarra, Comunidad Foral de                  16 País Vasco 
-##                             12                              3 
-##                   17 Rioja, La                       18 Ceuta 
-##                             19                            182 
-##                     19 Melilla 
-##                            247 
-## 
-## $Edad
-## 
-##   55 y más años De 16 a 19 años De 20 a 24 años De 25 a 34 años De 35 a 44 años 
-##             101             345              18               1              13 
-## De 45 a 54 años           Total 
-##              27               1
-\end{verbatim}
+\begin{longtable}[]{@{}lr@{}}
+\caption{Frecuencias de datos faltantes por Comunidad Autónoma en el
+conjunto de datos EPA}\tabularnewline
+\toprule\noalign{}
+Comunidad & Valores faltantes \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Comunidad & Valores faltantes \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+02 Aragón & 1 \\
+03 Asturias, Principado de & 12 \\
+04 Balears, Illes & 1 \\
+05 Canarias & 5 \\
+06 Cantabria & 18 \\
+11 Extremadura & 6 \\
+15 Navarra, Comunidad Foral de & 12 \\
+16 País Vasco & 3 \\
+17 Rioja, La & 19 \\
+18 Ceuta & 182 \\
+19 Melilla & 247 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lr@{}}
+\caption{Frecuencias de datos faltantes por edad en el conjunto de datos
+EPA}\tabularnewline
+\toprule\noalign{}
+Grupo de edad & Valores faltantes \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Grupo de edad & Valores faltantes \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+55 y más años & 101 \\
+De 16 a 19 años & 345 \\
+De 20 a 24 años & 18 \\
+De 25 a 34 años & 1 \\
+De 35 a 44 años & 13 \\
+De 45 a 54 años & 27 \\
+Total & 1 \\
+\end{longtable}
 
 Los datos se concentran en Comunidades y Ciudades Autónomas con
 proporcionalmente poca población y en rangos de edades donde es poco
@@ -391,12 +396,21 @@ resultar extraño es que exista un valor faltante para un Total de
 edades, pero al comprobar la localización y fecha notamos que es
 razonable.
 
-\begin{verbatim}
-## # A tibble: 1 x 3
-##   Sexo    `Comunidades y Ciudades Autónomas` Periodo   
-##   <chr>   <chr>                              <date>    
-## 1 Hombres 19 Melilla                         2002-06-01
-\end{verbatim}
+\begin{longtable}[]{@{}lll@{}}
+\caption{Valor faltante en el total de edades en el conjunto de datos
+EPA}\tabularnewline
+\toprule\noalign{}
+Sexo & Comunidades y Ciudades Autónomas & Periodo \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Sexo & Comunidades y Ciudades Autónomas & Periodo \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Hombres & 19 Melilla & 2002-06-01 \\
+\end{longtable}
 
 Dicho patrón parece reflejar que muy poca población de esas
 características se encontraba parada; por tanto, sustituiremos los
@@ -431,24 +445,47 @@ a extraerlos en dos datasets para posteriormente realizar un join,
 esencialmente como si se realizara un pivote. Una vez hemos unificado la
 tabla es recomendable realizar un análisis de datos faltantes.
 
-\begin{verbatim}
-## Rama.de.actividad.CNAE.2009                        Sexo 
-##                           0                           0 
-##                     Periodo                   Total_abs 
-##                           0                         313 
-##                  Total_porc 
-##                         313
-\end{verbatim}
+\begin{longtable}[]{@{}lr@{}}
+\caption{Frecuencias de datos faltantes en el conjunto de datos
+CNAE}\tabularnewline
+\toprule\noalign{}
+Variable & Valores faltantes \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Variable & Valores faltantes \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Rama.de.actividad.CNAE.2009 & 0 \\
+Sexo & 0 \\
+Periodo & 0 \\
+Total\_abs & 313 \\
+Total\_porc & 313 \\
+\end{longtable}
 
 Observamos que para un pequeño subconjunto de filas no existen cifras
 totales. Veamos si siguen algún patrón.
 
-\begin{verbatim}
-## [1] "05 Extracción de antracita, hulla y lignito"         
-## [2] "06 Extracción de crudo de petróleo y gas natural"    
-## [3] "07 Extracción de minerales metálicos"                
-## [4] "09 Actividades de apoyo a las industrias extractivas"
-\end{verbatim}
+\begin{longtable}[]{@{}l@{}}
+\caption{Primeras cuatro actividades con valores faltantes en
+Total\_abs}\tabularnewline
+\toprule\noalign{}
+Rama de actividad \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+Rama de actividad \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+05 Extracción de antracita, hulla y lignito \\
+06 Extracción de crudo de petróleo y gas natural \\
+07 Extracción de minerales metálicos \\
+09 Actividades de apoyo a las industrias extractivas \\
+\end{longtable}
 
 Notamos que los valores faltantes se encuentran en ramas de actividades
 poco comunes relacionadas con la industria pesada, por lo que dichos NA
@@ -514,7 +551,7 @@ empleo respectivamente: \(TI = 1 - TA\) y \(TD = 1 - TE\).
 
 }
 
-\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-26}
+\caption{Evolución del mercado de trabajo en España}\label{fig:unnamed-chunk-26}
 \end{figure}
 
 La figura 1 muestra la evolución de tres indicadores clave del mercado
@@ -560,7 +597,7 @@ comercio y el turismo.
 
 }
 
-\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-28}
+\caption{Evolución del mercado de trabajo por género en España}\label{fig:unnamed-chunk-28}
 \end{figure}
 
 La figura muestra la evolución de las tasas de actividad, empleo y
@@ -599,7 +636,7 @@ población activa y su impacto en las tasas de ocupación.
 
 }
 
-\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-30}
+\caption{Evolución del mercado de trabajo por grupo de edad en España}\label{fig:unnamed-chunk-30}
 \end{figure}
 
 Por último, desglosadando la población por grupos de edad, se puede
@@ -662,7 +699,7 @@ adecuado de clusters.
 
 }
 
-\caption{Evolución de la tasa de actividad en España}\label{fig:unnamed-chunk-34}
+\caption{Gráfico de codo global para la tasa de empleo}\label{fig:unnamed-chunk-34}
 \end{figure}
 
 Observando el gráfico anterior, se puede considerar que el número de
@@ -925,40 +962,45 @@ trataremos de averiguar si tienen una interpretación natural clara.
 
 \includegraphics{ProyectoAED2024_files/figure-latex/unnamed-chunk-47-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{lista\_ramas\_por\_cluster }\OtherTok{\textless{}{-}}\NormalTok{ data\_wide }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{group\_by}\NormalTok{(Cluster) }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Ramas =} \FunctionTok{list}\NormalTok{(}\FunctionTok{unique}\NormalTok{(Rama.de.actividad.CNAE}\FloatTok{.2009}\NormalTok{)), }\AttributeTok{.groups =} \StringTok{\textquotesingle{}drop\textquotesingle{}}\NormalTok{)}
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.0432}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.9568}}@{}}
+\caption{Ramas de actividad más representativas por
+cluster}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Cluster
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primeras tres Ramas de Actividad
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Cluster
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Primeras tres Ramas de Actividad
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 & 37 Recogida y tratamiento de aguas residuales; 39 Actividades de
+descontaminación y otros servicios de gestión de residuos; 52
+Almacenamiento y actividades anexas al transporte \\
+2 & 03 Pesca y acuicultura; 05 Extracción de antracita, hulla y lignito;
+06 Extracción de crudo de petróleo y gas natural \\
+3 & 01 Agricultura, ganadería, caza y servicios relacionados con las
+mismas; 02 Silvicultura y explotación forestal; 10 Industria de la
+alimentación \\
+\end{longtable}
 
-\NormalTok{lista\_ramas }\OtherTok{\textless{}{-}} \FunctionTok{as.list}\NormalTok{(}\FunctionTok{setNames}\NormalTok{(lista\_ramas\_por\_cluster}\SpecialCharTok{$}\NormalTok{Ramas, lista\_ramas\_por\_cluster}\SpecialCharTok{$}\NormalTok{Cluster))}
-\FunctionTok{print}\NormalTok{(}\FunctionTok{lapply}\NormalTok{(lista\_ramas, }\ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{head}\NormalTok{(x, }\DecValTok{3}\NormalTok{)))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## $`1`
-## [1] "37 Recogida y tratamiento de aguas residuales"                              
-## [2] "39 Actividades de descontaminación y otros servicios de gestión de residuos"
-## [3] "52 Almacenamiento y actividades anexas al transporte"                       
-## 
-## $`2`
-## [1] "03 Pesca y acuicultura"                          
-## [2] "05 Extracción de antracita, hulla y lignito"     
-## [3] "06 Extracción de crudo de petróleo y gas natural"
-## 
-## $`3`
-## [1] "01 Agricultura, ganadería, caza y servicios relacionados con las mismas"
-## [2] "02 Silvicultura y explotación forestal"                                 
-## [3] "10 Industria de la alimentación"
-\end{verbatim}
-
-Analizando los cuantiles y medias de cada cluster, se observa que se
-agrupan segun rendimiento, cosa a esperada proviniendo de la métrica
-definida. Se observan que la mayoría de las ramas de actividad se
+Analizando los cuantiles y medias de cada clúster, se observa que se
+agrupan según rendimiento, cosa ya esperada proviniendo de la métrica
+definida. Se observa que la mayoría de las ramas de actividad se
 acumulan en los clústeres con la evolución negativa o mediocre, en los
-cuales ha habido un decrecimiento (cluster 2) o estancamiento (cluster
-3) de los trabajadores. Por otra parte el cluster 1 parece presentar
+cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster
+3) de los trabajadores. Por otra parte el clúster 1 parece presentar
 ramas con resultados positivos, aunque con menor número de ramas que los
 anteriores.
 
