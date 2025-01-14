@@ -291,7 +291,7 @@ for (sexo in unique(datos_CNAE$Sexo)) {
     datos_CNAE$Diferencia_Total[datos_CNAE$Sexo == sexo & 
               datos_CNAE$Rama.de.actividad.CNAE.2009 == rama 
              & datos_CNAE$Periodo != min(datos_CNAE$Periodo)] <- 
-      diff(subset$Total_abs)
+      - diff(subset$Total_abs)
   }
 }
 
@@ -861,99 +861,133 @@ En conclusión, en comparación con 2007 el panorama de 2023 refleja un mercado 
 
 En primer lugar se analiza la distribución de peso de las ramas de actividad en el total de la población empleada. Además, se busca comparar la evolución y el cambio sufrido por la estructura laboral española desde el primer trimestre de 2008 y el tercer trimestre de 2024. Para ello se generan treemaps para los periodos inicial (2008T1) y final (2024T3) del análisis. Estos gráficos muestran cómo se distribuye el empleo entre las diferentes ramas económicas según su peso relativo.
 
-```{r, warning=FALSE, echo=FALSE}
-datos_filtrados <- na.omit(datos_CNAE[datos_CNAE$Sexo == "Ambos sexos" &
-                                       datos_CNAE$Periodo == "2024-09-01" &
-                                       datos_CNAE$Rama.de.actividad.CNAE.2009 != "Total" &
-                                       grepl("^[0-9]", datos_CNAE$Rama.de.actividad.CNAE.2009), ])
+```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
+library(ggplot2)
+library(treemap)
+library(dplyr)
+library(patchwork)
+library(stringr)  # Para usar str_wrap()
 
-datos_filtrados$Rama.abreviada <- substring(datos_filtrados$Rama.de.actividad.CNAE.2009, 1, 30) # esto es para que quepan los textos, que son muy largos
-grafico_treemap <- ggplot(datos_filtrados, aes(area = Total_porc, fill = Total_porc, label = paste(datos_filtrados$Rama.abreviada, Total_porc, sep = "\n"))) +
+# Filtrado de los datos para 2024T3
+datos_filtrados_2024 <- na.omit(datos_CNAE[datos_CNAE$Sexo == "Ambos sexos" &
+                                           datos_CNAE$Periodo == "2024-09-01" &
+                                           datos_CNAE$Rama.de.actividad.CNAE.2009 != "Total" &
+                                           grepl("^[0-9]", datos_CNAE$Rama.de.actividad.CNAE.2009), ])
+
+# Filtrado de los datos para 2008T1
+datos_filtrados_2008 <- na.omit(datos_CNAE[datos_CNAE$Sexo == "Ambos sexos" &
+                                           datos_CNAE$Periodo == "2008-03-01" &
+                                           datos_CNAE$Rama.de.actividad.CNAE.2009 != "Total" &
+                                           grepl("^[0-9]", datos_CNAE$Rama.de.actividad.CNAE.2009), ])
+
+# Crear una columna con las etiquetas recortadas solo si Total_porc < 4
+datos_filtrados_2024$Rama.abreviada <- ifelse(datos_filtrados_2024$Total_porc < 4,
+                                               substring(datos_filtrados_2024$Rama.de.actividad.CNAE.2009, 1, 2),
+                                               str_wrap(substring(datos_filtrados_2024$Rama.de.actividad.CNAE.2009, 1, 150), width = 25))
+
+datos_filtrados_2008$Rama.abreviada <- ifelse(datos_filtrados_2008$Total_porc < 5,
+                                               substr(datos_filtrados_2008$Rama.de.actividad.CNAE.2009, 1, 2),
+                                               str_wrap(substring(datos_filtrados_2008$Rama.de.actividad.CNAE.2009, 1, 150), width = 25))
+
+# Crear una escala de colores para asegurar que ambos gráficos tengan la misma paleta
+escala_color <- scale_fill_gradient(low = "lightblue", high = "darkblue")
+
+# Primer gráfico: Treemap para 2024T3 (con leyenda)
+grafico_treemap_2024 <- ggplot(datos_filtrados_2024, aes(area = Total_porc, fill = Total_porc, label = paste(datos_filtrados_2024$Rama.abreviada, Total_porc, sep = "\n"))) +
   geom_treemap() +
-  geom_treemap_text(aes(label = ifelse(Total_porc > 1, paste(datos_filtrados$Rama.abreviada, Total_porc, sep = "\n"), "")), 
+  geom_treemap_text(aes(label = ifelse(Total_porc > 1, paste(datos_filtrados_2024$Rama.abreviada, Total_porc, sep = "\n"), "")), 
                     colour = "white", 
                     place = "centre", 
                     size = 8) + 
-  labs(title = "Distribución de Total por Rama de Actividad (2024T3)") 
-print(grafico_treemap)
+  labs(title = "Distribución Rama de Actividad (2024T3)") +
+  escala_color
 
-datos_filtrados <- na.omit(datos_CNAE[datos_CNAE$Sexo == "Ambos sexos" &
-                                       datos_CNAE$Periodo == "2008-03-01" &
-                                       datos_CNAE$Rama.de.actividad.CNAE.2009 != "Total" &
-                                       grepl("^[0-9]", datos_CNAE$Rama.de.actividad.CNAE.2009), ])
-
-datos_filtrados$Rama.abreviada <- substring(datos_filtrados$Rama.de.actividad.CNAE.2009, 1, 30) # esto es para que quepan los textos, que son muy largos
-grafico_treemap <- ggplot(datos_filtrados, aes(area = Total_porc, fill = Total_porc, label = paste(datos_filtrados$Rama.abreviada, Total_porc, sep = "\n"))) +
+# Segundo gráfico: Treemap para 2008T1 (sin leyenda)
+grafico_treemap_2008 <- ggplot(datos_filtrados_2008, aes(area = Total_porc, fill = Total_porc, label = paste(datos_filtrados_2008$Rama.abreviada, Total_porc, sep = "\n"))) +
   geom_treemap() +
-  geom_treemap_text(aes(label = ifelse(Total_porc > 1, paste(datos_filtrados$Rama.abreviada, Total_porc, sep = "\n"), "")), 
+  geom_treemap_text(aes(label = ifelse(Total_porc > 1, paste(datos_filtrados_2008$Rama.abreviada, Total_porc, sep = "\n"), "")), 
                     colour = "white", 
                     place = "centre", 
                     size = 8) + 
-  labs(title = "Distribución de Total por Rama de Actividad (2008T1)") 
-print(grafico_treemap)
+  labs(title = "Distribución Rama de Actividad (2008T1)") +
+  escala_color +
+  guides(fill = "none")  # Elimina la leyenda del segundo gráfico
+
+# Usamos patchwork para poner los gráficos uno al lado del otro
+grafico_combinado <- grafico_treemap_2008 | grafico_treemap_2024
+
+# Mostrar el gráfico combinado
+grafico_combinado
+
+
 ```
 Se observa cómo algunas ramas han ganado o perdido relevancia en términos de empleo total a lo largo del tiempo. Por ejemplo, sectores relacionados con la educación y la administración pública han aumentado su proporción, mientras que ramas relacionadas con la construcción y la industria han experimentado una marcada disminución.
 
 Además de realizar un análisis comparativo de cómo se distribuye por ramas de actividad la población trabajadora, se realiza un análisis visual de la evolución del empleo en España de manera absoluta agrupando por sexo, en conjunto con un análisis de la evolución de la diferencia trimestral en el empleo. Para ello se han empleado gráficos de lineas. Estos gráficos incluyen referencias visuales a eventos históricos relevantes, como el fin de la crisis económica de 2013 y el inicio de la pandemia en 2020.
 
-```{r, warning=FALSE, echo=FALSE}
-fin_crisis <- as.Date("2013-06-01")      # Fin de la crisis (junio 2013)
-inicio_covid <- as.Date("2020-03-01")    # Inicio de COVID (marzo 2020)
+```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
+library(ggplot2)
+library(scales)  # Para formatear los números
+library(patchwork)
 
-ggplot(datos_CNAE[datos_CNAE$Sexo != "Total" & datos_CNAE$Rama.de.actividad.CNAE.2009 == "Total", ], 
+# Fin de la crisis (junio 2013) y Inicio de COVID (marzo 2020)
+fin_crisis <- as.Date("2013-06-01")      
+inicio_covid <- as.Date("2020-03-01")    
+
+# Primer gráfico: Evolución del empleo en España (con leyenda)
+grafico_empleo <- ggplot(datos_CNAE[datos_CNAE$Sexo != "Total" & datos_CNAE$Rama.de.actividad.CNAE.2009 == "Total", ], 
        aes(x = Periodo, y = Total_abs, color = Sexo, group = Sexo)) +
-  
   geom_line() + 
   geom_point() +
-  
   geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
   geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
   geom_text(aes(x = fin_crisis, y = max(datos_CNAE$Total_abs, na.rm = TRUE) * 0.6,
                 label = "Fin de la crisis\n (2013)"), 
-                color = "grey30", size = 3, fontface = "italic",
-            hjust = -0.04, vjust = 0) +
+            color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.04, vjust = 0.3) +
   geom_text(aes(x = inicio_covid, y = max(datos_CNAE$Total_abs, na.rm = TRUE) * 0.6,
-                label = "Inicio COVID\n (2020)" 
-                ), color = "grey30", size = 3,fontface = "italic",
+                label = "Inicio COVID\n (2020)"), 
+            color = "grey30", size = 3, fontface = "italic",
             hjust = -0.04, vjust = 0) +
-  
   scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
-  
   expand_limits(y = 0) +
-  
-
-  labs(title = "Evolución del empleo en España",
+  labs(title = "Evolución del empleo en España\n(Absoluto)",
        x = "Fecha",
-       y = "Total")
+       y = "Total") +
+  guides(color = guide_legend(position = "bottom"))  # Leyenda debajo
 
-```
-
-```{r, warning=FALSE, echo=FALSE}
-ggplot(datos_CNAE[datos_CNAE$Sexo != "Total" & datos_CNAE$Rama.de.actividad.CNAE.2009 == "Total", ], 
+# Segundo gráfico: Evolución del empleo en España (Diferencia respecto al periodo anterior, sin leyenda)
+grafico_diferencia <- ggplot(datos_CNAE[datos_CNAE$Sexo != "Total" & datos_CNAE$Rama.de.actividad.CNAE.2009 == "Total", ], 
        aes(x = Periodo, y = Diferencia_Total, color = Sexo, group = Sexo)) +
-  
   geom_line() + 
   geom_point() +
-  
   geom_vline(xintercept = as.numeric(fin_crisis), linetype = "dashed", color = "grey30", linewidth = 0.5) +
   geom_vline(xintercept = as.numeric(inicio_covid), linetype = "dashed", color = "grey30", linewidth = 0.5) +
-  
   geom_text(aes(x = fin_crisis, y = -750,
                 label = "Fin de la crisis\n (2013)"), 
             color = "grey30", size = 3, fontface = "italic",
-            hjust = -0.04, vjust = 0) +
+            hjust = -0.04, vjust = 0.75) +
   geom_text(aes(x = inicio_covid, y = -750,
-                label = "Inicio COVID\n (2020)" 
-                ), color = "grey30", size = 3, fontface = "italic",
-            hjust = -0.04, vjust = 0) +
-  
+                label = "Inicio COVID\n (2020)"), 
+            color = "grey30", size = 3, fontface = "italic",
+            hjust = -0.1, vjust = 0.75) +
   scale_y_continuous(labels = label_number(big.mark = ","), expand = expansion(mult = c(0, 0.05))) +
-  
+  expand_limits(y = -1200) +
 
-  labs(title = "Evolución del empleo en España (Diferencia respecto al periodo anterior)",
+  labs(title = "Evolución del empleo en España\n(Diferencia respecto al periodo anterior)",
        x = "Fecha",
-       y = "Diferencia en Total")
+       y = "Diferencia en Total") +
+  theme(legend.position = "none")  # Sin leyenda
+
+# Combinar ambos gráficos horizontalmente con patchwork
+grafico_combinado <- (grafico_empleo | grafico_diferencia) +
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "bottom")
+# Mostrar el gráfico combinado
+grafico_combinado
+
 ```
+
 
 Se destaca cómo el empleo masculino y femenino responden de manera diferente a los shocks económicos. Por ejemplo, los hombres experimentaron caídas más pronunciadas durante la crisis de 2008, mientras que las mujeres mostraron una recuperación más gradual. Además, se puede apreciar que la diferencia entre sexos se redujo en grán medida durante la crisis de 2008, desde la cual la población masculina ha sido incapaz de recuperar las cifras precrisis, mientras que las mujeres han superado marcadamente dichos valores.
 
@@ -961,7 +995,7 @@ Se destaca cómo el empleo masculino y femenino responden de manera diferente a 
 
 A continuación, se realiza un estudio de las correlaciones lineales de Pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Es por ello que se realizan dos gráficas separadas que muestran la matriz de correlaciones entre ramas.
 
-```{r, warning=FALSE, echo=FALSE}
+```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=6}
 datos_ancho <- datos_CNAE %>%
   filter(Sexo == "Ambos sexos") %>%
   filter(grepl("^[A-Za-z]", Rama.de.actividad.CNAE.2009)) %>%  # Filtra solo aquellas que empiezan con una letra
@@ -1013,7 +1047,7 @@ data_normalized <- ramas_individuales[ramas_individuales$Sexo=="Ambos sexos",] %
 
 En este punto, se busca estudiar las tendencias relativas, eliminando la influencia de las diferencias inciales entre ramas. Para ello, primero se normalizan los datos dividiendo por el número inicial de trabajadores en cada rama, y a continuación se obtiene una métrica de distancia entre dichos datos normalizados, obteniéndose como la media de las diferencias absolutas de las cantidades normalizadas. A partir de estas distancias, se proyectan en dos dimensiones utilizando MDS, lo que permite visualizar las relaciones entre ramas en función de sus patrones de empleo a lo largo del tiempo. 
 
-```{r, warning=FALSE, echo=FALSE}
+```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
 data_wide <- data_normalized %>%
   select(Rama.de.actividad.CNAE.2009, Periodo, Total_Normalizado) %>%  # Seleccionar las columnas necesarias
   pivot_wider(names_from = Periodo, values_from = Total_Normalizado, values_fill = 0)
@@ -1047,19 +1081,105 @@ grafica_mds
 
 Se forman agrupaciones naturales de ramas con patrones similares. Además, se observan claramente algunos outliers, que puede ser de gran interés analizarlos individualmente.
 
-```{r, warning=FALSE, echo=FALSE}
-ggplot(datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009=="99 Actividades de organizaciones y organismos extraterritoriales",], aes(x=Periodo,y=Total_abs, color=Sexo))+geom_line()+labs(title="Evolución del empleo en 'Actividades de orgs. y organismos extraterrit.'")
-ggplot(datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009=="07 Extracción de minerales metálicos",], aes(x=Periodo,y=Total_abs, color=Sexo))+geom_line()+labs(title="Evolución del empleo en 'Extracción de minerales metálicos'")
+```{r, warning=FALSE, echo=FALSE,fig.width=8, fig.height=3}
+library(ggplot2)
+library(patchwork)
+
+library(ggplot2)
+library(patchwork)
+
+# Primer gráfico
+plot1 <- ggplot(
+  datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009 == 
+               "09 Actividades de apoyo a las industrias extractivas", ], 
+  aes(x = Periodo, y = Total_abs, color = Sexo)
+) +
+  geom_line(size = 0.75) +
+  geom_point(size = 1.25) +
+  labs(
+    subtitle = "Apoyo a industrias extractivas", 
+    y = "Total"  # Etiqueta en eje y
+  ) +
+  theme(legend.position = "none")  # Ocultar la leyenda en este gráfico
+
+# Segundo gráfico
+plot2 <- ggplot(
+  datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009 == 
+               "07 Extracción de minerales metálicos", ], 
+  aes(x = Periodo, y = Total_abs, color = Sexo)
+) +
+  geom_line(size = 0.75) +
+  geom_point(size = 1.25) +
+  labs(
+    subtitle = "Extracción de minerales metálicos", 
+    y = "Total"  # Etiqueta en eje y
+  )
+
+# Tercer gráfico
+plot3 <- ggplot(
+  datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009 == 
+               "99 Actividades de organizaciones y organismos extraterritoriales", ], 
+  aes(x = Periodo, y = Total_abs, color = Sexo)
+) +
+  geom_line(size = 0.75) +
+  geom_point(size = 1.25) +
+  labs(
+    subtitle = "Org. y organismos extraterrit.", 
+    y = "Total"  # Etiqueta en eje y
+  )
+
+# Combinar los gráficos con un título general y una leyenda compartida
+combined_plot <- (plot1 | plot2 | plot3) +
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "bottom")
+
+
+# Mostrar el gráfico combinado
+print(combined_plot)
+
 ```
 
-Ramas como "Extracción de minerales metálicos" y "Actividades de organismos extraterritoriales" se destacan por su comportamiento atípico. Estas ramas tienen una dinámica de empleo inusual debido a su naturaleza específica, tamaño reducido o dependencia de factores externos como la demanda global. Observamos claramente que son datos con mucho ruido y un gran incremento en los últimos años, y por lo tanto es normal que nos apareciesen como outliers.
+Ramas como "Extracción de minerales metálicos", "Actividades de apoyo a las industrias extractivas" o "Actividades de organizaciones y organismos extraterritoriales" se destacan por su comportamiento atípico. Estas ramas tienen una dinámica de empleo inusual debido a su naturaleza específica, tamaño reducido o dependencia de factores externos como la demanda global. Observamos claramente que son datos con mucho ruido, y por lo tanto es normal que nos apareciesen como outliers. 
+
+```{r, warning=FALSE, include=FALSE}
+ramas_a_eliminar <- c(
+                      "07 Extracción de minerales metálicos",
+                      "09 Actividades de apoyo a las industrias extractivas",
+                      "99 Actividades de organizaciones y organismos extraterritoriales")
+data_normalized <- data_normalized %>%
+  filter(!(Rama.de.actividad.CNAE.2009 %in% ramas_a_eliminar))
+
+data_wide <- data_normalized %>%
+  select(Rama.de.actividad.CNAE.2009, Periodo, Total_Normalizado) %>%  # Seleccionar las columnas necesarias
+  pivot_wider(names_from = Periodo, values_from = Total_Normalizado, values_fill = 0)
+data_wide <- na.omit(data_wide)
+
+diferencias <- data_wide %>%
+  select(-Rama.de.actividad.CNAE.2009) %>%  # Excluir la columna de Rama
+  as.matrix() 
+
+distancias_matriz <- dist(diferencias, method = "euclidean")
+
+distancias_matriz <- as.matrix(distancias_matriz)
+
+rownames(distancias_matriz) <- data_wide$Rama.de.actividad.CNAE.2009
+colnames(distancias_matriz) <- data_wide$Rama.de.actividad.CNAE.2009
+
+mds_result <- cmdscale(distancias_matriz, k = 2)
+
+mds_data <- as.data.frame(mds_result)
+
+nombres_actividades <- colnames(distancias_matriz)
+
+mds_data$Rama <- nombres_actividades
+```
+
 
 ### Clusterización por Ramas de Actividad
 
 Tras observar la proyección tratamos de segmentar los datos en agrupaciones naturales, es por ello que tratamos de hacer un clustering que nos permita agrupar cuantitativamente aquellas ramas de actividad que han tenido un comportamiento similar entre ellas (con los datos normalizados). Para ello se opta en primer lugar por el algoritmo más típico en clustering (k-means), y se analiza sus resultados para ver si son satisfactorios. Además, como método para la selección del hiperparámetro `k`, se opta por el método del codo. Sin embargo, este resultado se analizará para saber si es adecuado, si sería necesario alterar ligeramente el número de clusters obtenidos o si directamente deberíamos escoger otro método.
 
-```{r, warning=FALSE, echo=FALSE}
-# Establecer semilla
+```{r, warning=FALSE, echo=FALSE, fig.width=8, fig.height=3}
 set.seed(123)
 
 # Crear un rango de posibles valores para el número de clusters
@@ -1075,72 +1195,114 @@ elbow_plot <- ggplot(data.frame(K = k_range, WCSS = wcss), aes(x = K, y = WCSS))
   geom_line() + 
   geom_point() +
   labs(title = "Gráfico de codo para determinar el número óptimo de clusters",
-       x = "Número de clusters (k)", y = "WCSS (Suma de cuadrados dentro de los clusters)")
+       x = "Número de clusters (k)", y = "WCSS")
 
 # Mostrar el gráfico de codo
 print(elbow_plot)
 ```
 
-A pesar que la gráfica del codo parece indicar que el mejor es `k=4`, como se observa que al añadir el quinto lo que hace es crear un cluster propio para los outliers, optamos por coger `k=5`, pues esto puede ser beneficioso para eliminar el ruido de estos sin la necesidad de eliminarlos de por si.
 
-```{r, warning=FALSE, echo=FALSE}
+```{r, warning=FALSE, echo=FALSE, fig.width=8, fig.height=3}
+library(ggplot2)
+library(patchwork)
+
+# Configurar semilla para reproducibilidad
 set.seed(123)
-num_clusters <- 5
+
+# Crear un rango de posibles valores para el número de clusters
+k_range <- 1:10
+
+# Calcular el WCSS (Within-Cluster Sum of Squares) para cada valor de k
+wcss <- sapply(k_range, function(k) {
+  kmeans(diferencias, centers = k, nstart = 25)$tot.withinss
+})
+
+# Crear el gráfico de codo
+elbow_plot <- ggplot(data.frame(K = k_range, WCSS = wcss), aes(x = K, y = WCSS)) +
+  geom_line() + 
+  geom_point() +
+  labs(title = "Gráfico del método del codo",
+       x = "Número de clusters (k)", y = "WCSS")
+
+# Determinar el número de clusters y crear el modelo kmeans
+num_clusters <- 3
 clusters <- kmeans(diferencias, centers = num_clusters)
 
+# Agregar la información de los clusters a los datos MDS
 mds_data$Cluster <- as.factor(clusters$cluster)
+
+# Crear el gráfico MDS
 grafica_mds <- ggplot(mds_data, aes(x = V1, y = V2, color = Cluster, label = Rama)) +
   geom_point(size = 2, alpha=0.8) +
-  labs(title = "Proyección MDS de actividades por medias de diferencias entre datos normalizados",
+  labs(title = "Proyección MDS de los datos clusterizados",
        x = "Dimensión 1", y = "Dimensión 2")
 
-grafica_mds
+# Combinar los gráficos con patchwork
+combined_plot <- elbow_plot + grafica_mds + plot_layout(ncol = 2)
+
+# Mostrar el gráfico combinado
+combined_plot
+
 ```
 
-Los resultados con k-means parecen positivos, por lo que por simplicidad del modelo nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y trataremos de averiguar si tienen una interpretación natural clara.
+El método del codo parece indicarnos que la mejor selección es $k=3$ y observamos que los resultados parecen satisfactorios. Por lo tanto, debido a la simplicidad del modelo nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y trataremos de averiguar si tienen una interpretación natural clara.
 
-```{r, warning=FALSE, echo=FALSE}
-medias_por_cluster <- data_wide %>%
-  group_by(Cluster = mds_data$Cluster) %>%
-  summarise(across(everything(), mean, na.rm = TRUE)) %>% 
-  pivot_longer(-c(Cluster,Rama.de.actividad.CNAE.2009), names_to = "Periodo", values_to = "Media")
+```{r, warning=FALSE, echo=FALSE, fig.width=8, fig.height=3}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(patchwork)
 
-grafico_lineas <- ggplot(medias_por_cluster, aes(x = Periodo, y = 100*Media, color = Cluster, group = Cluster)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
-  labs(title = "Media de Total Normalizado por Cluster a lo Largo del Tiempo",
-       x = "Fecha", y = "Media de Total Normalizado") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Suponiendo que tienes los datos en data_wide y mds_data como antes.
 
-print(grafico_lineas)
-```
-
-```{r}
+# Procesamiento de datos
 data_wide$Cluster <- as.factor(mds_data$Cluster)
 
+# Asegúrate de que Periodo esté en formato de fecha
 data_long <- data_wide %>%
-  pivot_longer(-c(Rama.de.actividad.CNAE.2009, Cluster), names_to = "Periodo", values_to = "Total_Normalizado")
+  pivot_longer(-c(Rama.de.actividad.CNAE.2009, Cluster), names_to = "Periodo", values_to = "Total_Normalizado") %>%
+  mutate(Periodo = as.Date(Periodo, format = "%Y-%m-%d"))  # Convierte Periodo a formato de fecha
 
-cuantiles_por_cluster <- data_long %>%
+# Agrupar por Cluster y Periodo, calcular la media y los cuantiles
+cuantiles_y_media_por_cluster <- data_long %>%
   group_by(Cluster, Periodo) %>%
   summarise(
+    Media = mean(Total_Normalizado, na.rm = TRUE),
     Cuantil_25 = quantile(Total_Normalizado, 0.25, na.rm = TRUE),
     Cuantil_50 = quantile(Total_Normalizado, 0.50, na.rm = TRUE),
     Cuantil_75 = quantile(Total_Normalizado, 0.75, na.rm = TRUE),
     .groups = 'drop'
   ) %>%
-  pivot_longer(-c(Cluster, Periodo), names_to = "Cuantil", values_to = "Valor")
+  pivot_longer(cols = c(Media, Cuantil_25, Cuantil_50, Cuantil_75), 
+               names_to = "Cuantil", values_to = "Valor")
 
-grafico_cuantiles <- ggplot(cuantiles_por_cluster, aes(x = Periodo, y = Valor, color = Cluster, group = interaction(Cluster, Cuantil))) +
+# Crear el gráfico con facet_wrap en 2x2 (2 columnas y 2 filas)
+grafico_combinado <- ggplot(cuantiles_y_media_por_cluster, aes(x = Periodo, y = 100 * Valor, color = Cluster, group = interaction(Cluster, Cuantil))) +
   geom_line(size = 1) +
-  geom_point(size = 2) +
-  facet_wrap(~ Cuantil, nrow = 3, scales = "free_y") + 
-  labs(title = "Cuantiles de Total Normalizado por Cluster a lo Largo del Tiempo",
-       x = "Fecha", y = "Valor") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  geom_point(size = 1.25) +
+  facet_wrap(~ Cuantil, ncol = 2, nrow = 2, scales = "free_y", 
+             labeller = as_labeller(c("Media" = "Media", "Cuantil_25" = "Percentil 25", 
+                                      "Cuantil_50" = "Percentil 50", "Cuantil_75" = "Percentil 75"))) +
+  labs(title = "Total Normalizado por Cluster a lo Largo del Tiempo",
+       x = "Año", y = "Valor (%)") +
+  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +  # Muestra solo los años
+  scale_y_continuous(limits = c(0, 220)) +  # Limita el eje Y de 0 a 220
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Ajusta la orientación de las fechas
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    plot.background = element_rect(fill = "white"),
+    strip.background = element_rect(fill = "gray90"),
+    strip.text = element_text(size = 12, face = "bold", color = "black")
+  )
 
-print(grafico_cuantiles)
+# Mostrar el gráfico combinado
+grafico_combinado
+
+
 ```
+
+
+
 
 ```{r}
 lista_ramas_por_cluster <- data_wide %>%
@@ -1151,4 +1313,4 @@ lista_ramas <- as.list(setNames(lista_ramas_por_cluster$Ramas, lista_ramas_por_c
 print(lapply(lista_ramas, function(x) head(x, 3)))
 ```
 
-Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento durante los últimos 16 años, cosa a esperar proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa, en los cuales ha habido un decrecimiento (cluster 5) o estancamiento (cluster 4) de los trabajadores. Por otra parte el cluster 3 parece presentar ramas con ligeros resultados positivos, y el cluster 1 con marcados resultados positivos, aunque con menor número de ramas que los anteriores. Por último, el cluster 2 se trata del cluster de outliers. 
+Analizando los cuantiles y medias de cada cluster, se observa que se agrupan segun rendimiento, cosa a esperada proviniendo de la métrica definida. Se observan que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (cluster 2) o estancamiento (cluster 3) de los trabajadores. Por otra parte el cluster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.
