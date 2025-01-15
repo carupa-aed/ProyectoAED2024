@@ -67,6 +67,8 @@ if(!require(visdat)) install.packages("visdat")
 if(!require(treemap)) install.packages("treemap")
 if(!require(stringr)) install.packages("stringr")
 if(!require(tibble)) install.packages("tibble")
+if(!require(kableExtra)) install.packages("kableExtra")
+
 
 # Cargar funciones desde el archivo functions.r
 source("functions.r")
@@ -1297,8 +1299,8 @@ tabla_ramas <- data_wide %>%
   )
 
 # Mostrar la tabla con kable
-kable(tabla_ramas, col.names = c("Cl.", "Primeras tres Ramas de Actividad"), 
-      caption = "Ramas de actividad más representativas por cluster")
+#kable(tabla_ramas, col.names = c("Cl.", "Primeras tres Ramas de Actividad"), 
+#      caption = "Ramas de actividad más representativas por cluster")
 ```
 
 Analizando los cuantiles y medias de cada clúster, se observa que se agrupan según rendimiento, cosa ya esperada proviniendo de la métrica definida. Se observa que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster 3) de los trabajadores. Por otra parte el clúster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.
