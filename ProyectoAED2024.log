@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.1.15)  15 JAN 2025 18:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.1.15)  15 JAN 2025 18:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1290,6 +1290,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 
 {c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc} <./Definitions/logo-mdpi-eps-converted-to.pdf>]
 
+
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 16.18796pt, for example:
 (fancyhdr)                \setlength{\headheight}{16.18796pt}.
@@ -1320,11 +1321,6 @@ File: ProyectoAED2024_files/figure-latex/unnamed-chunk-26-1.pdf Graphic file (ty
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-26-1.pdf>
 Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-26-1.pdf  used on input line 572.
 (pdftex.def)             Requested size: 394.35522pt x 273.01497pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 588--596
-
- []
-
 <ProyectoAED2024_files/figure-latex/unnamed-chunk-28-1.pdf, id=102, 469.755pt x 325.215pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-28-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-28-1.pdf>
@@ -1332,6 +1328,11 @@ Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-28-1.p
 (pdftex.def)             Requested size: 394.35522pt x 273.01497pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 616--621
+
+ []
 
 
 
@@ -1343,10 +1344,6 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
 [5 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-26-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 616--621
-
- []
-
 <ProyectoAED2024_files/figure-latex/unnamed-chunk-30-1.pdf, id=117, 469.755pt x 325.215pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-30-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-30-1.pdf>
@@ -1354,6 +1351,15 @@ Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-30-1.p
 (pdftex.def)             Requested size: 394.35522pt x 273.01497pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
+
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `cmtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+
+Underfull \hbox (badness 10000) in paragraph at lines 669--674
+
+ []
 
 
 
@@ -1365,20 +1371,29 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
 [6 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-28-1.pdf>]
-Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `cmtt' (encoding: T1).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
-
-Underfull \hbox (badness 10000) in paragraph at lines 669--674
-
- []
-
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1.pdf, id=133, 469.755pt x 325.215pt>
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1.pdf, id=134, 469.755pt x 325.215pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1.pdf>
 Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1.pdf  used on input line 677.
 (pdftex.def)             Requested size: 157.73967pt x 109.20201pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 688--696
+
+ []
+
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf, id=135, 469.755pt x 325.215pt>
+File: ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type pdf)
+<use ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf>
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf  used on input line 699.
+(pdftex.def)             Requested size: 354.91728pt x 245.71199pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 706--717
+
+ []
+
 
 
 
@@ -1389,40 +1404,15 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
 [7 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-30-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-34-1.pdf>]
-Underfull \hbox (badness 10000) in paragraph at lines 688--696
-
- []
-
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf, id=155, 469.755pt x 325.215pt>
-File: ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf Graphic file (type pdf)
-<use ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf  used on input line 699.
-(pdftex.def)             Requested size: 354.91728pt x 245.71199pt.
-
-Underfull \hbox (badness 10000) in paragraph at lines 706--717
-
- []
-
 <ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1.pdf, id=156, 469.755pt x 325.215pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1.pdf>
 Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1.pdf  used on input line 720.
 (pdftex.def)             Requested size: 354.91728pt x 245.71199pt.
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 727--737
 
  []
-
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf, id=157, 469.755pt x 325.215pt>
-File: ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf Graphic file (type pdf)
-<use ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf  used on input line 740.
-(pdftex.def)             Requested size: 354.91728pt x 245.71199pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
@@ -1433,8 +1423,13 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[8 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf>]
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf, id=170, 397.485pt x 216.81pt>
+[8 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-35-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1.pdf>]
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf, id=176, 469.755pt x 325.215pt>
+File: ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf Graphic file (type pdf)
+<use ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf>
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf  used on input line 740.
+(pdftex.def)             Requested size: 354.91728pt x 245.71199pt.
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf, id=177, 397.485pt x 216.81pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf>
 Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf  used on input line 775.
@@ -1444,13 +1439,13 @@ Overfull \hbox (3.1288pt too wide) in paragraph at lines 775--776
  [][] 
  []
 
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf, id=171, 397.485pt x 216.81pt>
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf, id=178, 397.485pt x 216.81pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf  used on input line 799.
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf  used on input line 800.
 (pdftex.def)             Requested size: 397.48402pt x 216.80946pt.
 
-Overfull \hbox (3.1288pt too wide) in paragraph at lines 799--800
+Overfull \hbox (3.1288pt too wide) in paragraph at lines 800--801
  [][] 
  []
 
@@ -1463,34 +1458,43 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[9 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-36-1.pdf>]
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf, id=183, 397.485pt x 216.81pt>
+[9 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf>]
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 16.18796pt, for example:
+(fancyhdr)                \setlength{\headheight}{16.18796pt}.
+(fancyhdr)                You might also make \topmargin smaller:
+(fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
+
+[10 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf>]
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf, id=209, 397.485pt x 216.81pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf  used on input line 830.
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf  used on input line 831.
 (pdftex.def)             Requested size: 397.48402pt x 216.80946pt.
 
-Overfull \hbox (3.1288pt too wide) in paragraph at lines 830--831
+Overfull \hbox (3.1288pt too wide) in paragraph at lines 831--832
  [][] 
  []
 
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf, id=184, 397.485pt x 144.54pt>
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf, id=210, 397.485pt x 144.54pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf  used on input line 862.
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf  used on input line 864.
 (pdftex.def)             Requested size: 397.48402pt x 144.53963pt.
 
-Overfull \hbox (3.1288pt too wide) in paragraph at lines 862--863
+Overfull \hbox (3.1288pt too wide) in paragraph at lines 864--865
  [][] 
  []
 
-<ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf, id=185, 397.485pt x 216.81pt>
+<ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf, id=211, 397.485pt x 216.81pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf  used on input line 875.
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf  used on input line 877.
 (pdftex.def)             Requested size: 397.48402pt x 216.80946pt.
 
-Overfull \hbox (3.1288pt too wide) in paragraph at lines 875--876
+Overfull \hbox (3.1288pt too wide) in paragraph at lines 877--878
  [][] 
  []
 
@@ -1503,7 +1507,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[10 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-37-1.pdf>]
+[11 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf>]
 
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1512,41 +1516,32 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[11 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-38-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-39-1.pdf>]
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 16.18796pt, for example:
-(fancyhdr)                \setlength{\headheight}{16.18796pt}.
-(fancyhdr)                You might also make \topmargin smaller:
-(fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
-
-[12 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-40-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf>]
+[12 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-42-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-43-1.pdf>]
 <ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf, id=239, 397.485pt x 144.54pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf  used on input line 907.
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf  used on input line 910.
 (pdftex.def)             Requested size: 397.48402pt x 144.53963pt.
 
-Overfull \hbox (3.1288pt too wide) in paragraph at lines 907--908
+Overfull \hbox (3.1288pt too wide) in paragraph at lines 910--911
  [][] 
  []
 
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 9.37807pt on input line 911.
+(Font)              scaled to size 9.37807pt on input line 914.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.29405pt on input line 911.
+(Font)              scaled to size 7.29405pt on input line 914.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 9.37807pt on input line 911.
+(Font)              scaled to size 9.37807pt on input line 914.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.29405pt on input line 911.
+(Font)              scaled to size 7.29405pt on input line 914.
 <ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf, id=240, 397.485pt x 216.81pt>
 File: ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf Graphic file (type pdf)
 <use ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf>
-Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf  used on input line 922.
+Package pdftex.def Info: ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf  used on input line 926.
 (pdftex.def)             Requested size: 397.48402pt x 216.80946pt.
 
-Overfull \hbox (3.1288pt too wide) in paragraph at lines 922--923
+Overfull \hbox (3.1288pt too wide) in paragraph at lines 926--927
  [][] 
  []
 
@@ -1559,7 +1554,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[13 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf> <./ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf>] (./appendix.tex
+[13 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-45-1.pdf>] (./appendix.tex
 Overfull \hbox (3.63081pt too wide) in paragraph at lines 10--37
  [][] 
  []
@@ -1575,7 +1570,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller:
 (fancyhdr)                \addtolength{\topmargin}{-4.18796pt}.
 
-[14] 
+[14 <./ProyectoAED2024_files/figure-latex/unnamed-chunk-46-1.pdf>] 
 enddocument/afterlastpage (AED): lastpage setting LastPage.
 (./ProyectoAED2024.aux)
  ***********
@@ -1586,13 +1581,13 @@ Package rerunfilecheck Info: File `ProyectoAED2024.out' has not changed.
 (rerunfilecheck)             Checksum: 6BA3CEF39490CF83E291A626DD2608A4;3137.
  ) 
 Here is how much of TeX's memory you used:
- 34793 strings out of 475177
- 660854 string characters out of 5764471
+ 34787 strings out of 475177
+ 660800 string characters out of 5764471
  1125081 words of memory out of 5000000
  56733 multiletter control sequences out of 15000+600000
- 628362 words of font info for 363 fonts, out of 8000000 for 9000
+ 628044 words of font info for 359 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 123i,12n,135p,1012b,650s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 123i,12n,135p,1012b,638s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk> <c:/Users/josem/AppData/Roaming/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecss0800.375pk><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplbi8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb><c:/Users/josem/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
 Output written on ProyectoAED2024.pdf (14 pages, 611126 bytes).
 PDF statistics:

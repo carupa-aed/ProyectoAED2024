@@ -324,11 +324,11 @@ completamos con dicha cadena.
 
 Notamos que para el conjunto de datos de población total en edad de
 trabajar y población inactiva hay un intervalo de edad más que para el
-resto de datasets: se divide l''55 y más años'' en los grupos ``De 55 a
+resto de datasets: se divide ``55 y más años'' en los grupos ``De 55 a
 64 años'' y ``65 y más años''. Dado que buscamos obtener un dataset
 único y compacto uniremos ambos grupos de edad como en el resto de
 datasets. Una vez normalizada la estructura de los datasets podemos
-unificar todas las tablas en una sola.
+unificarlos.
 
 Otra circunstancia a corregir que los datos de la columna ``Periodo''
 son cadenas; para solucionarlo, definimos y empleamos la función
@@ -576,7 +576,7 @@ anteriormente mencionado:
 \caption{Evolución del mercado de trabajo en España}\label{fig:unnamed-chunk-26}
 \end{figure}
 
-La figura 1 muestra la evolución de la tasa de actividad, empleo y
+La Figura 1 muestra la evolución de la tasa de actividad, empleo y
 ocupación en España desde 2002 hasta la actualidad, reflejando cambios
 asociados a eventos económicos y sociales. Entre 2002 y 2008, todas las
 tasas crecieron sostenidamente gracias a la bonanza económica, mientras
@@ -592,7 +592,7 @@ abandono escolar. La pandemia de COVID-19 en 2020 generó caídas abruptas
 en todas las tasas, especialmente en la ocupación, aunque a partir de
 2021 se observa una recuperación marcada por la reincorporación laboral
 y el dinamismo de sectores clave como el turismo y los servicios
-digitales.\newline
+digitales.
 
 \begin{figure}[h]
 
@@ -603,7 +603,7 @@ digitales.\newline
 \caption{Evolución del mercado de trabajo por género en España}\label{fig:unnamed-chunk-28}
 \end{figure}
 
-En cambio, la figura 2 muestra la evolución de las tasas de actividad,
+En cambio, la Figura 2 muestra la evolución de las tasas de actividad,
 empleo y ocupación por género, evidenciando desigualdades y avances
 hacia la igualdad. La tasa de actividad masculina, aunque más alta,
 disminuyó entre 2008 y 2020, mientras que la femenina creció
@@ -628,7 +628,7 @@ población activa y su impacto en la ocupación.\newline
 \caption{Evolución del mercado de trabajo por grupo de edad en España}\label{fig:unnamed-chunk-30}
 \end{figure}
 
-Por último, referenciando a la figura 3 que desglosa la población por
+Por último, referenciando a la Figura 3 que desglosa la población por
 grupos de edad, se puede observar cómo los grupos de edad han
 experimentado dinámicas distintas en el mercado laboral. Los mayores de
 35 a 54 años mantienen tasas de actividad superiores al 80 \%,
@@ -642,7 +642,7 @@ verano, cuando se incorporan al mercado laboral en sectores como la
 hostelería. Por otro lado, el grupo de 55 y más años presenta tasas de
 actividad y ocupación bajas debido a la jubilación, aunque esto no
 afecta de igual manera a la tasa de empleo, que excluye a los inactivos
-como los jubilados. \newpage
+como los jubilados.
 
 \subsubsection{\texorpdfstring{\textbf{Clusterización por Comunidades y
 Ciudades
@@ -658,7 +658,7 @@ se encuentran activamente en el mercado laboral.
 Como método de clusterización se utilizará el k-means, que organiza los
 datos en grupos basados en su similitud. Este algoritmo comienza
 eligiendo un número de clusters (\texttt{k}) y seleccionando centroides
-iniciales al azar. Cada punto se asigna al cluster cuyo centroide está
+iniciales al azar. Cada punto se asigna al clúster cuyo centroide está
 más cercano, y luego los centroides se recalculan como el promedio de
 los puntos en cada grupo. Es un proceso que se repite hasta que los
 centroides dejan de cambiar o se alcanza un límite de iteraciones. Al
@@ -668,7 +668,7 @@ caso CCAA.
 
 Por otro lado, para la selección del hiperparámetro \texttt{k} se opta
 por el método del codo. Este consiste en graficar la suma de cuadrados
-dentro del cluster (WSS) frente a distintos valores de \texttt{k}. El
+dentro del clúster (WSS) frente a distintos valores de \texttt{k}. El
 punto donde la disminución de WSS se ralentiza significativamente,
 formando un ``codo'', indica el número adecuado de clusters.\newline
 
@@ -681,7 +681,7 @@ formando un ``codo'', indica el número adecuado de clusters.\newline
 \caption{Gráfico de codo global para la tasa de empleo}\label{fig:unnamed-chunk-34}
 \end{figure}
 
-Observando el gráfico de la figura 4, se puede considerar que el número
+Observando el gráfico de la Figura 4, se puede considerar que el número
 de clusters a partir del cual la WSS se ralentiza es en \texttt{k=3},
 pues es en donde se forma el ``codo''.
 
@@ -703,7 +703,7 @@ laboral a nivel territorial.\newline
 \caption{Clusterización regional con 3 centroides para la tasa de empleo en España en 2007}\label{fig:unnamed-chunk-35}
 \end{figure}
 
-La figura 5 muestra el análisis de clustering de la tasa de empleo en
+La Figura 5 muestra el análisis de clustering de la tasa de empleo en
 España en 2007. Todas las comunidades de la península a excepción de
 Extremadura y Andalucía se agrupan en un clustering único debido a la
 similitud en su tasa, con valores superiores al 90\% representando
@@ -724,7 +724,7 @@ económica.\newline
 \caption{Clusterización regional con 3 centroides para la tasa de empleo en España en 2013}\label{fig:unnamed-chunk-36}
 \end{figure}
 
-En cambio, la figura 6 muestra el análisis de clustering de la tasa de
+En cambio, la Figura 6 muestra el análisis de clustering de la tasa de
 empleo en España en 2013, el peor momento de la crisis económica. En
 comparación con 2007, las tasas de empleo han disminuido
 significativamente en todas las comunidades autónomas, reflejando el
@@ -744,7 +744,7 @@ acentuadas por la crisis.\newline
 \caption{Clusterización regional con 3 centroides para la tasa de empleo en España en 2023}\label{fig:unnamed-chunk-37}
 \end{figure}
 
-En la actualidad, la figura 7 muestra una recuperación general en las
+En la actualidad, la Figura 7 muestra una recuperación general en las
 tasas de empleo respecto a 2013, aunque persisten desigualdades
 regionales. El clúster azul, que representa la mitad norte de España (a
 excepción de Asturias), destaca con tasas superiores al 83\%, reflejando
@@ -779,11 +779,12 @@ el empleo entre las diferentes ramas económicas según su peso relativo.
 \caption{Distribución de las ramas de actividad en el primer trimestre de 2008 y el tercer trimestre de 2024.}\label{fig:unnamed-chunk-38}
 \end{figure}
 
-Se observa cómo algunas ramas han ganado o perdido relevancia en
-términos de empleo total a lo largo del tiempo. Por ejemplo, sectores
-relacionados con la educación y la administración pública han aumentado
-su proporción, mientras que ramas relacionadas con la construcción y la
-industria han experimentado una marcada disminución.
+En la Figura 8 podemos observar cómo algunas ramas han ganado o perdido
+relevancia en términos de empleo total a lo largo del tiempo. Por
+ejemplo, sectores relacionados con la educación y la administración
+pública han aumentado su proporción, mientras que ramas relacionadas con
+la construcción y la industria han experimentado una marcada
+disminución.
 
 Además de realizar un análisis comparativo de cómo se distribuye por
 ramas de actividad la población trabajadora, se realiza un análisis
@@ -803,8 +804,8 @@ pandemia en 2020.
 \caption{Evolución del empleo en España y de las diferencias ientre dos periodos consecutivos.}\label{fig:unnamed-chunk-39}
 \end{figure}
 
-Se destaca cómo el empleo masculino y femenino responden de manera
-diferente a los shocks económicos. Por ejemplo, los hombres
+En la Figura 9 destaca cómo el empleo masculino y femenino responden de
+manera diferente a los shocks económicos. Por ejemplo, los hombres
 experimentaron caídas más pronunciadas durante la crisis de 2008,
 mientras que las mujeres mostraron una recuperación más gradual. Además,
 se puede apreciar que la diferencia entre sexos se redujo en grán medida
@@ -834,12 +835,13 @@ Apéndice.
 \caption{Matriz de correlación entre agrupaciones generales de ramas de actividad.}\label{fig:unnamed-chunk-40}
 \end{figure}
 
-Se observa que la mayoría de las ramas parecen estar correlacionadas
-positivamente, salvo aquellos puestos relacionados con el personal
-doméstico e industrias extractivas con una correlación negativa con la
-mayoría de las ramas, así como aquellas relacionadas con la agricultura,
-ganadería, construcción, actividades financieras entre otras que no
-presentan una marcada correlación con el resto.
+En la matriz de correlación de la Figura 10 se contempla que la mayoría
+de las ramas parecen estar correlacionadas positivamente, salvo aquellos
+puestos relacionados con el personal doméstico e industrias extractivas
+con una correlación negativa con la mayoría de las ramas, así como
+aquellas relacionadas con la agricultura, ganadería, construcción,
+actividades financieras entre otras que no presentan una marcada
+correlación con el resto.
 
 \subsubsection{\texorpdfstring{\textbf{Tendencias relativas a partir de
 datos
@@ -866,9 +868,9 @@ establecidas.
 \caption{Proyección MDS de las distancias entre la evolución de ramas de actividad normalizadas.}\label{fig:unnamed-chunk-42}
 \end{figure}
 
-Se forman agrupaciones naturales de ramas con patrones similares.
-Además, se observan claramente algunos outliers, que puede ser de gran
-interés analizarlos individualmente.
+Se forman agrupaciones naturales de ramas con patrones similares en la
+Figura 11. Además, se observan claramente algunos outliers, que puede
+ser de gran interés analizarlos individualmente.
 
 \begin{figure}
 
@@ -881,11 +883,12 @@ interés analizarlos individualmente.
 
 Ramas como ``Extracción de minerales metálicos'', ``Actividades de apoyo
 a las industrias extractivas'' o ``Actividades de organizaciones y
-organismos extraterritoriales'' se destacan por su comportamiento
-atípico. Estas ramas tienen una dinámica de empleo inusual debido a su
-naturaleza específica, tamaño reducido o dependencia de factores
-externos como la demanda global. Observamos claramente que son datos con
-mucho ruido, y por lo tanto es normal que nos apareciesen como outliers.
+organismos extraterritoriales'' se destacan en la Figura 12 por su
+comportamiento atípico. Estas ramas tienen una dinámica de empleo
+inusual debido a su naturaleza específica, tamaño reducido o dependencia
+de factores externos como la demanda global. Observamos claramente que
+son datos con mucho ruido, y por lo tanto es normal que nos apareciesen
+como outliers.
 
 \subsubsection{\texorpdfstring{\textbf{Clusterización por Ramas de
 Actividad}}{Clusterización por Ramas de Actividad}}\label{clusterizaciuxf3n-por-ramas-de-actividad}
@@ -911,11 +914,12 @@ directamente deberíamos escoger otro método.
 \caption{Gráfico del método del codo y representación mediante una proyección MDS de los clusters de k-means, con el parámetro $k$ escogido.}\label{fig:unnamed-chunk-45}
 \end{figure}
 
-El método del codo parece indicarnos que la mejor selección es \(k=3\) y
-observamos que los resultados parecen satisfactorios. Por lo tanto,
-debido a la simplicidad del modelo nos quedamos con esta elección.
-Pasamos a estudiar por separado el comportamiento de cada cluster y
-trataremos de averiguar si tienen una interpretación natural clara.
+El método del codo ilustrado en la Figura 13 parece indicarnos que la
+mejor selección es \(k=3\) y observamos que los resultados parecen
+satisfactorios. Por lo tanto, debido a la simplicidad del modelo nos
+quedamos con esta elección. Pasamos a estudiar por separado el
+comportamiento de cada clúster y trataremos de averiguar si tienen una
+interpretación natural clara.
 
 \begin{figure}
 
@@ -926,22 +930,22 @@ trataremos de averiguar si tienen una interpretación natural clara.
 \caption{Evolución de los percentiles 25, 50, 75 y media de la evolución normalizada agrupados por clúster.}\label{fig:unnamed-chunk-46}
 \end{figure}
 
-Analizando los cuantiles y medias de cada clúster, se observa que se
-agrupan según rendimiento, cosa ya esperada proviniendo de la métrica
-definida. Se observa que la mayoría de las ramas de actividad se
-acumulan en los clústeres con la evolución negativa o mediocre, en los
-cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster
-3) de los trabajadores. Por otra parte el clúster 1 parece presentar
-ramas con resultados positivos, aunque con menor número de ramas que los
-anteriores.
+Analizando los cuantiles y medias de cada clúster presentes en la Figura
+14, se observa que se agrupan según rendimiento, cosa ya esperada
+proviniendo de la métrica definida. Se observa que la mayoría de las
+ramas de actividad se acumulan en los clústeres con la evolución
+negativa o mediocre, en los cuales ha habido un decrecimiento (clúster
+2) o estancamiento (clúster 3) de los trabajadores. Por otra parte el
+clúster 1 parece presentar ramas con resultados positivos, aunque con
+menor número de ramas que los anteriores.
 
 Podemos observar que aquellos sectores relacionados con la
 descontaminación o la programación y la informática han avanzado mucho
-en los últimos años. Mientras que los sectores más relacionados con la
+en los últimos años, mientras que los sectores más relacionados con la
 construcción han caido fuertemente. Sin embargo, la conclusión general
 es que la evolución del empleo en España durante los últimos años ha
 sido marcadamente negativa para la mayoría de las ramas de actividad,
-salvandose de ella ejemplos muy concretos.
+salvándose de ella ejemplos muy concretos. \newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
