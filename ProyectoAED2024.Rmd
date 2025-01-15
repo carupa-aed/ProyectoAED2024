@@ -387,7 +387,6 @@ TA <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Actividad`)) +
     x = "Periodo",
     y = "Tasa de Actividad (%)",
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -422,7 +421,6 @@ TE <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Empleo`)) +
     x = "Periodo",
     y = "Tasa de Empleo (%)",
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -457,7 +455,6 @@ TO <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`)) +
     x = "Periodo",
     y = "Tasa de Ocupación (%)",
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -524,7 +521,6 @@ TA_sexo <- ggplot() +
     y = "Tasa de Actividad (%)",
     colour = "Sexo"
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -573,7 +569,6 @@ TE_sexo <- ggplot() +
     y = "Tasa de Empleo (%)",
     colour = "Sexo"
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -622,7 +617,6 @@ TO_sexo <- ggplot() +
     y = "Tasa de Ocupación (%)",
     colour = "Sexo"
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -683,7 +677,6 @@ TA_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Actividad`, colou
     y = "Tasa de Actividad (%)",
     colour = "Grupo de Edad",
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -723,7 +716,6 @@ TE_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Empleo`, colour =
     y = "Tasa de Empleo (%)",
     colour = "Grupo de Edad",
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -763,7 +755,6 @@ TO_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colo
     y = "Tasa de Ocupación (%)",
     colour = "Grupo de Edad",
   ) +
-  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
