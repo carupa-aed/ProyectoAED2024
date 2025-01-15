@@ -1322,4 +1322,4 @@ kable(tabla_ramas, col.names = c("Cl.", "Primeras tres Ramas de Actividad"),
 
 Analizando los cuantiles y medias de cada clúster, se observa que se agrupan según rendimiento, cosa ya esperada proviniendo de la métrica definida. Se observa que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster 3) de los trabajadores. Por otra parte el clúster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.
 
-Podemos obtener 
+Podemos observar que aquellos sectores relacionados con la descontaminación o la programación y la informática han avanzado mucho en los últimos años. Mientras que los sectores más relacionados con la construcción han caido fuertemente. Sin embargo, la conclusión general es que la evolución del empleo en España durante los últimos años ha sido marcadamente negativa para la mayoría de las ramas de actividad, salvandose de ella ejemplos muy concretos.
