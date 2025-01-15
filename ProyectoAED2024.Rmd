@@ -18,7 +18,7 @@ affiliation:
 authorcitation: |
   Catret Ruber, P.; Palazón Caballero, J.M.; Rosique Martínez, M.
 correspondence: |
-  jomipaca@alumni.uv.es.
+  jomipaca@alumni.uv.es.; rosique2@alumni.uv.es
 # document options
 journal: Universitat de València
 type: article
@@ -93,7 +93,7 @@ Este análisis exploratorio busca no solo describir el estado actual del mercado
 
 En primer lugar, se han descargado los datos directamente desde la base de datos abierta INE Base. Estos datos se presentan en un formato de csv, separado por el carácter ';', y con el uso de marca de decimales española ','.
 
-## Encuesta de Población Activa (EPA)
+## **Encuesta de Población Activa (EPA)**
 
 Como se ha mencionado anteriormente en la introducción, la EPA es realizada trimestralmente por el Instituto Nacional de Estadística, por lo que se han extraído cinco datasets de su base de datos: población total, activa, inactiva, ocupada y parada. 
 
@@ -219,10 +219,9 @@ kable(tabla_comunidades, caption = "Frecuencias de datos faltantes por Comunidad
 
 kable(tabla_edades, caption = "Frecuencias de datos faltantes por edad en el conjunto de datos EPA")
 
-
 ```
 
-Los datos se concentran en Comunidades y Ciudades Autónomas con proporcionalmente poca población y en rangos de edades donde es poco habitual estar parado (ya que para que se cumpla dicha condición se debe estar buscando activamente trabajo). De hecho, el único valor que podría resultar extraño es que exista un valor faltante para un Total de edades, pero al comprobar la localización y fecha notamos que es razonable.
+Los datos se concentran en Comunidades y Ciudades Autónomas con proporcionalmente poca población y en rangos de edades donde es poco habitual estar ocupado (ya que para que se cumpla dicha condición se debe estar buscando activamente trabajo). De hecho, el único valor que podría resultar extraño es que exista un valor faltante para un Total de edades, pero al comprobar la localización y fecha notamos que es razonable.
 
 ```{r, echo=FALSE}
 kable(miss_datos_EPA[miss_datos_EPA$Edad == "Total",
@@ -242,7 +241,7 @@ datos_EPA <- datos_EPA %>%
   mutate(Activos = ifelse(is.na(Activos), 0, Activos))
 ```
 
-## Clasificación Nacional de Actividades Económicas (CNAE-2009)
+## **Clasificación Nacional de Actividades Económicas (CNAE-2009)**
 
 Este dataset divide los datos según rama de actividad, sexo y fecha en el periodo comprendido entre el primer trimestre de 2008 y el tercer trimestre de 2024, usando las mismas unidades que en el resto de datasets. No obstante, en este caso podemos encontrar los datos segmentado en dos subconjuntos principales:
 
@@ -350,21 +349,21 @@ rm(list = c("subset"))
 
 Una vez preparados, los datos se visualizan a través de gráficos y tasas que permiten interpretar patrones, tendencias y distribuciones de manera más clara y directa.
 
-## Encuesta de Población Activa (EPA)
+## **Encuesta de Población Activa (EPA)**
 
 Las tasas del mercado de trabajo, como la de actividad, empleo y ocupación, son fundamentales para este análisis porque permiten comparar de forma clara y estandarizada las dinámicas laborales entre comunidades autónomas y grupos poblacionales. Estas métricas facilitan el estudio de tendencias temporales y desigualdades estructurales, como las brechas de género o regionales, que no serían evidentes al observar valores absolutos. Además, su uso es clave para identificar áreas críticas y evaluar el impacto de eventos económicos, como la crisis de 2008 o la pandemia de COVID-19, en la participación laboral de la población.
 
 Por ello, las siguientes tasas quedan incorporadas dentro del dataset anteriormente mencionado:
 
-+ Tasa de Actividad (TA): $\frac{\text{Activos}}{\text{Población} > 16}*100$
++ Tasa de Actividad (TA) = $\frac{\text{Activos}}{\text{Población} \geq 16}\cdot100$
 
-+ Tasa de Inactividad (TI): $\frac{\text{Inactivos}}{\text{Población} > 16}*100$
++ Tasa de Inactividad (TI) = $\frac{\text{Inactivos}}{\text{Población} \geq 16}\cdot100 = 1 - TA$
 
-+ Tasa de Ocupación (TO): $\frac{\text{Ocupados}}{\text{Población} > 16}*100$
++ Tasa de Ocupación (TO) = $\frac{\text{Ocupados}}{\text{Población} \geq 16}\cdot100$
 
-+ Tasa de Empleo (TE): $\frac{\text{Ocupados}}{\text{Activos}}*100$
++ Tasa de Empleo (TE) = $\frac{\text{Ocupados}}{\text{Activos}}\cdot100$
 
-+ Tasa de Desempleo (TD): $\frac{\text{Parados}}{\text{Activos}}*100$
++ Tasa de Desempleo (TD) = $\frac{\text{Parados}}{\text{Activos}}\cdot100 = 1 - TE$
 
 ```{r, include=FALSE}
 datos_EPA <- datos_EPA %>%
@@ -374,8 +373,6 @@ datos_EPA <- datos_EPA %>%
   mutate(`Tasa de Empleo` = (datos_EPA$Ocupados/datos_EPA$Activos)*100) %>%
   mutate(`Tasa de Desempleo` = (datos_EPA$Parados/datos_EPA$Activos)*100)
 ```
-
-Notamos que las tasas de inactividad y desempleo no proporcionan información nueva ya que se pueden obtener mediante la de actividad y empleo respectivamente: $TI = 1 - TA$ y $TD = 1 - TE$.
 
 ```{r, include=FALSE}
 inicio_crisis <- as.Date("2008-01-01")   # Inicio de la crisis (enero 2008)
@@ -397,6 +394,7 @@ TA <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Actividad`)) +
     x = "Periodo",
     y = "Tasa de Actividad (%)",
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -431,6 +429,7 @@ TE <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Empleo`)) +
     x = "Periodo",
     y = "Tasa de Empleo (%)",
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -465,6 +464,7 @@ TO <- ggplot(data = data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`)) +
     x = "Periodo",
     y = "Tasa de Ocupación (%)",
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -503,13 +503,10 @@ combinado <- TA + TE + TO +
 combinado
 ```
 
-La figura 1 muestra la evolución de tres indicadores clave del mercado laboral en España: la tasa de actividad, la tasa de empleo y la tasa de ocupación, desde 2002 hasta prácticamente la actualidad, reflejando periodos de estabilidad y cambios abruptos relacionados con eventos económicos y sociales. Entre 2002 y 2008, todas las tasas experimentan un crecimiento sostenido, impulsado por la bonanza económica previa a la crisis financiera global, con un auge en sectores como la construcción y los servicios, y una incorporación activa de la población al mercado laboral.
 
-El inicio de la crisis en 2008 genera un comportamiento diferenciado: mientras que la tasa de actividad se mantiene relativamente estable hasta 2013, las tasas de empleo y ocupación muestran un descenso significativo, reflejando el impacto directo de la destrucción de empleo y la pérdida de capacidad de absorción del mercado laboral. Esto indica que, aunque muchas personas siguieron buscando trabajo activamente (evitando una caída en la actividad), el deterioro de las condiciones laborales afectó severamente las oportunidades de empleo. La tasa de empleo pasó de más del 90% a por debajo del 75% en 2013, o que es lo mismo, un desempleo de más del 25% en la población.
+La figura 1 muestra la evolución de la tasa de actividad, empleo y ocupación en España desde 2002 hasta la actualidad, reflejando cambios asociados a eventos económicos y sociales. Entre 2002 y 2008, todas las tasas crecieron sostenidamente gracias a la bonanza económica, mientras que la crisis de 2008 provocó una fuerte caída en las tasas de empleo y ocupación, aunque la tasa de actividad se mantuvo estable hasta 2013. En ese periodo, el empleo cayó a niveles del 75%, evidenciando un desempleo superior al 25%.
 
-A partir de 2013, con los primeros signos de recuperación económica, la tasa de actividad decrece levemente, posiblemente asociada a una menor presión en el mercado laboral y una reducción del abandono escolar, mientras que las tasas de empleo y ocupación comienzan una recuperación progresiva. Este periodo refleja una estabilización del mercado laboral con la recuperación de ciertos sectores clave.
-
-El impacto de la pandemia de COVID-19 en 2020 es evidente en todas las tasas, con caídas abruptas, especialmente en la tasa de ocupación, debido al cierre temporal de actividades económicas y restricciones de movilidad. Este impacto fue más pronunciado que el de la crisis financiera. Desde 2021, se observa una recuperación acelerada en las tres tasas, marcada por la reincorporación de trabajadores al mercado laboral y el dinamismo de sectores como los servicios digitales, el comercio y el turismo.
+Desde 2013, con signos de recuperación económica, las tasas de empleo y ocupación comenzaron a mejorar progresivamente, mientras que la tasa de actividad decreció ligeramente debido a factores como la reducción del abandono escolar. La pandemia de COVID-19 en 2020 generó caídas abruptas en todas las tasas, especialmente en la ocupación, aunque a partir de 2021 se observa una recuperación marcada por la reincorporación laboral y el dinamismo de sectores clave como el turismo y los servicios digitales.\newline
 
 ```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo por género en España", fig.pos="h"}
 # Crear un gráfico de lineas para cada sexo + gráfico de barras para las diferencias
@@ -534,6 +531,7 @@ TA_sexo <- ggplot() +
     y = "Tasa de Actividad (%)",
     colour = "Sexo"
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -582,6 +580,7 @@ TE_sexo <- ggplot() +
     y = "Tasa de Empleo (%)",
     colour = "Sexo"
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -630,6 +629,7 @@ TO_sexo <- ggplot() +
     y = "Tasa de Ocupación (%)",
     colour = "Sexo"
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -671,11 +671,9 @@ combinado2 <- TA_sexo + TE_sexo + TO_sexo +
 combinado2
 ```
 
-La figura muestra la evolución de las tasas de actividad, empleo y ocupación desglosadas por género, evidenciando patrones de desigualdad, convergencia y algunas diferencias clave entre estos indicadores. La tasa de actividad masculina, consistentemente más alta que la femenina, experimenta un descenso gradual entre 2008 y 2020, probablemente vinculado a los cambios estructurales tras la crisis financiera. En contraste, la tasa de actividad femenina ha crecido de forma sostenida desde 2002, impulsada por cambios sociales y legislativos, aunque este crecimiento se ralentiza a partir de 2008. Este proceso ha reducido la brecha de género de casi un 20% en 2002 a cerca de un 8% en años recientes, como reflejan las barras grises que representan esta diferencia.
+En cambio, la figura 2 muestra la evolución de las tasas de actividad, empleo y ocupación por género, evidenciando desigualdades y avances hacia la igualdad. La tasa de actividad masculina, aunque más alta, disminuyó entre 2008 y 2020, mientras que la femenina creció sostenidamente desde 2002, reduciendo la brecha de género del 20% al 8%. En la tasa de empleo, las diferencias son menores, ya que mide solo a la población activa, mientras que en la tasa de ocupación las disparidades son más evidentes al incluir a toda la población en edad de trabajar.
 
-En la tasa de empleo, sin embargo, las diferencias entre hombres y mujeres son mucho más reducidas, lo que sugiere que la principal disparidad radica en la población activa. Esto se explica porque la tasa de empleo mide únicamente a las personas empleadas dentro de la población activa, mientras que la tasa de ocupación considera a toda la población en edad de trabajar. Por ello, las diferencias en la tasa de ocupación entre hombres y mujeres son más marcadas, reflejando no solo las desigualdades en el empleo, sino también las disparidades en la incorporación al mercado laboral.
-
-Durante la pandemia de COVID-19 en 2020, todas las tasas muestran un descenso significativo, seguido de una recuperación que resalta la resiliencia del mercado laboral. Este análisis pone en evidencia tanto los avances hacia la igualdad de género en términos laborales como las áreas donde persisten desigualdades estructurales, especialmente en la población activa y su impacto en las tasas de ocupación.
+La pandemia de 2020 generó descensos significativos en todas las tasas, seguidos de una recuperación que refleja la resiliencia del mercado laboral. Este análisis resalta los avances hacia la igualdad laboral, aunque persisten desigualdades estructurales, especialmente en la población activa y su impacto en la ocupación.\newline
 
 ```{r, warning=FALSE, include=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución del mercado de trabajo por grupo de edad en España", fig.pos="h"}
 # Crear un gráfico de líneas para cada grupo de edad
@@ -692,6 +690,7 @@ TA_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Actividad`, colou
     y = "Tasa de Actividad (%)",
     colour = "Grupo de Edad",
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -731,6 +730,7 @@ TE_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Empleo`, colour =
     y = "Tasa de Empleo (%)",
     colour = "Grupo de Edad",
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -770,6 +770,7 @@ TO_edad <- ggplot(data_filtered, aes(x = Periodo, y = `Tasa de Ocupación`, colo
     y = "Tasa de Ocupación (%)",
     colour = "Grupo de Edad",
   ) +
+  theme_minimal() +
   theme(
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 12),
@@ -810,19 +811,19 @@ combinado3 <- TA_edad + TE_edad + TO_edad +
 combinado3
 ```
 
-Por último, desglosadando la población por grupos de edad, se puede observar cómo cada segmento ha experimentado diferentes dinámicas en el mercado laboral. Los grupos de mayor edad, como los de 35 a 44 años y 45 a 54 años, destacan por mantener tasas de actividad superiores al 80 %, significativamente más altas y estables a lo largo del tiempo, reflejando su integración consolidada en el mercado laboral. En contraste, los grupos más jóvenes, especialmente el de 16 a 19 años, presentan tasas considerablemente más bajas, con una caída pronunciada desde 2008. Por ejemplo, en 2013, la tasa de empleo de este grupo se sitúa por debajo del 30 %, lo que implica un desempleo superior al 70 %. Este fenómeno puede atribuirse a que este grupo se encontraba principalmente en el sector de la construcción, el cual sufrió más el efecto de la recesión. Por otro lado, el aumento de la escolarización y la prolongación de los estudios produjo la caída en su actividad.
+Por último, referenciando a la figura 3 que desglosa la población por grupos de edad, se puede observar cómo los grupos de edad han experimentado dinámicas distintas en el mercado laboral. Los mayores de 35 a 54 años mantienen tasas de actividad superiores al 80 %, reflejando una integración estable. En contraste, los jóvenes de 16 a 24 años presentan tasas mucho más bajas, con un desempleo superior al 70 % en 2013, influido por la crisis en sectores como la construcción y el aumento de la escolarización.
 
-Además, en los grupos jóvenes, como los de 16 a 19 años y 20 a 24 años, se observa una marcada estacionalidad a lo largo del periodo, probablemente vinculada a los meses de verano, cuando muchos estudiantes se incorporan temporalmente al mercado laboral, especialmente en sectores como la hostelería. Por su parte, en la tasa de actividad y ocupación, el grupo de 55 y más años presenta niveles considerablemente más bajos debido a la jubilación, ya que estos ciudadanos son considerados población inactiva. Sin embargo, este fenómeno no se refleja de la misma forma en la tasa de empleo, ya que este indicador se calcula en función de la población activa, excluyendo a los inactivos como los jubilados.
+Los grupos jóvenes también exhiben estacionalidad, especialmente en verano, cuando se incorporan al mercado laboral en sectores como la hostelería. Por otro lado, el grupo de 55 y más años presenta tasas de actividad y ocupación bajas debido a la jubilación, aunque esto no afecta de igual manera a la tasa de empleo, que excluye a los inactivos como los jubilados. \newpage
 
-### Clusterización por Comunidades y Ciudades Autónomas
+### **Clusterización por Comunidades y Ciudades Autónomas**
 
 En este apartado del proyecto se va a proceder a realizar un clustering de la tasa de empleo para las distintas Comunidades y Ciudades Autónomas de España en los siguientes años: 2007, 2013 y 2023.
 El principal motivo por el cual escogemos esta tasa se debe a que se mide como el porcentaje de personas ocupadas respecto a la población activa, es decir, las que se encuentran activamente en el mercado laboral.
 
 Como método de clusterización se utilizará el k-means, que organiza los datos en grupos basados en su similitud. Este algoritmo comienza eligiendo un número de clusters (`k`) y seleccionando centroides iniciales al azar. Cada punto se asigna al cluster cuyo centroide está más cercano, y luego los centroides se recalculan como el promedio de los puntos en cada grupo.
-Es un proceso que se repite hasta que los centroides dejan de cambiar o se alcanza un límite de iteraciones. Al finalizar, las comunidades quedan agrupadas en k clusters, representando cada uno un conjunto de puntos con características similares.
+Es un proceso que se repite hasta que los centroides dejan de cambiar o se alcanza un límite de iteraciones. Al finalizar, las comunidades quedan agrupadas en k clusters representando cada uno un conjunto de puntos con características similares, en este caso CCAA.
 
-Por otro lado, como método para la selección del hiperparámetro `k` se opta por el método del codo. Este método Consiste en graficar la suma de cuadrados dentro del cluster (WSS) frente a distintos valores de `k`. El punto donde la disminución de WSS se ralentiza significativamente, formando un "codo", indica el número adecuado de clusters.
+Por otro lado, para la selección del hiperparámetro `k` se opta por el método del codo. Este consiste en graficar la suma de cuadrados dentro del cluster (WSS) frente a distintos valores de `k`. El punto donde la disminución de WSS se ralentiza significativamente, formando un "codo", indica el número adecuado de clusters.\newline
 
 ```{r, include=FALSE}
 # Eliminamos el total nacional puesto que ahora nos centramos en la CCAA
@@ -842,55 +843,35 @@ tasas <- c("Tasa de Actividad", "Tasa de Empleo", "Tasa de Ocupación")
 ```
 
 
-```{r, warning=FALSE, echo=FALSE,  fig.align='center', fig.cap="Gráfico de codo global para la tasa de empleo", fig.pos="h",fig.width=5.5, fig.height=3}
+```{r, warning=FALSE, echo=FALSE, out.width='40%', fig.align='center', fig.cap="Gráfico de codo global para la tasa de empleo", fig.pos="h"}
 grafico_codo_global("Tasa de Empleo", datos_EPA)
 ```
 
-Observando el gráfico anterior, se puede considerar que el número de clusters a partir del cual la WSS se ralentiza es en `k=3`, pues es en donde se forma el "codo".
+Observando el gráfico de la figura 4, se puede considerar que el número de clusters a partir del cual la WSS se ralentiza es en `k=3`, pues es en donde se forma el "codo".
 
-Posteriormente, y como se ha mencionado al principio del apartado, vamos a hacer un clustering con el objetivo de agrupar las CCAA según su tasa de empleo en distintos periodos. Posteriormente los colores de los clusters se representan en un mapa de España dividido por dichas regiones para visualizar de forma clara y efectiva los patrones espaciales.
+Posteriormente, y como se ha mencionado al principio del apartado, vamos a hacer un clustering con el objetivo de agrupar las CCAA según su tasa de empleo en distintos periodos. Posteriormente los colores de los clusters se representan en un mapa de España dividido por dichas regiones para visualizar de forma clara y efectiva los patrones espaciales. La intención de esta medida es identificar patrones regionales y analizar las diferencias en las dinámicas del mercado laboral a nivel territorial.\newline
 
-La intención de esta medida es identificar patrones regionales y analizar las diferencias en las dinámicas del mercado laboral a nivel territorial. Este enfoque permite agrupar regiones con características similares, facilitando la comparación interregional y destacando aquellas con tasas de empleo altas, medias o bajas. Además, es útil para detectar desigualdades laborales y sectoriales entre regiones comprendendiendo cómo estas evolucionan a lo largo del tiempo.
-
-```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, warning=FALSE, echo=FALSE, out.width='90%', fig.align='center', fig.cap="Clusterización regional con 3 centroides para la tasa de empleo en España en 2007", fig.pos="h"}
 crear_clustering_grafico_mapa(datos_EPA, "Tasa de Empleo", mapa_comunidades, "2007")
 ```
-La figura muestra el análisis de clustering y el mapa correspondiente a la tasa de empleo de las comunidades autónomas en España en el año 2007, justo antes del inicio de la crisis financiera. En el gráfico de barras, se observa que comunidades como Navarra, Aragón, Cantabria y Cataluña presentan las tasas de empleo más altas, superando el 90%. Estas regiones, representadas en azul en el mapa, se agrupan en un mismo clúster, lo que sugiere un desempeño laboral favorable en estas áreas, posiblemente asociado a economías diversificadas y mercados laborales más sólidos tales como el tecnológico o el industrial.
 
-Por otro lado, comunidades como Ceuta, Melilla, Extremadura y Andalucía tienen las tasas de empleo más bajas, por debajo del 85%, y se agrupan en un clúster diferenciado, marcado en rojo en el mapa. Esto refleja un mercado laboral más débil en estas regiones, históricamente caracterizadas por mayores tasas de desempleo y una dependencia económica de sectores menos dinámicos.
+La figura 5 muestra el análisis de clustering de la tasa de empleo en España en 2007. Todas las comunidades de la península a excepción de Extremadura y Andalucía se agrupan en un clustering único debido a la similitud en su tasa, con valores superiores al 90% representando mercados laborales sólidos. Ceuta y Melilla, con tasas por debajo del 80%, pertenecen al clúster rojo, reflejando mayores desafíos laborales. El clúster verde, con tasas entre el 80% y el 85%, incluye las regiones de Extremadura, Andalucía y Canarias, que muestran estabilidad moderada. En conjunto, la figura evidencia claras disparidades regionales en el empleo respecto al sur del país antes de la crisis económica.\newline
 
-El clúster intermedio, representado en verde, incluye comunidades como Galicia, Castilla-La Mancha y Murcia, con tasas de empleo moderadas, entre el 85% y el 90%. Este grupo muestra un desempeño laboral estable, aunque menos destacado en comparación con las regiones líderes.
-
-En su conjunto, la figura permite identificar con claridad las disparidades regionales en el mercado laboral español en 2007 desde el sur hasta el norte del país, proporcionando una línea base para evaluar cómo estas dinámicas se vieron afectadas por la crisis económica que comenzaría poco después.
-
-```{r, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, echo=FALSE, out.width='90%', fig.align='center', fig.cap="Clusterización regional con 3 centroides para la tasa de empleo en España en 2013", fig.pos="h"}
 crear_clustering_grafico_mapa(datos_EPA, "Tasa de Empleo", mapa_comunidades, "2013")
 ```
 
-Por otro lado, la figura muestra el análisis de clustering y el mapa en 2013, el momento más crítico de la crisis económica en España. En comparación con 2007, se observa una disminución generalizada de las tasas de empleo en todas las regiones, reflejando el impacto severo de la crisis en el mercado laboral. Las comunidades con tasas de empleo más altas, como País Vasco, La Rioja y Navarra, apenas superan el 70%, situándose muy por debajo de los niveles precrisis que superaban el 90%. Estas regiones, representadas en azul en el mapa, se mantienen como las de mejor desempeño relativo, aunque con una caída significativa respecto a 2007.
+En cambio, la figura 6 muestra el análisis de clustering de la tasa de empleo en España en 2013, el peor momento de la crisis económica. En comparación con 2007, las tasas de empleo han disminuido significativamente en todas las comunidades autónomas, reflejando el impacto generalizado de la recesión. Mientras que en 2007 gran parte de la península estaba agrupada en un único clúster, en 2013 se observa una mayor dispersión. El clúster azul mantiene las tasas más altas, superiores al 70%, mientras que el clúster rojo refleja las más bajas, por debajo del 60%. Esto evidencia las desigualdades regionales acentuadas por la crisis.\newline
 
-Las comunidades con tasas más bajas, como Andalucía, Canarias y Extremadura, presentan tasas de empleo inferiores al 60%, destacando Andalucía con un preocupante 55.5%. Este grupo, representado en rojo en el mapa, evidencia el fuerte deterioro del mercado laboral en regiones tradicionalmente más vulnerables, donde la crisis intensificó los problemas estructurales de empleo.
-
-El clúster intermedio, en verde, agrupa comunidades como Galicia, Castilla y León, y Cataluña, con tasas de empleo entre el 63% y el 70%. Este grupo muestra una reducción importante en comparación con los niveles previos a la crisis, pero logra mantenerse en un rango moderado frente a las regiones con peor desempeño.
-
-En conjunto, la figura refleja cómo la crisis económica impactó de manera desigual en el territorio español, exacerbando las disparidades regionales en el empleo. Aunque las regiones líderes lograron mantener una relativa ventaja, la caída generalizada evidencia la magnitud del daño económico y social provocado por la crisis. Este análisis destaca la importancia de entender las dinámicas regionales para diseñar políticas efectivas de recuperación y fortalecimiento del mercado laboral.
-
-```{r, warning=FALSE, echo=FALSE, out.width='100%', fig.align='center', fig.cap="Evolución de la tasa de actividad en España", fig.pos="h"}
+```{r, warning=FALSE, echo=FALSE, out.width='90%', fig.align='center', fig.cap="Clusterización regional con 3 centroides para la tasa de empleo en España en 2023", fig.pos="h"}
 crear_clustering_grafico_mapa(datos_EPA, "Tasa de Empleo", mapa_comunidades, "2023")
 ```
 
-Por último lugar, y relacionado con la actualidad, la figura de 2023 refleja una clara recuperación del mercado laboral tras los efectos de la crisis económica de 2008-2013 y la pandemia de COVID-19. Comparado con 2007, la tasa de empleo aún no alcanza los niveles previos a la crisis, pero muestra una mejora significativa respecto a 2013, lo que indica una tendencia hacia la estabilización y el fortalecimiento del empleo en el país.
+En la actualidad, la figura 7 muestra una recuperación general en las tasas de empleo respecto a 2013, aunque persisten desigualdades regionales. El clúster azul, que representa la mitad norte de España (a excepción de Asturias), destaca con tasas superiores al 83%, reflejando un mercado laboral sólido en esta área. El clúster verde, que representa la mitad sur, presenta tasas intermedias entre el 74% y el 82%, reflejando una mayor estabilidad en el empleo, aunque todavía sin alcanzar la uniformidad observada antes de la crisis. Por el contrario, el clúster rojo, que incluye las ciudades de Ceuta y Melilla, presenta tasas inferiores al 70%, evidenciando desafíos laborales persistentes.
 
-En 2023, las comunidades con mejor desempeño, representadas en azul, poseen tasas de empleo que superan el 84%. Aunque aún por debajo del 90% que caracterizaba a las regiones líderes en 2007, estas comunidades han logrado una recuperación considerable desde 2013, cuando sus tasas apenas superaban el 70%.
+En conclusión, se evidencia una mejora general, pero con brechas regionales significativas.
 
-El grupo intermedio, representado en verde, posee unos valores de empleo alrededor del 80%. Este grupo muestra una notable mejora frente a los niveles de 2013, cuando sus tasas se encontraban en torno al 65%-70%. La recuperación en estas regiones evidencia un crecimiento sostenido que les permite acercarse al desempeño de las regiones líderes.
-
-Las comunidades con menor tasa de empleo, como Ceuta, Melilla, Andalucía y Extremadura, representadas en rojo, registran tasas por debajo del 75%. Aunque muestran avances significativos respecto a 2013, cuando sus tasas eran inferiores al 60%, estas regiones siguen siendo las más afectadas por problemas estructurales en el mercado laboral. Andalucía, por ejemplo, ha alcanzado una tasa del 74.3%, un progreso importante desde el 55.5% en 2013, pero aún distante de las regiones con mejor desempeño.
-
-En conclusión, en comparación con 2007 el panorama de 2023 refleja un mercado laboral más o menos parecido pero con más desempleo, persistiendo también las disparidades regionales. Las comunidades más vulnerables han avanzado considerablemente, pero no han cerrado la brecha con las regiones líderes. Este análisis realizado con clustering subraya la importancia de continuar impulsando políticas orientadas a fortalecer el empleo en las regiones más rezagadas, fomentando la cohesión territorial y reduciendo las desigualdades en el mercado laboral español.
-
-
-## Clasificación Nacional de Actividades Económicas (CNAE-2009)
+## **Clasificación Nacional de Actividades Económicas (CNAE-2009)**
 
 
 En primer lugar se analiza la distribución de peso de las ramas de actividad en el total de la población empleada. Además, se busca comparar la evolución y el cambio sufrido por la estructura laboral española desde el primer trimestre de 2008 y el tercer trimestre de 2024. Para ello se generan treemaps para los periodos inicial (2008T1) y final (2024T3) del análisis. Estos gráficos muestran cómo se distribuye el empleo entre las diferentes ramas económicas según su peso relativo.
@@ -1025,7 +1006,7 @@ grafico_combinado
 
 Se destaca cómo el empleo masculino y femenino responden de manera diferente a los shocks económicos. Por ejemplo, los hombres experimentaron caídas más pronunciadas durante la crisis de 2008, mientras que las mujeres mostraron una recuperación más gradual. Además, se puede apreciar que la diferencia entre sexos se redujo en grán medida durante la crisis de 2008, desde la cual la población masculina ha sido incapaz de recuperar las cifras precrisis, mientras que las mujeres han superado marcadamente dichos valores.
 
-### Estudio de correlaciones entre Ramas de Actividad
+### **Estudio de correlaciones entre Ramas de Actividad**
 
 A continuación, se realiza un estudio de las correlaciones lineales de Pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Es por ello que se realizan dos gráficas separadas que muestran la matriz de correlaciones entre ramas.
 
@@ -1066,7 +1047,7 @@ cor_melted <- melt(matriz_correlacion)
 
 Se observa que la mayoría de las ramas parecen estar correlacionadas positivamente, salvo aquellos puestos relacionados con el personal doméstico e industrias extractivas con una correlación negativa con la mayoría de las ramas, así como aquellas relacionadas con la agricultura, ganadería, construcción, actividades financieras entre otras que no presentan una marcada correlación con el resto.
 
-### Tendencias relativas a partir de datos normalizados
+### **Tendencias relativas a partir de datos normalizados**
 
 ```{r, warning=FALSE, echo=FALSE}
 ramas_individuales <- datos_CNAE[!grepl("^[A-Za-z]", datos_CNAE$Rama.de.actividad.CNAE.2009), ]
@@ -1206,7 +1187,7 @@ mds_data$Rama <- nombres_actividades
 ```
 
 
-### Clusterización por Ramas de Actividad
+### **Clusterización por Ramas de Actividad**
 
 Tras observar la proyección tratamos de segmentar los datos en agrupaciones naturales, es por ello que tratamos de hacer un clustering que nos permita agrupar cuantitativamente aquellas ramas de actividad que han tenido un comportamiento similar entre ellas (con los datos normalizados). Para ello se opta en primer lugar por el algoritmo más típico en clustering (k-means), y se analiza sus resultados para ver si son satisfactorios. Además, como método para la selección del hiperparámetro `k`, se opta por el método del codo. Sin embargo, este resultado se analizará para saber si es adecuado, si sería necesario alterar ligeramente el número de clusters obtenidos o si directamente deberíamos escoger otro método.
 
