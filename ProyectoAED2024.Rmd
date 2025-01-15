@@ -27,16 +27,7 @@ status: submit
 simplesummary: |
   A Simple summary goes here.
 abstract: |
-  A single paragraph of about 200 words maximum. For research articles, 
-  abstracts should give a pertinent overview of the work. We strongly encourage
-  authors to use the following style of structured abstracts, but without 
-  headings: 1) Background: Place the question addressed in a broad context and
-  highlight the purpose of the study; 2) Methods: Describe briefly the main
-  methods or treatments applied; 3) Results: Summarize the article's main 
-  findings; and 4) Conclusion: Indicate the main conclusions or interpretations. 
-  The abstract should be an objective representation of the article, it must not 
-  contain results which are not presented and substantiated in the main text and 
-  should not exaggerate the main conclusions.
+  Este trabajo aborda el análisis exploratorio del mercado laboral en España como parte de la asignatura de Análisis Exploratorio de Datos. Utiliza datos de la Encuesta de Población Activa (EPA) y la Clasificación Nacional de Actividades Económicas (CNAE-2009), abarcando el período entre 2002 y 2024. En el estudio se realizan técnicas de ciencia de datos para limpiar y analizar información sobre tasas de empleo, actividad y ocupación, desglosadas por género, grupos de edad, regiones y sectores económicos. Se emplearon herramientas de tratamiento y transformación de datos para unificar conjuntos, corregir valores faltantes y estandarizar formatos, incluyendo la normalización de fechas y la imputación de datos ausentes. Además, se integraron métricas como tasas de actividad, empleo y desempleo, calculadas mediante fórmulas específicas para identificar patrones y tendencias en el tiempo. Los métodos incluyen visualizaciones gráficas para representar dinámicas temporales y regionales, cálculos de variación entre periodos para detectar cambios significativos y técnicas de clusterización para analizar de manera segmentada la evolución del mercado laboral en distintos grupos. El análisis revela el impacto de eventos como la crisis de 2008 y la pandemia de COVID-19 en el mercado laboral, destacando desigualdades estructurales y patrones sectoriales.
 # back matter
 keywords: |
   Mercado laboral; Tasa; Clustering; Pandemia COVID-19; Análisis exploratorio de datos
