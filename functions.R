@@ -137,7 +137,6 @@ crear_clustering_grafico_mapa <- function(datos, tasa, mapa_comunidades, anio) {
       y = paste(tasa, "(%)"),
       fill = "Cluster"
     ) +
-    theme_minimal() +
     theme(legend.position = "none")
   
   # Unir el dataset con el GeoJSON
@@ -147,7 +146,6 @@ crear_clustering_grafico_mapa <- function(datos, tasa, mapa_comunidades, anio) {
   # Crear el mapa
   mapa_clustering <- ggplot(mapa) +
     geom_sf(aes(fill = Cluster)) +
-    theme_minimal() +
     theme(legend.position = "none")
   
   # Combinar ambos gráficos con patchwork
@@ -191,7 +189,6 @@ grafico_codo <- function(tasa, anio, datos) {
       x = "Número de Clusters (k)",
       y = "Suma de Cuadrados Dentro del Cluster (WSS)"
     ) +
-    theme_minimal() +
     theme(
       plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
       axis.text = element_text(size = 10),
@@ -229,9 +226,8 @@ grafico_codo_global <- function(tasa, datos) {
     labs(
       title = paste("Gráfico de Codo para la", tasa),
       x = "Número de Clusters (k)",
-      y = "Suma de Cuadrados Dentro del Cluster (WSS)"
+      y = "WSS"
     ) +
-    theme_minimal() +
     theme(
       plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
       axis.text = element_text(size = 10)
