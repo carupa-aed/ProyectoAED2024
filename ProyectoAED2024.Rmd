@@ -1080,7 +1080,7 @@ data_normalized <- ramas_individuales[ramas_individuales$Sexo=="Ambos sexos",] %
 
 En este punto, se busca estudiar las tendencias relativas, eliminando la influencia de las diferencias inciales entre ramas. Para ello, primero se normalizan los datos dividiendo por el número inicial de trabajadores en cada rama, y a continuación se obtiene una métrica de distancia entre dichos datos normalizados, obteniéndose como la media de las diferencias absolutas de las cantidades normalizadas. A partir de estas distancias, se proyectan en dos dimensiones utilizando MDS, lo que permite visualizar las relaciones entre ramas en función de sus patrones de empleo a lo largo del tiempo. La proyección MDS es escogida frente a otros métodos debido a su enfoque en conservar las distancias establecidas.
 
-```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=2.25, fig.cap="Proyección MDS de las distancias entre la evolución de ramas de actividad normalizadas."}
+```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=2, fig.cap="Proyección MDS de las distancias entre la evolución de ramas de actividad normalizadas."}
 data_wide <- data_normalized %>%
   select(Rama.de.actividad.CNAE.2009, Periodo, Total_Normalizado) %>%  # Seleccionar las columnas necesarias
   pivot_wider(names_from = Periodo, values_from = Total_Normalizado, values_fill = 0)
