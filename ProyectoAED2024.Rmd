@@ -1097,7 +1097,7 @@ grafica_mds
 
 Se forman agrupaciones naturales de ramas con patrones similares. Además, se observan claramente algunos outliers, que puede ser de gran interés analizarlos individualmente.
 
-```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=3, fig.cap="Evolución de la tasa de actividad en España"}
+```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=3, fig.cap="Evolución del empleo en posibles outliers de ramas de actividad."}
 # Primer gráfico
 plot1 <- ggplot(
   datos_CNAE[datos_CNAE$Rama.de.actividad.CNAE.2009 == 
