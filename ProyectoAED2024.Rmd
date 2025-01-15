@@ -1213,7 +1213,7 @@ Tras observar la proyección tratamos de segmentar los datos en agrupaciones nat
 
 
 
-```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=3, fig.cap="Gráfico del método del codo y representación mediante una proyección MDS de los clusters de k-means, con el parámetro $k$ escogido."}
+```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=2, fig.cap="Gráfico del método del codo y representación mediante una proyección MDS de los clusters de k-means, con el parámetro $k$ escogido."}
 # Configurar semilla para reproducibilidad
 set.seed(123)
 
