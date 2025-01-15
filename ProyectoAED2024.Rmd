@@ -32,7 +32,7 @@ abstract: |
 keywords: |
   Mercado laboral; Tasa; Clustering; Pandemia COVID-19; Análisis exploratorio de datos
 bibliography: mybibfile.bib
-#appendix: appendix.tex
+appendix: appendix.tex
 endnotes: false
 output: 
   rticles::mdpi_article:
@@ -134,7 +134,7 @@ Poblacion_edad_trabajar <- Poblacion %>%
            replace_na(`Comunidades y Ciudades Autónomas`, "Total Nacional"))
 ```
 
-Notamos que para el conjunto de datos de población total en edad de trabajar y población inactiva hay un intervalo de edad más que para el resto de datasets: se divide l"55 y más años" en los grupos "De 55 a 64 años" y "65 y más años". Dado que buscamos obtener un dataset único y compacto uniremos ambos grupos de edad como en el resto de datasets. Una vez normalizada la estructura de los datasets podemos unificar todas las tablas en una sola.
+Notamos que para el conjunto de datos de población total en edad de trabajar y población inactiva hay un intervalo de edad más que para el resto de datasets: se divide "55 y más años" en los grupos "De 55 a 64 años" y "65 y más años". Dado que buscamos obtener un dataset único y compacto uniremos ambos grupos de edad como en el resto de datasets. Una vez normalizada la estructura de los datasets podemos unificar todas las tablas en una sola.
 
 ```{r, include=FALSE}
 Poblacion_edad_trabajar <- Poblacion_edad_trabajar %>%
@@ -813,10 +813,10 @@ Los grupos jóvenes también exhiben estacionalidad, especialmente en verano, cu
 En este apartado del proyecto se va a proceder a realizar un clustering de la tasa de empleo para las distintas Comunidades y Ciudades Autónomas de España en los siguientes años: 2007, 2013 y 2023.
 El principal motivo por el cual escogemos esta tasa se debe a que se mide como el porcentaje de personas ocupadas respecto a la población activa, es decir, las que se encuentran activamente en el mercado laboral.
 
-Como método de clusterización se utilizará el k-means, que organiza los datos en grupos basados en su similitud. Este algoritmo comienza eligiendo un número de clusters (`k`) y seleccionando centroides iniciales al azar. Cada punto se asigna al cluster cuyo centroide está más cercano, y luego los centroides se recalculan como el promedio de los puntos en cada grupo.
+Como método de clusterización se utilizará el k-means, que organiza los datos en grupos basados en su similitud. Este algoritmo comienza eligiendo un número de clusters (`k`) y seleccionando centroides iniciales al azar. Cada punto se asigna al clúster cuyo centroide está más cercano, y luego los centroides se recalculan como el promedio de los puntos en cada grupo.
 Es un proceso que se repite hasta que los centroides dejan de cambiar o se alcanza un límite de iteraciones. Al finalizar, las comunidades quedan agrupadas en k clusters representando cada uno un conjunto de puntos con características similares, en este caso CCAA.
 
-Por otro lado, para la selección del hiperparámetro `k` se opta por el método del codo. Este consiste en graficar la suma de cuadrados dentro del cluster (WSS) frente a distintos valores de `k`. El punto donde la disminución de WSS se ralentiza significativamente, formando un "codo", indica el número adecuado de clusters.\newline
+Por otro lado, para la selección del hiperparámetro `k` se opta por el método del codo. Este consiste en graficar la suma de cuadrados dentro del clúster (WSS) frente a distintos valores de `k`. El punto donde la disminución de WSS se ralentiza significativamente, formando un "codo", indica el número adecuado de clusters.\newline
 
 ```{r, include=FALSE}
 # Eliminamos el total nacional puesto que ahora nos centramos en la CCAA
@@ -1001,7 +1001,7 @@ Se destaca cómo el empleo masculino y femenino responden de manera diferente a 
 
 ### **Estudio de correlaciones entre Ramas de Actividad**
 
-A continuación, se realiza un estudio de las correlaciones lineales de Pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Es por ello que se realizan dos gráficas separadas que muestran la matriz de correlaciones entre ramas.
+A continuación, se realiza un estudio de las correlaciones lineales de Pearson entre distintas ramas de actividad (en ambos sexos en conjunto). Los datos de CNAE vienen dispuestos en dos órdenes de agrupación, unos más generales, caracterizados por empezar por una letra en su nombre, y otros más concretos, empezando por un número. Realizaremos el estudio sobre los datos agrupados de forma más general, usando solo la letra como etiqueta; el nombre completo de la rama se puede consultar en el Apéndice.
 
 ```{r, warning=FALSE, echo=FALSE, fig.align='center',fig.width=5.5, fig.height=3, fig.cap="Matriz de correlación entre agrupaciones generales de ramas de actividad."}
 datos_ancho <- datos_CNAE %>%
@@ -1227,7 +1227,7 @@ combined_plot
 
 ```
 
-El método del codo parece indicarnos que la mejor selección es $k=3$ y observamos que los resultados parecen satisfactorios. Por lo tanto, debido a la simplicidad del modelo nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada cluster y trataremos de averiguar si tienen una interpretación natural clara.
+El método del codo parece indicarnos que la mejor selección es $k=3$ y observamos que los resultados parecen satisfactorios. Por lo tanto, debido a la simplicidad del modelo nos quedamos con esta elección. Pasamos a estudiar por separado el comportamiento de cada clúster y trataremos de averiguar si tienen una interpretación natural clara.
 
 ```{r, warning=FALSE, echo=FALSE, fig.align='center', fig.width=5.5, fig.height=3, fig.cap="Evolución de los percentiles 25, 50, 75 y media de la evolución normalizada agrupados por clúster."}
 # Suponiendo que tienes los datos en data_wide y mds_data como antes.
@@ -1296,4 +1296,4 @@ tabla_ramas <- data_wide %>%
 
 Analizando los cuantiles y medias de cada clúster, se observa que se agrupan según rendimiento, cosa ya esperada proviniendo de la métrica definida. Se observa que la mayoría de las ramas de actividad se acumulan en los clústeres con la evolución negativa o mediocre, en los cuales ha habido un decrecimiento (clúster 2) o estancamiento (clúster 3) de los trabajadores. Por otra parte el clúster 1 parece presentar ramas con resultados positivos, aunque con menor número de ramas que los anteriores.
 
-Podemos observar que aquellos sectores relacionados con la descontaminación o la programación y la informática han avanzado mucho en los últimos años. Mientras que los sectores más relacionados con la construcción han caido fuertemente. Sin embargo, la conclusión general es que la evolución del empleo en España durante los últimos años ha sido marcadamente negativa para la mayoría de las ramas de actividad, salvandose de ella ejemplos muy concretos.
+Podemos observar que aquellos sectores relacionados con la descontaminación o la programación y la informática han avanzado mucho en los últimos años, mientras que los sectores más relacionados con la construcción han caido fuertemente. Sin embargo, la conclusión general es que la evolución del empleo en España durante los últimos años ha sido marcadamente negativa para la mayoría de las ramas de actividad, salvándose de ella ejemplos muy concretos.
