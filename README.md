@@ -1,3 +1,4 @@
+# Análisis exploratorio del mercado laboral en España. EPA y CNAE-2009.
 Este trabajo aborda el análisis exploratorio del mercado laboral en España como parte de la
 asignatura de Análisis Exploratorio de Datos. Utiliza datos de la Encuesta de Población Activa (EPA)
 y la Clasificación Nacional de Actividades Económicas (CNAE-2009), abarcando el período entre
